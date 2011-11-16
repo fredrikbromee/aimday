@@ -1,0 +1,14 @@
+#{extends 'main.html' /}
+#{set title:'Home' /}
+
+ <form action="@{Application.schedule()}" method="GET" accept-charset="${_response_encoding}">
+     <label for="tracks">Antal parallella spår</label>
+     <input type="text" name="tracks" value="10" id="tracks" />
+     <label for="sessions">Antal sessioner</label>
+     <input type="text" name="sessions" value="5" id="sessions" />
+     &nbsp;
+     <input type="submit" value="Visa schema" id="scheduleBtn" />
+ </form>
+
+<p>
+<a href="/admin">Ändra/lägg till</a> frågor och deltagare

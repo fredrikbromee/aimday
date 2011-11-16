@@ -1,0 +1,48 @@
+#{extends 'main.html' /}
+#{set title:'Home' /}
+
+Det här schemats poäng är ${schedule.score.format('#.##')} (1=idealt schema, 0=sämst tänkbara) . <br>
+ <table>
+     <thead>
+         <tr>
+             <th  width="9%">Rum 1</th>
+             <th  width="9%">Rum 2</th>
+             <th  width="9%">Rum 3</th>
+             <th  width="9%">Rum 4</th>
+             <th  width="9%">Rum 5</th>
+             <th  width="9%">Rum 6</th>
+             <th  width="9%">Rum 7</th>
+             <th  width="9%">Rum 8</th>
+             <th  width="9%">Rum 9</th>
+             <th  width="9%">Rum 10</th>
+             <th  width="9%">Rum 11</th>
+         </tr>
+     </thead>
+     <tbody>
+     <!-- Hur får man tag på iterationsvariabeln? Ska användas för att generera rätt antal kolumner (ovan) och sessionskolumnen som inte finns nedan -->
+         #{list schedule.sessions, as:'session'}
+             <tr>
+		         #{list session.workshops, as:'workshop'}
+		                 <td><div "question"><b>Fråga ${workshop.question.q}:</b></div> 
+		                 #{list workshop.participants, as:'participant'}
+		                         <div "participant">${participant.first_name}</div> 
+		                 #{/list}		                 
+		                 </td>
+		         #{/list}
+             </tr>
+         #{/list}
+     </tbody>
+ </table>
+ 
+#{if schedule.unplacedQuestions}
+	<br>I det här schemat misslyckades vi att placera ut:
+	#{list schedule.unplacedQuestions, as:'unplaced'}
+	        Fråga ${unplaced.q}
+	#{/list}                        
+#{/if}
+
+<p>
+OBS: I excelbladet hittade jag 59 frågor. Av dessa var det 13 som antingen inte hade några seniora anmälda eller 
+slogs ihop med någon annan fråga. Därav finns det bara 46 frågor i den här databasen. Det stämmer också med excel-filen
+'schedule' där det ordnades 46 workshops.
+	
