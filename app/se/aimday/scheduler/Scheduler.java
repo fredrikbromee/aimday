@@ -29,7 +29,7 @@ public class Scheduler {
 	private final Collection<Question> questions;
 
 
-	private TreeMap<String, FrågaMedDeltagare> frågor;
+	private TreeMap<String, QuestionWithParticipants> frågor;
 
 	public Scheduler(int numParallelTracks, int numSessions, int maxAttendantsPerWS, Collection<Question> questions,
 			List<Participant> erfarna, List<Participant> oerfarna) {
@@ -38,9 +38,9 @@ public class Scheduler {
 		this.maxAttendantsPerWS = maxAttendantsPerWS;
 		this.questions = questions;
 
-		frågor = new TreeMap<String, FrågaMedDeltagare>();
+		frågor = new TreeMap<String, QuestionWithParticipants>();
 		for (Question q : questions) {
-			FrågaMedDeltagare f = new FrågaMedDeltagare(q);
+			QuestionWithParticipants f = new QuestionWithParticipants(q);
 			frågor.put(q.getQ(), f);
 		}
 
@@ -63,7 +63,7 @@ public class Scheduler {
 	 */
 	public List<AIMDay> lägg() {
 		// do first try based on how many candidates each question has
-		List<FrågaMedDeltagare> sorteradeFrågor = new ArrayList<FrågaMedDeltagare>(getAllQs());
+		List<QuestionWithParticipants> sorteradeFrågor = new ArrayList<QuestionWithParticipants>(getAllQs());
 		Collections.sort(sorteradeFrågor, comp);
 		AIMDay schedule = schedule(sorteradeFrågor);
 		AIMDay bestSoFar = schedule;
@@ -96,7 +96,7 @@ public class Scheduler {
 		Collections.sort(allWorkshops, painPointComparator);
 
 		// and place new schedule with the previous pain points first
-		ArrayList<FrågaMedDeltagare> sortedQs = new ArrayList<FrågaMedDeltagare>();
+		ArrayList<QuestionWithParticipants> sortedQs = new ArrayList<QuestionWithParticipants>();
 		for (Question unplaced : schedule.getAllUnplacedQuestions()) {
 			sortedQs.add(frågor.get(unplaced.getQ()).deepClone());
 		}
@@ -107,10 +107,10 @@ public class Scheduler {
 		return schedule(sortedQs);
 	}
 
-	private AIMDay schedule(List<FrågaMedDeltagare> sorteradeFrågor) {
+	private AIMDay schedule(List<QuestionWithParticipants> sorteradeFrågor) {
 		AIMDay schema = new AIMDay(numParallelTracks, numSessions);
 
-		for (FrågaMedDeltagare fråga : sorteradeFrågor) {
+		for (QuestionWithParticipants fråga : sorteradeFrågor) {
 			boolean gickPlaceraUt = false;
 			while (fråga.harKandidat()) {
 				Workshop workshop = new Workshop(fråga.getFråga());
@@ -128,9 +128,9 @@ public class Scheduler {
 		return schema;
 	}
 
-	private Collection<FrågaMedDeltagare> getAllQs() {
-		Collection<FrågaMedDeltagare> lst = new ArrayList<FrågaMedDeltagare>();
-		for (FrågaMedDeltagare f : frågor.values()) {
+	private Collection<QuestionWithParticipants> getAllQs() {
+		Collection<QuestionWithParticipants> lst = new ArrayList<QuestionWithParticipants>();
+		for (QuestionWithParticipants f : frågor.values()) {
 			lst.add(f.deepClone());
 		}
 		return lst;
@@ -168,7 +168,7 @@ public class Scheduler {
 		if (ws.getNumberOfAttendants() == 2) {
 			return 1;
 		}
-		FrågaMedDeltagare frågaMedDeltagare = frågor.get(ws.getQuestion().getQ());
+		QuestionWithParticipants frågaMedDeltagare = frågor.get(ws.getQuestion().getQ());
 		if (frågaMedDeltagare.antalKandidater() == 1 && ws.getNumberOfAttendants() == 1) {
 			return 1;
 		}
@@ -183,7 +183,7 @@ public class Scheduler {
 		return questions.size() == schedule.getNumberOfScheduledWS();
 	}
 
-	private boolean placeraUt(AIMDay schema, FrågaMedDeltagare fråga, Workshop workshop) {
+	private boolean placeraUt(AIMDay schema, QuestionWithParticipants fråga, Workshop workshop) {
 		if (fråga.harKandidat()) {
 			workshop.läggTill(fråga.taKandidat());
 		}
@@ -204,10 +204,10 @@ public class Scheduler {
 		}
 	};
 
-	private static final Comparator<FrågaMedDeltagare> comp = new Comparator<FrågaMedDeltagare>() {
+	private static final Comparator<QuestionWithParticipants> comp = new Comparator<QuestionWithParticipants>() {
 
 		@Override
-		public int compare(FrågaMedDeltagare ett, FrågaMedDeltagare två) {
+		public int compare(QuestionWithParticipants ett, QuestionWithParticipants två) {
 			return Integer.valueOf(två.antalKandidater()).compareTo(ett.antalKandidater());
 		}
 	};

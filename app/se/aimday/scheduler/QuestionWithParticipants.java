@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import models.Participant;
 import models.Question;
 
-public class FrågaMedDeltagare {
+public class QuestionWithParticipants {
 
 	private final Question fråga;
 	private ArrayList<Participant> kandidater;
 
-	public FrågaMedDeltagare(Question fråga) {
+	public QuestionWithParticipants(Question fråga) {
 		this.fråga = fråga;
 		kandidater = new ArrayList<Participant>();
 	}
@@ -35,8 +35,8 @@ public class FrågaMedDeltagare {
 		return kandidater.remove(randomIndex);
 	}
 
-	public FrågaMedDeltagare deepClone() {
-		FrågaMedDeltagare frågaMedDeltagare = new FrågaMedDeltagare(fråga);
+	public QuestionWithParticipants deepClone() {
+		QuestionWithParticipants frågaMedDeltagare = new QuestionWithParticipants(fråga);
 		frågaMedDeltagare.kandidater.addAll(kandidater);
 		return frågaMedDeltagare;
 	}
