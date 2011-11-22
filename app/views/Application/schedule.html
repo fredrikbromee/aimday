@@ -1,7 +1,7 @@
 #{extends 'main.html' /}
 #{set title:'Home' /}
 
-Det här schemats poäng är ${schedule.score.format('#.##')} (1=idealt schema, 0=sämst tänkbara) . <br>
+Det här schemats poäng är ${schedule.score.format('#.##')} (1=idealt schema, 0=sämst tänkbara) . Gamla poängen:  ${schedule.scoreOld.format('#.##')}<br>
  <table>
      <thead>
          <tr>
@@ -40,6 +40,11 @@ Det här schemats poäng är ${schedule.score.format('#.##')} (1=idealt schema, 
 	        Fråga ${unplaced.q}
 	#{/list}                        
 #{/if}
+<p>
+I det här schemat fick följande (${schedule.unsatisfied.size} st) deltagare inte vara med på hela sin önskelista:
+#{list schedule.unsatisfied, as:'un'}
+         <div "unsatisfied_participant">${un.participant.first_name} önskade ${un.wishedNumber} st, fick se ${un.assignedNumber} st </div>
+#{/list}                        
 
 <p>
 OBS: I excelbladet hittade jag 59 frågor. Av dessa var det 13 som antingen inte hade några seniora anmälda eller 

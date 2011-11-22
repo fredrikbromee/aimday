@@ -28,8 +28,9 @@ public class Scheduler {
 
 	private final Collection<Question> questions;
 
-
 	private TreeMap<String, QuestionWithParticipants> frågor;
+
+	private final List<Participant> allParticipants = new ArrayList<Participant>();
 
 	public Scheduler(int numParallelTracks, int numSessions, int maxAttendantsPerWS, Collection<Question> questions,
 			List<Participant> erfarna, List<Participant> oerfarna) {
@@ -37,6 +38,7 @@ public class Scheduler {
 		this.numSessions = numSessions;
 		this.maxAttendantsPerWS = maxAttendantsPerWS;
 		this.questions = questions;
+		this.allParticipants.addAll(erfarna);
 
 		frågor = new TreeMap<String, QuestionWithParticipants>();
 		for (Question q : questions) {
@@ -77,16 +79,6 @@ public class Scheduler {
 			}
 			schedule = newSchedule;
 		}
-		
-
-		// Här har vi ett lagt schema. Kvar att göra:
-		// 1. Poängsätta schemat. Klart! (tillräckligt)
-		// 2. Hitta pain points (dåliga workshops). Klart!
-		// 3. Gör ett nytt schema med frågorna sorterade efter nya pain points. Ev med viss randomisering. El så gör man
-		// randomiseringen när man tar kandidater! Klart!
-		// 4. Gör om 1-3 till en loop där man för varje gång jämför det framlagda schemat med det hittills bästa. När är
-		// man klar? Klart!
-
 		return Collections.singletonList(bestSoFar);
 	}
 
@@ -124,7 +116,10 @@ public class Scheduler {
 				// System.out.println("Could not place " + fråga.getFråga());
 			}
 		}
-		schema.setScore(score(schema));
+
+		// TODO placera ut alla kandidater som går att placera ut (dvs de som inte bryter mot schemat).
+
+		score(schema);
 		return schema;
 	}
 
@@ -151,20 +146,31 @@ public class Scheduler {
 		// are all ws filled with experienced?
 		double cumulativeWSScore = 0;
 		for (Workshop ws : schedule.getAllWorkshops()) {
-			double wsScore = scoreOneWorkshop(cumulativeWSScore, ws);
+			double wsScore = scoreOneWorkshop(ws);
 			cumulativeWSScore += wsScore;
 			ws.setScore(wsScore);
 		}
 		int weightWS = 5;
 		cumulativeWSScore = cumulativeWSScore / (numParallelTracks * numSessions) * weightWS;
 
-		// TODO how well have attendants wishes been filled?
+		// how well have attendants wishes been filled?
+		int weightPrio = 10;
+		double cumulativePrioScore =0;
+		for (IndividualAgenda agenda : schedule.getAllIndividualAgendas()) {
+			double agendaScore = agenda.score(numSessions);
+			cumulativePrioScore += agendaScore;
+			agenda.setScore(agendaScore);
+		}
+		cumulativePrioScore = cumulativePrioScore * weightPrio / allParticipants.size();
 
-		double score = (allQScore + cumulativeWSScore) / (weightForAllQsPlaced + weightWS);
+		double scoreOld = (allQScore + cumulativeWSScore) / (weightForAllQsPlaced + weightWS);
+		double score = (allQScore + cumulativeWSScore + cumulativePrioScore) / (weightForAllQsPlaced + weightWS + weightPrio);
+		schedule.setScore(score);
+		schedule.setOldScore(scoreOld);
 		return score;
 	}
 
-	private double scoreOneWorkshop(double cumulativeWSScore, Workshop ws) {
+	private double scoreOneWorkshop(Workshop ws) {
 		if (ws.getNumberOfAttendants() == 2) {
 			return 1;
 		}
