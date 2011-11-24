@@ -52,22 +52,17 @@ public class Scheduler {
 			}
 		}
 
-
 		// TODO lägg frågor helt utan anmälda i en egen hög
 
 		// TODO tills vidare, hoppa över de oerfarna
 	}
 
-	/**
-	 * Ger en lista med bra scheman, med det bästa schemat först
-	 * 
-	 * @return
-	 */
-	public List<AIMDay> lägg() {
-		// do first try based on how many candidates each question has
-		List<QuestionWithParticipants> sorteradeFrågor = new ArrayList<QuestionWithParticipants>(getAllQs());
-		Collections.sort(sorteradeFrågor, comp);
-		AIMDay schedule = schedule(sorteradeFrågor);
+	public AIMDay lägg() {
+		// do first try based on how many workshops each candidate has
+
+		List<Participant> sorteradeDeltagare = new ArrayList<Participant>(this.allParticipants);
+		Collections.sort(sorteradeDeltagare, comp);
+		AIMDay schedule = schedule(sorteradeDeltagare);
 		AIMDay bestSoFar = schedule;
 		System.out.println("Initial schedule: \n" + schedule);
 
@@ -79,56 +74,32 @@ public class Scheduler {
 			}
 			schedule = newSchedule;
 		}
-		return Collections.singletonList(bestSoFar);
+		return bestSoFar;
 	}
 
 	private AIMDay getNewScheduleFrom(AIMDay schedule) {
 		// Find pain points in the previous schedule
-		ArrayList<Workshop> allWorkshops = schedule.getAllWorkshops();
-		Collections.sort(allWorkshops, painPointComparator);
+		List<IndividualAgenda> allAgendas = new ArrayList<IndividualAgenda>(schedule.getAllIndividualAgendas());
+		Collections.sort(allAgendas, painPointComparator);
 
-		// and place new schedule with the previous pain points first
-		ArrayList<QuestionWithParticipants> sortedQs = new ArrayList<QuestionWithParticipants>();
-		for (Question unplaced : schedule.getAllUnplacedQuestions()) {
-			sortedQs.add(frågor.get(unplaced.getQ()).deepClone());
+		List<Participant> allPeeps = new ArrayList<Participant>();
+		for (IndividualAgenda individualAgenda : allAgendas) {
+			allPeeps.add(individualAgenda.getParticipant());
 		}
-		for (Workshop workshop : allWorkshops) {
-			sortedQs.add(frågor.get(workshop.getQuestion().getQ()).deepClone());
-		}
-
-		return schedule(sortedQs);
+		return schedule(allPeeps);
 	}
 
-	private AIMDay schedule(List<QuestionWithParticipants> sorteradeFrågor) {
+	private AIMDay schedule(List<Participant> sorteradeDeltagare) {
 		AIMDay schema = new AIMDay(numParallelTracks, numSessions);
 
-		for (QuestionWithParticipants fråga : sorteradeFrågor) {
-			boolean gickPlaceraUt = false;
-			while (fråga.harKandidat()) {
-				Workshop workshop = new Workshop(fråga.getFråga());
-				gickPlaceraUt = placeraUt(schema, fråga, workshop);
-				if (gickPlaceraUt)
-					break;
-			}
-			if (!gickPlaceraUt) {
-				schema.couldNotPlace(fråga.getFråga());
-				// TODO ta hand om frågor som inte gick att placera ut!
-				// System.out.println("Could not place " + fråga.getFråga());
+		for (Participant p : sorteradeDeltagare) {
+			for (Question q : p.getRandomizedWishlist()) {
+				schema.place(q, p);
 			}
 		}
-
-		// TODO placera ut alla kandidater som går att placera ut (dvs de som inte bryter mot schemat).
 
 		score(schema);
 		return schema;
-	}
-
-	private Collection<QuestionWithParticipants> getAllQs() {
-		Collection<QuestionWithParticipants> lst = new ArrayList<QuestionWithParticipants>();
-		for (QuestionWithParticipants f : frågor.values()) {
-			lst.add(f.deepClone());
-		}
-		return lst;
 	}
 
 	/**
@@ -150,12 +121,12 @@ public class Scheduler {
 			cumulativeWSScore += wsScore;
 			ws.setScore(wsScore);
 		}
-		int weightWS = 5;
+		int weightWS = 10;
 		cumulativeWSScore = cumulativeWSScore / (numParallelTracks * numSessions) * weightWS;
 
 		// how well have attendants wishes been filled?
 		int weightPrio = 10;
-		double cumulativePrioScore =0;
+		double cumulativePrioScore = 0;
 		for (IndividualAgenda agenda : schedule.getAllIndividualAgendas()) {
 			double agendaScore = agenda.score(numSessions);
 			cumulativePrioScore += agendaScore;
@@ -171,7 +142,7 @@ public class Scheduler {
 	}
 
 	private double scoreOneWorkshop(Workshop ws) {
-		if (ws.getNumberOfAttendants() == 2) {
+		if (ws.getNumberOfAttendants() >= 2) {
 			return 1;
 		}
 		QuestionWithParticipants frågaMedDeltagare = frågor.get(ws.getQuestion().getQ());
@@ -189,51 +160,55 @@ public class Scheduler {
 		return questions.size() == schedule.getNumberOfScheduledWS();
 	}
 
-	private boolean placeraUt(AIMDay schema, QuestionWithParticipants fråga, Workshop workshop) {
-		if (fråga.harKandidat()) {
-			workshop.läggTill(fråga.taKandidat());
-		}
-		if (fråga.harKandidat()) {
-			workshop.läggTill(fråga.taKandidat());
-		}
-		boolean gickPlaceraUt = schema.place(workshop);
-		return gickPlaceraUt;
-	}
+	// private boolean placeraUt(AIMDay schema, QuestionWithParticipants fråga, Workshop workshop) {
+	// if (fråga.harKandidat()) {
+	// workshop.add(fråga.taKandidat());
+	// }
+	// if (fråga.harKandidat()) {
+	// workshop.add(fråga.taKandidat());
+	// }
+	// boolean gickPlaceraUt = schema.place(workshop);
+	// return gickPlaceraUt;
+	// }
 
 	/**
-	 * Sorts workshops after how good they are. Better workshops later
+	 * Sorts agendas after how good they are. Better agendas later
 	 */
-	private Comparator<Workshop> painPointComparator = new Comparator<Workshop>() {
+	private Comparator<IndividualAgenda> painPointComparator = new Comparator<IndividualAgenda>() {
 		@Override
-		public int compare(Workshop arg0, Workshop arg1) {
+		public int compare(IndividualAgenda arg0, IndividualAgenda arg1) {
+			int degreeCompare = arg0.getParticipant().compareSWO(arg1.getParticipant());
+			if (degreeCompare != 0) {
+				return degreeCompare;
+			}
 			return Double.valueOf(arg0.getScore()).compareTo(Double.valueOf(arg1.getScore()));
 		}
 	};
 
-	private static final Comparator<QuestionWithParticipants> comp = new Comparator<QuestionWithParticipants>() {
+	private static final Comparator<Participant> comp = new Comparator<Participant>() {
 
 		@Override
-		public int compare(QuestionWithParticipants ett, QuestionWithParticipants två) {
-			return Integer.valueOf(två.antalKandidater()).compareTo(ett.antalKandidater());
+		public int compare(Participant ett, Participant två) {
+			return Integer.valueOf(två.getÖnskelista().size()).compareTo(ett.getÖnskelista().size());
 		}
 	};
 
 	public static final class Byggare {
-	
+
 		private final int numParallelTracks;
-	
+
 		private int numSessions;
-	
+
 		private int maxAttendantsPerWS;
-	
+
 		private ArrayList<Question> frågor = new ArrayList<Question>();
 		private List<Participant> erfarna = new ArrayList<Participant>();
 		private List<Participant> oerfarna = new ArrayList<Participant>();
-	
+
 		public Byggare(int numParallelTracks) {
 			this.numParallelTracks = numParallelTracks;
 		}
-	
+
 		public Byggare medDeltagare(Participant... deltagare) {
 			for (Participant del : deltagare) {
 				if (del.ärErfaren()) {
@@ -244,27 +219,27 @@ public class Scheduler {
 			}
 			return this;
 		}
-	
+
 		public Byggare mednumSessions(int numSessions) {
 			this.numSessions = numSessions;
 			return this;
 		}
-	
+
 		public Byggare medMaxAntalDeltagarePerMöte(int maxAttendantsPerWS) {
 			this.maxAttendantsPerWS = maxAttendantsPerWS;
 			return this;
 		}
-	
+
 		public Byggare medFrågor(Question... frågor) {
 			this.frågor.clear();
 			this.frågor.addAll(Arrays.asList(frågor));
 			return this;
 		}
-	
+
 		public Scheduler bygg() {
 			return new Scheduler(numParallelTracks, numSessions, maxAttendantsPerWS, frågor, erfarna, oerfarna);
 		}
-	
+
 	}
 
 }

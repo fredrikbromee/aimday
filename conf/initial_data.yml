@@ -195,6 +195,7 @@ Participant(T):
 Participant(U):
     prio:       [3,4,16,43,19,40,49]
     first_name: Prof Sture Högmark
+    isJoker:    true
 
 Participant(V):
     prio:       [24,5]

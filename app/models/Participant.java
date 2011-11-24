@@ -1,6 +1,7 @@
 package models;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -17,14 +18,54 @@ import play.db.jpa.Model;
 @Entity
 public class Participant extends Model {
 	
+	enum Degree implements Comparable<Degree> {
+		PROF("Prof"), DOC("Doc"), DR("Dr"), LIC("Lic");
+		private final String deg;
+
+		Degree(String deg) {
+			this.deg = deg;
+		}
+
+		public static Degree degreeFrom(String prefix) {
+			if (PROF.hasDegree(prefix)) {
+				return PROF;
+			}
+			if (DOC.hasDegree(prefix)) {
+				return DOC;
+			}
+			if (DR.hasDegree(prefix)) {
+				return DR;
+			}
+			if (LIC.hasDegree(prefix)) {
+				return LIC;
+			}
+			throw new RuntimeException("Did not recognize degree " + prefix);
+		}
+
+		private boolean hasDegree(String prefix) {
+			return prefix.toLowerCase().contains(deg.toLowerCase());
+		}
+
+	}
+
 	@ManyToMany
 	public List<Question> prio = new ArrayList<Question>();
 	private boolean is_experienced = true;
 	public String first_name;
+	private Degree degree;
+	public boolean isJoker;
+
+	public Degree getDegree() {
+		if (degree == null) {
+			degree = Degree.degreeFrom(first_name);
+		}
+		return degree;
+	}
 
 	public Participant(boolean ärErfaren, String namn) {
 		this.is_experienced = ärErfaren;
 		this.first_name = namn;
+		this.degree = Degree.degreeFrom(namn);
 	}
 
 	public static Participant erfaren(String namn) {
@@ -46,6 +87,12 @@ public class Participant extends Model {
 
 	public List<Question> getÖnskelista() {
 		return prio;
+	}
+
+	public List<Question> getRandomizedWishlist() {
+		List<Question> shuffled = new ArrayList<Question>(prio);
+		Collections.shuffle(shuffled);
+		return shuffled;
 	}
 
 	@Override
@@ -78,6 +125,20 @@ public class Participant extends Model {
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
+	}
+
+	public int compareSWO(Participant other) {
+		if (this.isJoker()) {
+			return 1;
+		}
+		if (other.isJoker) {
+			return -1;
+		}
+		return this.getDegree().compareTo(other.getDegree());
+	}
+
+	private boolean isJoker() {
+		return isJoker;
 	}
 
 }

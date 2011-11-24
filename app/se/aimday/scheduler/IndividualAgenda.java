@@ -19,9 +19,15 @@ public class IndividualAgenda {
 		this.participant = deltagare;
 	}
 
+	@Override
+	public String toString() {
+		return "IndividualAgenda [participant=" + participant + ", schema=" + schema + ", score=" + score + "]";
+	}
+
 	public void läggTill(Workshop möte, Session session) {
 		if (harMöte(session)) {
-			throw new RuntimeException("Har redan ett möte denna session!");
+			throw new RuntimeException(String.format("Har redan ett möte denna session! Session %s  \n försöker lägga till %s", session,
+					möte));
 		}
 		schema.put(session, möte);
 	}
@@ -39,8 +45,9 @@ public class IndividualAgenda {
 	}
 
 	public double score(int numSessions) {
+		int antalMöten = antalMöten();
 		int max = Math.min(numSessions, participant.getÖnskelista().size());
-		if (antalMöten() >= max) {
+		if (antalMöten >= max) {
 			return 1;
 		}
 		return antalMöten() / max;

@@ -63,14 +63,13 @@ public class AIMDay {
 		return schema;
 	}
 
-	public boolean place(Workshop workshop) {
+	public void place(Question q, Participant p) {
 		boolean gotAPlace = false;
 		for (Session session : sessions) {
-			gotAPlace = session.place(workshop);
+			gotAPlace = session.place(q, p);
 			if (gotAPlace)
 				break;
 		}
-		return gotAPlace;
 	}
 
 	public int getNumberOfScheduledWS() {
@@ -128,5 +127,15 @@ public class AIMDay {
 
 	public void setOldScore(double scoreOld) {
 		this.scoreOld = scoreOld;
+	}
+
+	public Workshop getWorkshop(Question q) {
+		for (Session session : sessions) {
+			Workshop ws = session.getWorkshop(q);
+			if (ws != null) {
+				return ws;
+			}
+		}
+		return null;
 	}
 }

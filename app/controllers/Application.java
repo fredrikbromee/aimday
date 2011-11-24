@@ -27,9 +27,8 @@ public class Application extends Controller {
 		List<Question> allQuestions = Question.<Question> findAll();
 
 		Scheduler scheduler = new Scheduler(tracks, sessions, 10, allQuestions, allParticipants, null);
-		List<AIMDay> schedules = scheduler.lägg();
+		AIMDay schedule = scheduler.lägg();
 
-		AIMDay schedule = schedules.get(0);
 		render(schedule);
 	}
 

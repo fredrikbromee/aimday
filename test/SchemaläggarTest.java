@@ -1,5 +1,3 @@
-import java.util.List;
-
 import models.Participant;
 import models.Question;
 
@@ -23,18 +21,19 @@ public class SchemaläggarTest {
 	@Test
 	public void testaEnkeltSchema() {
 		// Givet att alla vill vara med på allt
-		ARNE.önskarSe(fråga1, fråga2);
+		ARNE.önskarSe(fråga2);
 		BJARNE.önskarSe(fråga1, fråga2);
 		CHRISTER.önskarSe(fråga1, fråga2);
-		DAVID.önskarSe(fråga1, fråga2);
+		DAVID.önskarSe(fråga1);
 
 		läggare = new Scheduler.Byggare(1).mednumSessions(2).medMaxAntalDeltagarePerMöte(3).medDeltagare(ARNE, BJARNE, CHRISTER, DAVID)
 				.medFrågor(fråga1, fråga2).bygg();
 
-		List<se.aimday.scheduler.AIMDay> braScheman = läggare.lägg();
-		se.aimday.scheduler.AIMDay bästSchema = braScheman.get(0);
+		se.aimday.scheduler.AIMDay bästSchema = läggare.lägg();
 		System.out.println("Valt schema:\n" + bästSchema);
-		Assert.assertTrue(bästSchema.getScore() == 1);
+
+		// placera ut resten av deltagarna också så skare bli ett
+		Assert.assertEquals(1, bästSchema.getScore(), 0.05);
 	}
 
 	@Test
@@ -48,8 +47,7 @@ public class SchemaläggarTest {
 		läggare = new Scheduler.Byggare(2).mednumSessions(2).medMaxAntalDeltagarePerMöte(3).medDeltagare(ARNE, BJARNE, CHRISTER, DAVID)
 				.medFrågor(fråga1, fråga2, fråga3, fråga4).bygg();
 
-		List<se.aimday.scheduler.AIMDay> braScheman = läggare.lägg();
-		se.aimday.scheduler.AIMDay bästSchema = braScheman.get(0);
+		se.aimday.scheduler.AIMDay bästSchema = läggare.lägg();
 
 		System.out.println("Valt schema:\n" + bästSchema);
 		Assert.assertTrue(bästSchema.getScore() == 1);
