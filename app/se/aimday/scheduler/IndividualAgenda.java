@@ -45,6 +45,10 @@ public class IndividualAgenda {
 	}
 
 	public double score(int numSessions) {
+		if (participant.isJoker()) {
+			return 1;
+		}
+
 		int antalMöten = antalMöten();
 		int max = Math.min(numSessions, participant.getÖnskelista().size());
 		if (antalMöten >= max) {

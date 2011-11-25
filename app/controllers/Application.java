@@ -22,11 +22,13 @@ public class Application extends Controller {
 		render();
     }
 
-	public static void schedule(int tracks, int sessions) {
+	public static void schedule(int tracks, int sessions, int generations) {
 		List<Participant> allParticipants = Participant.<Participant> findAll();
 		List<Question> allQuestions = Question.<Question> findAll();
-
-		Scheduler scheduler = new Scheduler(tracks, sessions, 10, allQuestions, allParticipants, null);
+		
+		generations = Math.min(100000, generations);
+		System.out.println("num gs" + generations);
+		Scheduler scheduler = new Scheduler(tracks, sessions, 10, allQuestions, allParticipants, null, generations);
 		AIMDay schedule = scheduler.lägg();
 
 		render(schedule);

@@ -65,6 +65,11 @@ public class AIMDay {
 
 	public void place(Question q, Participant p) {
 		boolean gotAPlace = false;
+		Session sessionWithQ = getSessionFor(q);
+		if (sessionWithQ != null) {
+			sessionWithQ.place(q, p);
+			return;
+		}
 		for (Session session : sessions) {
 			gotAPlace = session.place(q, p);
 			if (gotAPlace)
@@ -127,6 +132,16 @@ public class AIMDay {
 
 	public void setOldScore(double scoreOld) {
 		this.scoreOld = scoreOld;
+	}
+
+	public Session getSessionFor(Question q) {
+		for (Session session : sessions) {
+			Workshop ws = session.getWorkshop(q);
+			if (ws != null) {
+				return session;
+			}
+		}
+		return null;
 	}
 
 	public Workshop getWorkshop(Question q) {

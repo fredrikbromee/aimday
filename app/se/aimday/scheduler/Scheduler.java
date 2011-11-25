@@ -20,6 +20,8 @@ import models.Question;
  */
 public class Scheduler {
 
+	private final int generations = 2000;
+
 	private int numParallelTracks;
 
 	private int numSessions;
@@ -33,7 +35,7 @@ public class Scheduler {
 	private final List<Participant> allParticipants = new ArrayList<Participant>();
 
 	public Scheduler(int numParallelTracks, int numSessions, int maxAttendantsPerWS, Collection<Question> questions,
-			List<Participant> erfarna, List<Participant> oerfarna) {
+			List<Participant> erfarna, List<Participant> oerfarna, int generations) {
 		this.numParallelTracks = numParallelTracks;
 		this.numSessions = numSessions;
 		this.maxAttendantsPerWS = maxAttendantsPerWS;
@@ -66,7 +68,7 @@ public class Scheduler {
 		AIMDay bestSoFar = schedule;
 		System.out.println("Initial schedule: \n" + schedule);
 
-		for (int i = 0; i < 2000; i++) {
+		for (int i = 0; i < generations; i++) {
 			AIMDay newSchedule = getNewScheduleFrom(schedule);
 			// System.out.println("New schedule: \n" + newSchedule);
 			if (newSchedule.isBetterThan(bestSoFar)) {
@@ -237,7 +239,7 @@ public class Scheduler {
 		}
 
 		public Scheduler bygg() {
-			return new Scheduler(numParallelTracks, numSessions, maxAttendantsPerWS, frågor, erfarna, oerfarna);
+			return new Scheduler(numParallelTracks, numSessions, maxAttendantsPerWS, frågor, erfarna, oerfarna, 2000);
 		}
 
 	}

@@ -137,7 +137,7 @@ public class Participant extends Model {
 		return this.getDegree().compareTo(other.getDegree());
 	}
 
-	private boolean isJoker() {
+	public boolean isJoker() {
 		return isJoker;
 	}
 
