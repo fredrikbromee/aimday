@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeMap;
 
+import models.ForetagsRepresentant;
 import models.Participant;
 import models.Question;
 
@@ -30,27 +31,34 @@ public class Scheduler {
 
 	private final Collection<Question> questions;
 
-	private TreeMap<String, QuestionWithParticipants> frågor;
+	private TreeMap<String, FrågaMedDeltagare> frågor;
 
 	private final List<Participant> allParticipants = new ArrayList<Participant>();
 
 	public Scheduler(int numParallelTracks, int numSessions, int maxAttendantsPerWS, Collection<Question> questions,
-			List<Participant> erfarna, List<Participant> oerfarna, int generations) {
+			List<Participant> erfarna, List<Participant> oerfarna, List<ForetagsRepresentant> foretagare,
+			int generations) {
 		this.numParallelTracks = numParallelTracks;
 		this.numSessions = numSessions;
 		this.maxAttendantsPerWS = maxAttendantsPerWS;
 		this.questions = questions;
 		this.allParticipants.addAll(erfarna);
 
-		frågor = new TreeMap<String, QuestionWithParticipants>();
+		frågor = new TreeMap<String, FrågaMedDeltagare>();
 		for (Question q : questions) {
-			QuestionWithParticipants f = new QuestionWithParticipants(q);
+			FrågaMedDeltagare f = new FrågaMedDeltagare(q);
 			frågor.put(q.getQ(), f);
 		}
 
 		for (Participant deltagare : erfarna) {
 			for (Question fråga : deltagare.getÖnskelista()) {
 				frågor.get(fråga.getQ()).läggTillDeltagare(deltagare);
+			}
+		}
+
+		for (ForetagsRepresentant f : foretagare) {
+			for (Question fråga : f.getFrågelista()) {
+				frågor.get(fråga.getQ()).läggTillFöretagare(f);
 			}
 		}
 
@@ -88,15 +96,18 @@ public class Scheduler {
 		for (IndividualAgenda individualAgenda : allAgendas) {
 			allPeeps.add(individualAgenda.getParticipant());
 		}
+		// System.out.println(allPeeps);
+		// Logger.info(allPeeps.toString(), allPeeps);
 		return schedule(allPeeps);
 	}
 
 	private AIMDay schedule(List<Participant> sorteradeDeltagare) {
-		AIMDay schema = new AIMDay(numParallelTracks, numSessions);
+		AIMDay schema = new AIMDay(numParallelTracks, numSessions, allParticipants);
 
 		for (Participant p : sorteradeDeltagare) {
 			for (Question q : p.getRandomizedWishlist()) {
-				schema.place(q, p);
+				FrågaMedDeltagare medDeltagare = frågor.get(q.getQ());
+				schema.place(q, p, medDeltagare.getFrågare());
 			}
 		}
 
@@ -147,7 +158,7 @@ public class Scheduler {
 		if (ws.getNumberOfAttendants() >= 2) {
 			return 1;
 		}
-		QuestionWithParticipants frågaMedDeltagare = frågor.get(ws.getQuestion().getQ());
+		FrågaMedDeltagare frågaMedDeltagare = frågor.get(ws.getQuestion().getQ());
 		if (frågaMedDeltagare.antalKandidater() == 1 && ws.getNumberOfAttendants() == 1) {
 			return 1;
 		}
@@ -207,6 +218,8 @@ public class Scheduler {
 		private List<Participant> erfarna = new ArrayList<Participant>();
 		private List<Participant> oerfarna = new ArrayList<Participant>();
 
+		private List<ForetagsRepresentant> lyssnare = new ArrayList<ForetagsRepresentant>();
+
 		public Byggare(int numParallelTracks) {
 			this.numParallelTracks = numParallelTracks;
 		}
@@ -219,6 +232,11 @@ public class Scheduler {
 					this.oerfarna.add(del);
 				}
 			}
+			return this;
+		}
+
+		public Byggare medDeltagare(List<ForetagsRepresentant> lyssnare) {
+			this.lyssnare = lyssnare;
 			return this;
 		}
 
@@ -239,9 +257,8 @@ public class Scheduler {
 		}
 
 		public Scheduler bygg() {
-			return new Scheduler(numParallelTracks, numSessions, maxAttendantsPerWS, frågor, erfarna, oerfarna, 2000);
+			return new Scheduler(numParallelTracks, numSessions, maxAttendantsPerWS, frågor, erfarna, oerfarna,
+					lyssnare, 2000);
 		}
-
 	}
-
 }

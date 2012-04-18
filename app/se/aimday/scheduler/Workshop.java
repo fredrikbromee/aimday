@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import models.ForetagsRepresentant;
 import models.Participant;
 import models.Question;
 
@@ -16,6 +17,7 @@ import models.Question;
 public class Workshop {
 
 	List<Participant> participants = new ArrayList<Participant>();
+	List<ForetagsRepresentant> lyssnare = new ArrayList<ForetagsRepresentant>();
 	Question question;
 	private double score;
 
@@ -31,13 +33,22 @@ public class Workshop {
 		return participants.contains(kanskeMed);
 	}
 
+	public boolean harFrågeStällare(ForetagsRepresentant kanskeDär) {
+		return lyssnare.contains(kanskeDär);
+	}
+
 	public void add(Participant d) {
 		participants.add(d);
 	}
 
+	public void add(Collection<ForetagsRepresentant> lyssnare) {
+		this.lyssnare.addAll(lyssnare);
+
+	}
+
 	@Override
 	public String toString() {
-		return "WS: [score=" + score + ", fråga=" + question + ", deltagare=" + participants + "]";
+		return question + ":" + participants;
 	}
 
 	public Collection<Participant> getDeltagare() {
@@ -84,4 +95,6 @@ public class Workshop {
 			return false;
 		return true;
 	}
+
+
 }

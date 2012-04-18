@@ -2,11 +2,10 @@ package controllers;
 
 import java.util.List;
 
+import models.ForetagsRepresentant;
 import models.Participant;
 import models.Question;
-
 import play.mvc.Controller;
-
 import se.aimday.scheduler.AIMDay;
 import se.aimday.scheduler.Scheduler;
 
@@ -23,12 +22,15 @@ public class Application extends Controller {
     }
 
 	public static void schedule(int tracks, int sessions, int generations) {
+		
+		List<ForetagsRepresentant> foretagare = ForetagsRepresentant.<ForetagsRepresentant> findAll();
 		List<Participant> allParticipants = Participant.<Participant> findAll();
 		List<Question> allQuestions = Question.<Question> findAll();
 		
 		generations = Math.min(100000, generations);
 		System.out.println("num gs" + generations);
-		Scheduler scheduler = new Scheduler(tracks, sessions, 10, allQuestions, allParticipants, null, generations);
+		Scheduler scheduler = new Scheduler(tracks, sessions, 10, allQuestions, allParticipants, null, foretagare,
+				generations);
 		AIMDay schedule = scheduler.lägg();
 
 		render(schedule);

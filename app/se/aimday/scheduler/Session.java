@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import models.ForetagsRepresentant;
 import models.Participant;
 import models.Question;
 
@@ -20,9 +21,9 @@ public class Session {
 	private final int numParalllelTracks;
 
 
-	public Session(int numParalllelTracks) {
-		this.numParalllelTracks = numParalllelTracks;
-		workshops = new ArrayList<Workshop>(numParalllelTracks);
+	public Session(int numParallelTracks) {
+		this.numParalllelTracks = numParallelTracks;
+		workshops = new ArrayList<Workshop>(numParallelTracks);
 	}
 
 
@@ -31,19 +32,27 @@ public class Session {
 	}
 
 	public boolean place(Question q, Participant p) {
-		// TODO kolla att företag inte deltar i parallellt möte
+		return place(q, p, Collections.<ForetagsRepresentant>emptyList());
+	}
 
+	public boolean place(Question q, Participant p, Collection<ForetagsRepresentant> lyssnare) {
 		if (isAttendedByAnyOf(Collections.singletonList(p))) {
+			return false;
+		}
+
+		if (harFrågaStälldAv(lyssnare)) {
 			return false;
 		}
 
 		Workshop ws = getWorkshop(q);
 		if (ws != null) {
 			ws.add(p);
+			ws.add(lyssnare);
 			return true;
 		}
 		ws = new Workshop(q);
 		ws.add(p);
+		ws.add(lyssnare);
 
 		if (workshops.size() >= numParalllelTracks) {
 			return false;
@@ -51,6 +60,17 @@ public class Session {
 
 		workshops.add(ws);
 		return true;
+	}
+
+	private boolean harFrågaStälldAv(Collection<ForetagsRepresentant> lyssnare) {
+		for (Workshop workshop : workshops) {
+			for (ForetagsRepresentant kanskeDär : lyssnare) {
+				if (workshop.harFrågeStällare(kanskeDär)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public boolean isAttendedByAnyOf(Collection<Participant> deltagare) {
@@ -66,7 +86,12 @@ public class Session {
 
 	@Override
 	public String toString() {
-		return "Session [workshops=" + workshops + "]";
+		StringBuffer sb = new StringBuffer();
+		for (Workshop s : workshops) {
+			sb.append(s.toString() + ";");
+		}
+		return sb.toString();
+		// return "Session [workshops=" + workshops + "]";
 	}
 
 	public int getNumberOfScheduledWS() {
@@ -85,5 +110,10 @@ public class Session {
 		}
 		return null;
 	}
+
+	public boolean harFråga(Question fråga) {
+		return getWorkshop(fråga) != null;
+	}
+
 
 }

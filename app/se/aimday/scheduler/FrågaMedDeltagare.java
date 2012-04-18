@@ -1,17 +1,21 @@
 package se.aimday.scheduler;
 import java.util.ArrayList;
+import java.util.Collection;
 
+import models.ForetagsRepresentant;
 import models.Participant;
 import models.Question;
 
-public class QuestionWithParticipants {
+public class FrågaMedDeltagare {
 
 	private final Question fråga;
 	private ArrayList<Participant> kandidater;
+	private ArrayList<ForetagsRepresentant> lyssnare;
 
-	public QuestionWithParticipants(Question fråga) {
+	public FrågaMedDeltagare(Question fråga) {
 		this.fråga = fråga;
 		kandidater = new ArrayList<Participant>();
+		lyssnare = new ArrayList<ForetagsRepresentant>();
 	}
 
 	public int antalKandidater() {
@@ -20,6 +24,10 @@ public class QuestionWithParticipants {
 
 	public void läggTillDeltagare(Participant deltagare) {
 		kandidater.add(deltagare);
+	}
+
+	public void läggTillFöretagare(ForetagsRepresentant frågare) {
+		lyssnare.add(frågare);
 	}
 
 	public Question getFråga() {
@@ -35,9 +43,10 @@ public class QuestionWithParticipants {
 		return kandidater.remove(randomIndex);
 	}
 
-	public QuestionWithParticipants deepClone() {
-		QuestionWithParticipants frågaMedDeltagare = new QuestionWithParticipants(fråga);
+	public FrågaMedDeltagare deepClone() {
+		FrågaMedDeltagare frågaMedDeltagare = new FrågaMedDeltagare(fråga);
 		frågaMedDeltagare.kandidater.addAll(kandidater);
+		frågaMedDeltagare.lyssnare.addAll(lyssnare);
 		return frågaMedDeltagare;
 	}
 
@@ -46,4 +55,7 @@ public class QuestionWithParticipants {
 		return "[" + fråga + ", kandidater=" + kandidater + "]";
 	}
 
+	public Collection<ForetagsRepresentant> getFrågare() {
+		return lyssnare;
+	}
 }
