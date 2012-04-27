@@ -84,6 +84,9 @@ public class Scheduler {
 			}
 			schedule = newSchedule;
 		}
+
+		// TODO här kan man placera ut de oerfarna
+
 		return bestSoFar;
 	}
 
@@ -102,7 +105,7 @@ public class Scheduler {
 	}
 
 	private AIMDay schedule(List<Participant> sorteradeDeltagare) {
-		AIMDay schema = new AIMDay(numParallelTracks, numSessions, allParticipants);
+		AIMDay schema = new AIMDay(numParallelTracks, numSessions, allParticipants, questions);
 
 		for (Participant p : sorteradeDeltagare) {
 			for (Question q : p.getRandomizedWishlist()) {
@@ -147,10 +150,8 @@ public class Scheduler {
 		}
 		cumulativePrioScore = cumulativePrioScore * weightPrio / allParticipants.size();
 
-		double scoreOld = (allQScore + cumulativeWSScore) / (weightForAllQsPlaced + weightWS);
 		double score = (allQScore + cumulativeWSScore + cumulativePrioScore) / (weightForAllQsPlaced + weightWS + weightPrio);
 		schedule.setScore(score);
-		schedule.setOldScore(scoreOld);
 		return score;
 	}
 

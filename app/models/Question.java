@@ -11,7 +11,7 @@ import play.db.jpa.Model;
  * 
  */
 @Entity
-public class Question extends Model {
+public class Question extends Model implements Comparable<Question> {
 
 	public String q;
 
@@ -51,6 +51,11 @@ public class Question extends Model {
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
+	}
+
+	@Override
+	public int compareTo(Question other) {
+		return q.compareTo(other.q);
 	}
 
 }

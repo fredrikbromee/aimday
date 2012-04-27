@@ -19,13 +19,17 @@ public class Session {
 
 	private List<Workshop> workshops;
 	private final int numParalllelTracks;
+	private final int sessionNumber;
 
-
-	public Session(int numParallelTracks) {
+	public Session(int sessionNumber, int numParallelTracks) {
+		this.sessionNumber = sessionNumber;
 		this.numParalllelTracks = numParallelTracks;
 		workshops = new ArrayList<Workshop>(numParallelTracks);
 	}
 
+	public int getSessionNumber() {
+		return sessionNumber;
+	}
 
 	public List<Workshop> getMöten() {
 		return workshops;

@@ -1,5 +1,6 @@
 package controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import models.ForetagsRepresentant;
@@ -32,8 +33,12 @@ public class Application extends Controller {
 		Scheduler scheduler = new Scheduler(tracks, sessions, 10, allQuestions, allParticipants, null, foretagare,
 				generations);
 		AIMDay schedule = scheduler.lägg();
+		ArrayList<Integer> spår = new ArrayList<Integer>();
+		for (int i = 1; i <= tracks; i++) {
+			spår.add(i);
+		}
 
-		render(schedule);
+		render(schedule, spår);
 	}
 
 }

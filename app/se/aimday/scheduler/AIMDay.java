@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import models.ForetagsRepresentant;
 import models.Participant;
@@ -22,15 +24,22 @@ public class AIMDay {
 	private HashMap<Participant, IndividualAgenda> allAgendas;
 
 	// the questions that couldn't be fit in to the schedule end up here
-	private List<Question> unplacedQuestions = new ArrayList<Question>();
-	private double scoreOld;
+	private Set<Question> unplacedQuestions = new TreeSet<Question>();
 	private final List<Participant> allParticipants;
+	private final int spår;
 
-	public AIMDay(int antalParallellaSpår, int antalSessioner, List<Participant> allParticipants) {
+	public AIMDay(int antalParallellaSpår, int antalSessioner, List<Participant> allParticipants,
+			Collection<Question> questions) {
+		this.spår = antalParallellaSpår;
 		this.allParticipants = allParticipants;
 		for (int i = 0; i < antalSessioner; i++) {
-			sessions.add(new Session(antalParallellaSpår));
+			sessions.add(new Session(i + 1, antalParallellaSpår));
 		}
+		unplacedQuestions.addAll(questions);
+	}
+
+	public int getSpår() {
+		return spår;
 	}
 
 	public Collection<IndividualAgenda> getAllIndividualAgendas() {
@@ -58,13 +67,16 @@ public class AIMDay {
 		return schema;
 	}
 
-	public void place(Question q, Participant p, Collection<ForetagsRepresentant> lyssnare) {
+	public boolean place(Question q, Participant p, Collection<ForetagsRepresentant> lyssnare) {
 		boolean gotAPlace = false;
 		Session sessionWithQ = getSessionFor(q);
 		if (sessionWithQ != null) {
 			gotAPlace = sessionWithQ.place(q, p);
 			// Logger.info("Failed to place %s at %s in session %s", p, q, sessionWithQ);
-			return;
+			if (gotAPlace) {
+				unplacedQuestions.remove(q);
+			}
+			return gotAPlace;
 		}
 
 		// Prova att sortera sessioner så att den session med minst antal workshops kommer först! Vi vill fylla
@@ -74,6 +86,10 @@ public class AIMDay {
 			if (gotAPlace)
 				break;
 		}
+		if (gotAPlace) {
+			unplacedQuestions.remove(q);
+		}
+		return gotAPlace;
 	}
 
 	public int getNumberOfScheduledWS() {
@@ -113,10 +129,6 @@ public class AIMDay {
 		return this.score > other.score;
 	}
 
-	public void couldNotPlace(Question q) {
-		unplacedQuestions.add(q);
-	}
-
 	public Collection<Question> getAllUnplacedQuestions() {
 		return Collections.unmodifiableCollection(unplacedQuestions);
 	}
@@ -134,10 +146,6 @@ public class AIMDay {
 
 	public double getScore() {
 		return score;
-	}
-
-	public void setOldScore(double scoreOld) {
-		this.scoreOld = scoreOld;
 	}
 
 	public Session getSessionFor(Question q) {
