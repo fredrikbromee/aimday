@@ -6,13 +6,13 @@ import models.ForetagsRepresentant;
 import models.Participant;
 import models.Question;
 
-public class FrågaMedDeltagare {
+public class FragaMedDeltagare {
 
 	private final Question fråga;
 	private ArrayList<Participant> kandidater;
 	private ArrayList<ForetagsRepresentant> lyssnare;
 
-	public FrågaMedDeltagare(Question fråga) {
+	public FragaMedDeltagare(Question fråga) {
 		this.fråga = fråga;
 		kandidater = new ArrayList<Participant>();
 		lyssnare = new ArrayList<ForetagsRepresentant>();
@@ -43,8 +43,8 @@ public class FrågaMedDeltagare {
 		return kandidater.remove(randomIndex);
 	}
 
-	public FrågaMedDeltagare deepClone() {
-		FrågaMedDeltagare frågaMedDeltagare = new FrågaMedDeltagare(fråga);
+	public FragaMedDeltagare deepClone() {
+		FragaMedDeltagare frågaMedDeltagare = new FragaMedDeltagare(fråga);
 		frågaMedDeltagare.kandidater.addAll(kandidater);
 		frågaMedDeltagare.lyssnare.addAll(lyssnare);
 		return frågaMedDeltagare;

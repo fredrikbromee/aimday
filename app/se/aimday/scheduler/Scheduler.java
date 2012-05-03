@@ -31,7 +31,7 @@ public class Scheduler {
 
 	private final Collection<Question> questions;
 
-	private TreeMap<String, FrågaMedDeltagare> frågor;
+	private TreeMap<String, FragaMedDeltagare> frågor;
 
 	private final List<Participant> allParticipants = new ArrayList<Participant>();
 
@@ -44,9 +44,9 @@ public class Scheduler {
 		this.questions = questions;
 		this.allParticipants.addAll(erfarna);
 
-		frågor = new TreeMap<String, FrågaMedDeltagare>();
+		frågor = new TreeMap<String, FragaMedDeltagare>();
 		for (Question q : questions) {
-			FrågaMedDeltagare f = new FrågaMedDeltagare(q);
+			FragaMedDeltagare f = new FragaMedDeltagare(q);
 			frågor.put(q.getQ(), f);
 		}
 
@@ -109,7 +109,7 @@ public class Scheduler {
 
 		for (Participant p : sorteradeDeltagare) {
 			for (Question q : p.getRandomizedWishlist()) {
-				FrågaMedDeltagare medDeltagare = frågor.get(q.getQ());
+				FragaMedDeltagare medDeltagare = frågor.get(q.getQ());
 				schema.place(q, p, medDeltagare.getFrågare());
 			}
 		}
@@ -159,7 +159,7 @@ public class Scheduler {
 		if (ws.getNumberOfAttendants() >= 2) {
 			return 1;
 		}
-		FrågaMedDeltagare frågaMedDeltagare = frågor.get(ws.getQuestion().getQ());
+		FragaMedDeltagare frågaMedDeltagare = frågor.get(ws.getQuestion().getQ());
 		if (frågaMedDeltagare.antalKandidater() == 1 && ws.getNumberOfAttendants() == 1) {
 			return 1;
 		}
