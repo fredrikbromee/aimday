@@ -1,8 +1,10 @@
 package models;
 
-import javax.persistence.Entity;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import play.db.jpa.Model;
+import se.aimday.scheduler.api.FragaJson;
 
 /**
  * En diskussionsfråga
@@ -10,29 +12,48 @@ import play.db.jpa.Model;
  * @author fredrikbromee
  * 
  */
-@Entity
-public class Question extends Model implements Comparable<Question> {
+public class Question implements Comparable<Question> {
 
-	public String q;
+	public String id;
+	private int vikt = 0;
 
 	public Question(String q) {
-		this.q = q;
+		this.id = q;
+	}
+
+	public int getVikt() {
+		return vikt;
 	}
 
 	public String getQ() {
-		return q;
+		return id;
 	}
 
 	@Override
 	public String toString() {
-		return q;
+		return id;
+	}
+
+	@Override
+	public int compareTo(Question other) {
+		return id.compareTo(other.id);
+	}
+
+	public static Map<String, Question> fromAPI(List<FragaJson> json) {
+		Map<String, Question> frågor = new HashMap<String, Question>();
+		for (FragaJson fragaJson : json) {
+			Question question = new Question(fragaJson.id);
+			question.vikt = fragaJson.vikt;
+			frågor.put(fragaJson.id, question);
+		}
+		return frågor;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + id.hashCode();
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
 
@@ -40,7 +61,7 @@ public class Question extends Model implements Comparable<Question> {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (obj == null)
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
@@ -53,9 +74,8 @@ public class Question extends Model implements Comparable<Question> {
 		return true;
 	}
 
-	@Override
-	public int compareTo(Question other) {
-		return q.compareTo(other.q);
+	public void setVikt(int i) {
+		this.vikt = i;
 	}
 
 }

@@ -2,12 +2,12 @@ package se.aimday.scheduler;
 import java.util.HashMap;
 import java.util.Map;
 
-import models.Participant;
+import models.Forskare;
 
 
 public class IndividualAgenda {
 
-	private final Participant participant;
+	private final Forskare participant;
 	private final Map<Session, Workshop> schema = new HashMap();
 	private double score;
 
@@ -15,7 +15,7 @@ public class IndividualAgenda {
 		return score;
 	}
 
-	public IndividualAgenda(Participant deltagare) {
+	public IndividualAgenda(Forskare deltagare) {
 		this.participant = deltagare;
 	}
 
@@ -57,7 +57,7 @@ public class IndividualAgenda {
 		return antalMöten() / max;
 	}
 
-	public Participant getParticipant() {
+	public Forskare getParticipant() {
 		return participant;
 	}
 

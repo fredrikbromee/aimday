@@ -2,7 +2,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import models.ForetagsRepresentant;
-import models.Participant;
+import models.Forskare;
 import models.Question;
 
 import org.junit.Assert;
@@ -14,10 +14,10 @@ import se.aimday.scheduler.Session;
 
 public class SchemaläggarTest {
 
-	private static final Participant ARNE = Participant.erfaren("Prof Arne");
-	private static final Participant BJARNE = Participant.erfaren("Prof Bjarne");
-	private static final Participant CHRISTER = Participant.erfaren("Prof Christer");
-	private static final Participant DAVID = Participant.erfaren("Prof David");
+	private Forskare ARNE = Forskare.erfaren("Arne");
+	private Forskare BJARNE = Forskare.erfaren("Bjarne");
+	private Forskare CHRISTER = Forskare.erfaren("Christer");
+	private Forskare DAVID = Forskare.erfaren("David");
 	private Scheduler läggare;
 	Question fråga1 = new Question("1?");
 	Question fråga2 = new Question("2?");
@@ -26,7 +26,6 @@ public class SchemaläggarTest {
 
 	@Test
 	public void testaEnkeltSchema() {
-		// Givet att alla vill vara med på allt
 		ARNE.önskarSe(fråga2);
 		BJARNE.önskarSe(fråga1, fråga2);
 		CHRISTER.önskarSe(fråga1, fråga2);
@@ -43,6 +42,26 @@ public class SchemaläggarTest {
 	}
 
 	@Test
+	public void testaViktatSchema() {
+		ARNE.önskarSe(fråga1, fråga2);
+		BJARNE.setHarVikt(true);
+		BJARNE.önskarSe(fråga1, fråga2);
+		fråga1.setVikt(5);
+
+		läggare = new Scheduler.Byggare(2).mednumSessions(1).medMaxAntalDeltagarePerMöte(3).medDeltagare(ARNE, BJARNE)
+				.medFrågor(fråga1, fråga2).bygg();
+
+		AIMDay bästSchema = läggare.lägg();
+		System.out.println("Valt schema:\n" + bästSchema);
+		System.out.println(bästSchema.getScore());
+
+		Assert.assertNotNull("Fråga 1 borde ha blivit utplacerad eftersom den är viktad",
+				bästSchema.getSessionFor(fråga1));
+		Assert.assertEquals(1, bästSchema.getScore(), 0.05);
+		
+	}
+
+	@Test
 	public void testaSchemaMedTvåParallellaSessioner() {
 		// Givet att alla vill vara med på nästan allt
 		ARNE.önskarSe(fråga1, fråga2, fråga3, fråga4);
@@ -50,10 +69,10 @@ public class SchemaläggarTest {
 		CHRISTER.önskarSe(fråga1, fråga2, fråga3, fråga4);
 		DAVID.önskarSe(fråga1, fråga2, fråga3, fråga4);
 
-		ForetagsRepresentant företag1 = new ForetagsRepresentant("företag 1");
+		ForetagsRepresentant företag1 = new ForetagsRepresentant("1", "företag 1");
 		företag1.önskarSe(fråga1);
 		företag1.önskarSe(fråga2);
-		ForetagsRepresentant företag2 = new ForetagsRepresentant("företag 2");
+		ForetagsRepresentant företag2 = new ForetagsRepresentant("2", "företag 2");
 		företag2.önskarSe(fråga3);
 		företag2.önskarSe(fråga4);
 		List<ForetagsRepresentant> lyssnare = Arrays.asList(new ForetagsRepresentant[] { företag1, företag2 });

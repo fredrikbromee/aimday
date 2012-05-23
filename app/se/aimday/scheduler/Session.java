@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import models.ForetagsRepresentant;
-import models.Participant;
+import models.Forskare;
 import models.Question;
 
 /**
@@ -35,11 +35,11 @@ public class Session {
 		return workshops;
 	}
 
-	public boolean place(Question q, Participant p) {
+	public boolean place(Question q, Forskare p) {
 		return place(q, p, Collections.<ForetagsRepresentant>emptyList());
 	}
 
-	public boolean place(Question q, Participant p, Collection<ForetagsRepresentant> lyssnare) {
+	public boolean place(Question q, Forskare p, Collection<ForetagsRepresentant> lyssnare) {
 		if (isAttendedByAnyOf(Collections.singletonList(p))) {
 			return false;
 		}
@@ -77,9 +77,9 @@ public class Session {
 		return false;
 	}
 
-	public boolean isAttendedByAnyOf(Collection<Participant> deltagare) {
+	public boolean isAttendedByAnyOf(Collection<Forskare> deltagare) {
 		for (Workshop workshop : workshops) {
-			for (Participant maybeThere : deltagare) {
+			for (Forskare maybeThere : deltagare) {
 				if (workshop.isAttendedBy(maybeThere)) {
 					return true;
 				}

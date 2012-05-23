@@ -3,18 +3,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import models.ForetagsRepresentant;
-import models.Participant;
+import models.Forskare;
 import models.Question;
 
 public class FragaMedDeltagare {
 
 	private final Question fråga;
-	private ArrayList<Participant> kandidater;
+	private ArrayList<Forskare> kandidater;
 	private ArrayList<ForetagsRepresentant> lyssnare;
 
 	public FragaMedDeltagare(Question fråga) {
 		this.fråga = fråga;
-		kandidater = new ArrayList<Participant>();
+		kandidater = new ArrayList<Forskare>();
 		lyssnare = new ArrayList<ForetagsRepresentant>();
 	}
 
@@ -22,7 +22,7 @@ public class FragaMedDeltagare {
 		return kandidater.size();
 	}
 
-	public void läggTillDeltagare(Participant deltagare) {
+	public void läggTillDeltagare(Forskare deltagare) {
 		kandidater.add(deltagare);
 	}
 
@@ -38,7 +38,7 @@ public class FragaMedDeltagare {
 		return !kandidater.isEmpty();
 	}
 
-	public Participant taKandidat() {
+	public Forskare taKandidat() {
 		int randomIndex = (int) Math.floor(Math.random() * kandidater.size());
 		return kandidater.remove(randomIndex);
 	}

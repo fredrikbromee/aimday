@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 import models.ForetagsRepresentant;
-import models.Participant;
+import models.Forskare;
 import models.Question;
 
 /**
@@ -33,10 +33,10 @@ public class Scheduler {
 
 	private TreeMap<String, FragaMedDeltagare> frågor;
 
-	private final List<Participant> allParticipants = new ArrayList<Participant>();
+	private final List<Forskare> allParticipants = new ArrayList<Forskare>();
 
 	public Scheduler(int numParallelTracks, int numSessions, int maxAttendantsPerWS, Collection<Question> questions,
-			List<Participant> erfarna, List<Participant> oerfarna, List<ForetagsRepresentant> foretagare,
+			List<Forskare> erfarna, List<Forskare> oerfarna, List<ForetagsRepresentant> foretagare,
 			int generations) {
 		this.numParallelTracks = numParallelTracks;
 		this.numSessions = numSessions;
@@ -50,7 +50,7 @@ public class Scheduler {
 			frågor.put(q.getQ(), f);
 		}
 
-		for (Participant deltagare : erfarna) {
+		for (Forskare deltagare : erfarna) {
 			for (Question fråga : deltagare.getÖnskelista()) {
 				frågor.get(fråga.getQ()).läggTillDeltagare(deltagare);
 			}
@@ -70,7 +70,7 @@ public class Scheduler {
 	public AIMDay lägg() {
 		// do first try based on how many workshops each candidate has
 
-		List<Participant> sorteradeDeltagare = new ArrayList<Participant>(this.allParticipants);
+		List<Forskare> sorteradeDeltagare = new ArrayList<Forskare>(this.allParticipants);
 		Collections.sort(sorteradeDeltagare, comp);
 		AIMDay schedule = schedule(sorteradeDeltagare);
 		AIMDay bestSoFar = schedule;
@@ -78,8 +78,10 @@ public class Scheduler {
 
 		for (int i = 0; i < generations; i++) {
 			AIMDay newSchedule = getNewScheduleFrom(schedule);
-			// System.out.println("New schedule: \n" + newSchedule);
+			System.out.println("New schedule: \n" + newSchedule);
 			if (newSchedule.isBetterThan(bestSoFar)) {
+				System.out.println("Better schedule: \n" + schedule);
+
 				bestSoFar = newSchedule;
 			}
 			schedule = newSchedule;
@@ -95,7 +97,7 @@ public class Scheduler {
 		List<IndividualAgenda> allAgendas = new ArrayList<IndividualAgenda>(schedule.getAllIndividualAgendas());
 		Collections.sort(allAgendas, painPointComparator);
 
-		List<Participant> allPeeps = new ArrayList<Participant>();
+		List<Forskare> allPeeps = new ArrayList<Forskare>();
 		for (IndividualAgenda individualAgenda : allAgendas) {
 			allPeeps.add(individualAgenda.getParticipant());
 		}
@@ -104,10 +106,10 @@ public class Scheduler {
 		return schedule(allPeeps);
 	}
 
-	private AIMDay schedule(List<Participant> sorteradeDeltagare) {
+	private AIMDay schedule(List<Forskare> sorteradeDeltagare) {
 		AIMDay schema = new AIMDay(numParallelTracks, numSessions, allParticipants, questions);
 
-		for (Participant p : sorteradeDeltagare) {
+		for (Forskare p : sorteradeDeltagare) {
 			for (Question q : p.getRandomizedWishlist()) {
 				FragaMedDeltagare medDeltagare = frågor.get(q.getQ());
 				schema.place(q, p, medDeltagare.getFrågare());
@@ -125,15 +127,18 @@ public class Scheduler {
 	 */
 	private double score(AIMDay schedule) {
 		// are all questions placed?
-		int weightForAllQsPlaced = 1;
+		int weightForAllQsPlaced = 10;
 		int allQScore = 0;
 		if (allQsPlaced(schedule)) {
 			allQScore = weightForAllQsPlaced;
 		}
-		// are all ws filled with experienced?
+
+		// what is the score for all workshops?
 		double cumulativeWSScore = 0;
 		for (Workshop ws : schedule.getAllWorkshops()) {
-			double wsScore = scoreOneWorkshop(ws);
+			FragaMedDeltagare frågaMedDeltagare = frågor.get(ws.getQuestion().getQ());
+
+			double wsScore = ws.score(frågaMedDeltagare);
 			cumulativeWSScore += wsScore;
 			ws.setScore(wsScore);
 		}
@@ -155,35 +160,10 @@ public class Scheduler {
 		return score;
 	}
 
-	private double scoreOneWorkshop(Workshop ws) {
-		if (ws.getNumberOfAttendants() >= 2) {
-			return 1;
-		}
-		FragaMedDeltagare frågaMedDeltagare = frågor.get(ws.getQuestion().getQ());
-		if (frågaMedDeltagare.antalKandidater() == 1 && ws.getNumberOfAttendants() == 1) {
-			return 1;
-		}
-		if (frågaMedDeltagare.antalKandidater() == 0 && ws.getNumberOfAttendants() == 0) {
-			return 1;
-		}
-
-		return 0.5;
-	}
 
 	private boolean allQsPlaced(AIMDay schedule) {
 		return questions.size() == schedule.getNumberOfScheduledWS();
 	}
-
-	// private boolean placeraUt(AIMDay schema, QuestionWithParticipants fråga, Workshop workshop) {
-	// if (fråga.harKandidat()) {
-	// workshop.add(fråga.taKandidat());
-	// }
-	// if (fråga.harKandidat()) {
-	// workshop.add(fråga.taKandidat());
-	// }
-	// boolean gickPlaceraUt = schema.place(workshop);
-	// return gickPlaceraUt;
-	// }
 
 	/**
 	 * Sorts agendas after how good they are. Better agendas later
@@ -199,10 +179,10 @@ public class Scheduler {
 		}
 	};
 
-	private static final Comparator<Participant> comp = new Comparator<Participant>() {
+	private static final Comparator<Forskare> comp = new Comparator<Forskare>() {
 
 		@Override
-		public int compare(Participant ett, Participant två) {
+		public int compare(Forskare ett, Forskare två) {
 			return Integer.valueOf(två.getÖnskelista().size()).compareTo(ett.getÖnskelista().size());
 		}
 	};
@@ -216,8 +196,8 @@ public class Scheduler {
 		private int maxAttendantsPerWS;
 
 		private ArrayList<Question> frågor = new ArrayList<Question>();
-		private List<Participant> erfarna = new ArrayList<Participant>();
-		private List<Participant> oerfarna = new ArrayList<Participant>();
+		private List<Forskare> erfarna = new ArrayList<Forskare>();
+		private List<Forskare> oerfarna = new ArrayList<Forskare>();
 
 		private List<ForetagsRepresentant> lyssnare = new ArrayList<ForetagsRepresentant>();
 
@@ -225,8 +205,8 @@ public class Scheduler {
 			this.numParallelTracks = numParallelTracks;
 		}
 
-		public Byggare medDeltagare(Participant... deltagare) {
-			for (Participant del : deltagare) {
+		public Byggare medDeltagare(Forskare... deltagare) {
+			for (Forskare del : deltagare) {
 				if (del.ärErfaren()) {
 					this.erfarna.add(del);
 				} else {

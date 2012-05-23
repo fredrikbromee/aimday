@@ -2,10 +2,8 @@ package models;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
-
-import play.db.jpa.Model;
+import se.aimday.scheduler.api.ForetagsRepresentantJson;
+import se.aimday.scheduler.api.InconsistentJsonException;
 
 /**
  * En deltagare på en konferens som vill ställa en eller fler frågor
@@ -13,15 +11,15 @@ import play.db.jpa.Model;
  * @author fredrikbromee
  * 
  */
-@Entity
-public class ForetagsRepresentant extends Model {
+public class ForetagsRepresentant {
 	
-	@ManyToMany
 	public List<Question> fragor = new ArrayList<Question>();
 	public String namn;
+	private final String id;
 
-	public ForetagsRepresentant(String namn) {
+	public ForetagsRepresentant(String namn, String id) {
 		this.namn = namn;
+		this.id = id;
 	}
 
 	public List<Question> getFrågelista() {
@@ -62,5 +60,25 @@ public class ForetagsRepresentant extends Model {
 
 	public void önskarSe(Question fråga) {
 		fragor.add(fråga);
+	}
+
+	public static List<ForetagsRepresentant> fromAPI(List<ForetagsRepresentantJson> företagsrepresentanter)
+			throws InconsistentJsonException {
+		ArrayList<ForetagsRepresentant> reps = new ArrayList<ForetagsRepresentant>();
+		for (ForetagsRepresentantJson foretagsRepresentantJson : företagsrepresentanter) {
+			reps.add(ForetagsRepresentant.fromApi(foretagsRepresentantJson));
+		}
+		return reps;
+	}
+
+	public static ForetagsRepresentant fromApi(ForetagsRepresentantJson json) throws InconsistentJsonException {
+		if (json.kontakt == null){
+			throw new InconsistentJsonException(String.format("Företagsrepresentant %s has no contact info", json.id));
+		}
+		ForetagsRepresentant rep = new ForetagsRepresentant(json.kontakt.fornamn + json.kontakt.efternamn, json.id);
+		for (String qId : json.frågor) {
+			rep.önskarSe(new Question(qId));
+		}
+		return rep;
 	}
 }

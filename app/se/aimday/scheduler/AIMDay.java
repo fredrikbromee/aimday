@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import models.ForetagsRepresentant;
-import models.Participant;
+import models.Forskare;
 import models.Question;
 
 
@@ -21,14 +21,14 @@ public class AIMDay {
 
 	private double score;
 	private List<Session> sessions = new ArrayList<Session>();
-	private HashMap<Participant, IndividualAgenda> allAgendas;
+	private HashMap<Forskare, IndividualAgenda> allAgendas;
 
 	// the questions that couldn't be fit in to the schedule end up here
 	private Set<Question> unplacedQuestions = new TreeSet<Question>();
-	private final List<Participant> allParticipants;
+	private final List<Forskare> allParticipants;
 	private final int spår;
 
-	public AIMDay(int antalParallellaSpår, int antalSessioner, List<Participant> allParticipants,
+	public AIMDay(int antalParallellaSpår, int antalSessioner, List<Forskare> allParticipants,
 			Collection<Question> questions) {
 		this.spår = antalParallellaSpår;
 		this.allParticipants = allParticipants;
@@ -47,15 +47,15 @@ public class AIMDay {
 			return allAgendas.values();
 		}
 
-		allAgendas = new HashMap<Participant, IndividualAgenda>();
-		for (Participant p : allParticipants) {
+		allAgendas = new HashMap<Forskare, IndividualAgenda>();
+		for (Forskare p : allParticipants) {
 			allAgendas.put(p, personalAgendaFor(p));
 		}
 
 		return allAgendas.values();
 	}
 
-	public IndividualAgenda personalAgendaFor(Participant deltagare) {
+	public IndividualAgenda personalAgendaFor(Forskare deltagare) {
 		IndividualAgenda schema = new IndividualAgenda(deltagare);
 		for (Session session : sessions) {
 			for (Workshop möte : session.getMöten()) {
@@ -67,7 +67,7 @@ public class AIMDay {
 		return schema;
 	}
 
-	public boolean place(Question q, Participant p, Collection<ForetagsRepresentant> lyssnare) {
+	public boolean place(Question q, Forskare p, Collection<ForetagsRepresentant> lyssnare) {
 		boolean gotAPlace = false;
 		Session sessionWithQ = getSessionFor(q);
 		if (sessionWithQ != null) {

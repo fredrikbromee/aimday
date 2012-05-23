@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import models.ForetagsRepresentant;
-import models.Participant;
+import models.Forskare;
 import models.Question;
 
 /**
@@ -16,7 +16,7 @@ import models.Question;
  */
 public class Workshop {
 
-	List<Participant> participants = new ArrayList<Participant>();
+	List<Forskare> participants = new ArrayList<Forskare>();
 	List<ForetagsRepresentant> lyssnare = new ArrayList<ForetagsRepresentant>();
 	Question question;
 	private double score;
@@ -29,7 +29,7 @@ public class Workshop {
 		this.question = fråga;
 	}
 
-	public boolean isAttendedBy(Participant kanskeMed) {
+	public boolean isAttendedBy(Forskare kanskeMed) {
 		return participants.contains(kanskeMed);
 	}
 
@@ -37,7 +37,7 @@ public class Workshop {
 		return lyssnare.contains(kanskeDär);
 	}
 
-	public void add(Participant d) {
+	public void add(Forskare d) {
 		participants.add(d);
 	}
 
@@ -51,7 +51,7 @@ public class Workshop {
 		return question + ":" + participants;
 	}
 
-	public Collection<Participant> getDeltagare() {
+	public Collection<Forskare> getDeltagare() {
 		return Collections.unmodifiableCollection(participants);
 	}
 
@@ -96,5 +96,42 @@ public class Workshop {
 		return true;
 	}
 
+	private boolean harDeltagareMedVikt() {
+		for (Forskare f : participants) {
+			if (f.harVikt()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public double score(FragaMedDeltagare frågaMedDeltagare) {
+		double unweighted = scoreOneWorkshopUnweighted(frågaMedDeltagare);
+		if (harDeltagareMedVikt()) {
+			return unweighted;
+		}
+
+		int vikt = getQuestion().getVikt();
+
+		// vikt = 1 => liite viktigt att det finns en kliniker
+		// vikt = 5 => superviktigt att det finns en kliniker
+		// Poängen faller linjärt i 6 steg:
+		int max = Math.max(1, 6 - vikt);
+		return max * unweighted / 6;
+	}
+
+	private double scoreOneWorkshopUnweighted(FragaMedDeltagare frågaMedDeltagare) {
+		if (getNumberOfAttendants() >= 2) {
+			return 1;
+		}
+		if (frågaMedDeltagare.antalKandidater() == 1 && getNumberOfAttendants() == 1) {
+			return 1;
+		}
+		if (frågaMedDeltagare.antalKandidater() == 0 && getNumberOfAttendants() == 0) {
+			return 1;
+		}
+
+		return 0.5;
+	}
 
 }
