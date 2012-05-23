@@ -3,12 +3,9 @@
 # ~~~~
 
 
-# CRUD routes (remember to check the job boards app for a real admin gui)
-*           /admin                      module:crud
-
 
 # Home page
-GET     /                                       Application.index
+GET     /                                       Application.form
 
 # Ignore favicon requests
 GET     /favicon.ico                            404
