@@ -179,7 +179,7 @@ public class Scheduler {
 
 
 	private boolean allQsPlaced(AIMDay schedule) {
-		return questions.size() == schedule.getNumberOfScheduledWS();
+		return questions.size() == schedule.getNumberOfScheduledWS() + schedule.getAllUnplacedQuestions().size();
 	}
 
 	/**
