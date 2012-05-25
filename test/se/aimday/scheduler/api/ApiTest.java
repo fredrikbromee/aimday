@@ -35,7 +35,9 @@ public class ApiTest {
 		rep1.id = "rep1";
 		List<String> rep1fragor = Arrays.asList("f1", "f2");
 		rep1.frågor = rep1fragor;
+		rep1.kontakt = new KontaktJson("Arne", "Företagskontakt", null, "Ett företag");
 		reps.add(rep1);
+
 		return reps;
 	}
 

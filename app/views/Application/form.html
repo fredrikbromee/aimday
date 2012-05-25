@@ -8,6 +8,12 @@
      <input type="text" name="sessions" value="5" id="sessions" />
      <label for="generations">Antal generationer</label>
      <input type="text" name="generations" value="2000" id="generations" />
+     <label for="placeWeight">Att frågor är utplacerade</label>
+     <input type="text" name="placeWeight" value="10" id="placeWeight" />
+     <label for="wsWeight">Att varje fråga har fyllts med erfarna deltagare (och att den har kliniker om det behövs)</label>
+     <input type="text" name="wsWeight" value="10" id="wsWeight" />
+     <label for="agendaWeight">Att forskarnas önskemål är tillgodosedda</label>
+     <input type="text" name="agendaWeight" value="10" id="agendaWeight" />
      &nbsp;
      <label for="json">Data för frågor och deltagare</label>
      <textarea name="json"  class="input-xlarge, span12" rows="43" id="json" >paste json here</textarea>
@@ -17,3 +23,8 @@
 
     #{authenticityToken /}
 <p>
+
+Exempelkonferens med ett par deltagare:
+<Pre>
+{"id":"1","namn":"Aimday life science","optimeringsInformation":{"användVikter":true,"viktNamn":"Har klinisk erfarenhet"},"senioritetsgrader":["Överl.","Prof.","Doc.","Dr.","Doktorand"],"frågor":[{"id":"f1","fråga":"What is the cure for the common cold?","vikt":5},{"id":"f2","fråga":"What is the cure for the common cancer?","vikt":0},{"id":"f3","fråga":"What is the cure for the common arne?","vikt":0},{"id":"f4","fråga":"What is the cure for the common bjarne?","vikt":0}],"företagsrepresentanter":[{"id":"rep1","kontakt":{"fornamn":"Arne","efternamn":"Företagskontakt","org":"Ett företag"},"frågor":["f1","f2"]}],"forskare":[{"harVikt":true,"id":"id1","grad":2,"frågor":["f1","f2"],"joker":true,"kontakt":{"fornamn":"Arne","efternamn":"Arnesson","avdelning":"Institutionen för materialfysik","org":"Uppsala universitet"}},{"harVikt":false,"id":"id2","grad":1,"frågor":["f2","f3"],"joker":false,"kontakt":{"fornamn":"Bjarne","efternamn":"Bengtsson","avdelning":"Institutionen för neurologi","org":"Uppsala universitet"}},{"harVikt":false,"id":"id3","grad":3,"frågor":["f4"],"joker":false,"kontakt":{"fornamn":"Carl","efternamn":"Carlsson","avdelning":"Institutionen för materialfysik","org":"Lunds universitet"}}],"schema":{"sessioner":[{"workshops":[{"frågeId":"f1","forskare":["id1"],"företagsrepresentanter":["rep1"]},{"frågeId":"f2","forskare":["id1"]}]},{"workshops":[{"frågeId":"f3","forskare":["id2"]},{"frågeId":"f4","forskare":["id3"]}]}]}}
+</pre>

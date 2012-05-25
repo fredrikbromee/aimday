@@ -57,8 +57,6 @@ public class SchemaläggarTest {
 
 		Assert.assertNotNull("Fråga 1 borde ha blivit utplacerad eftersom den är viktad",
 				bästSchema.getSessionFor(fråga1));
-		Assert.assertEquals(1, bästSchema.getScore(), 0.05);
-		
 	}
 
 	@Test

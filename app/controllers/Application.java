@@ -16,7 +16,6 @@ import se.aimday.scheduler.api.KonferensJson;
 import com.google.gson.Gson;
 
 /**
- * titta på priolista i ordning (som en del av ranking)
  * 
  * @author fredrikbromee
  * 
@@ -31,7 +30,18 @@ public class Application extends Controller {
 		render();
 	}
 
-	public static void schedule(int tracks, int sessions, int generations, String json) {
+	public static void schedule(int tracks, int sessions, int generations, String json, int placeWeight, int wsWeight,
+			int agendaWeight) {
+
+		if (placeWeight < 0) {
+			placeWeight = 10;
+		}
+		if (wsWeight < 0) {
+			wsWeight = 10;
+		}
+		if (agendaWeight < 0) {
+			agendaWeight = 10;
+		}
 
 		List<Forskare> allParticipants = null;
 		List<ForetagsRepresentant> foretagare = null;
@@ -49,7 +59,7 @@ public class Application extends Controller {
 		generations = Math.min(100000, generations);
 		System.out.println("num gs" + generations);
 		Scheduler scheduler = new Scheduler(tracks, sessions, 10, allQuestions.values(), allParticipants, null,
-				foretagare, generations);
+				foretagare, generations, placeWeight, wsWeight, agendaWeight);
 		AIMDay schedule = scheduler.lägg();
 		ArrayList<Integer> spår = new ArrayList<Integer>();
 		for (int i = 1; i <= tracks; i++) {

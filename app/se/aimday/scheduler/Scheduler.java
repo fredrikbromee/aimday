@@ -35,13 +35,30 @@ public class Scheduler {
 
 	private final List<Forskare> allParticipants = new ArrayList<Forskare>();
 
+	private final int placeWeight;
+
+	private final int wsWeight;
+
+	private final int agendaWeight;
+
 	public Scheduler(int numParallelTracks, int numSessions, int maxAttendantsPerWS, Collection<Question> questions,
 			List<Forskare> erfarna, List<Forskare> oerfarna, List<ForetagsRepresentant> foretagare,
 			int generations) {
+		this(numParallelTracks, numSessions, maxAttendantsPerWS, questions, erfarna, oerfarna, foretagare, generations,
+				10, 10, 10);
+
+	}
+
+	public Scheduler(int numParallelTracks, int numSessions, int maxAttendantsPerWS, Collection<Question> questions,
+			List<Forskare> erfarna, List<Forskare> oerfarna, List<ForetagsRepresentant> foretagare, int generations,
+			int placeWeight, int wsWeight, int agendaWeight) {
 		this.numParallelTracks = numParallelTracks;
 		this.numSessions = numSessions;
 		this.maxAttendantsPerWS = maxAttendantsPerWS;
 		this.questions = questions;
+		this.placeWeight = placeWeight;
+		this.wsWeight = wsWeight;
+		this.agendaWeight = agendaWeight;
 		this.allParticipants.addAll(erfarna);
 
 		frågor = new TreeMap<String, FragaMedDeltagare>();
@@ -127,7 +144,7 @@ public class Scheduler {
 	 */
 	private double score(AIMDay schedule) {
 		// are all questions placed?
-		int weightForAllQsPlaced = 10;
+		int weightForAllQsPlaced = placeWeight;
 		int allQScore = 0;
 		if (allQsPlaced(schedule)) {
 			allQScore = weightForAllQsPlaced;
@@ -142,11 +159,11 @@ public class Scheduler {
 			cumulativeWSScore += wsScore;
 			ws.setScore(wsScore);
 		}
-		int weightWS = 10;
+		int weightWS = wsWeight;
 		cumulativeWSScore = cumulativeWSScore / (numParallelTracks * numSessions) * weightWS;
 
 		// how well have attendants wishes been filled?
-		int weightPrio = 10;
+		int weightPrio = agendaWeight;
 		double cumulativePrioScore = 0;
 		for (IndividualAgenda agenda : schedule.getAllIndividualAgendas()) {
 			double agendaScore = agenda.score(numSessions);
