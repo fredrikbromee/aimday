@@ -1,12 +1,8 @@
 package controllers;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
-import models.ForetagsRepresentant;
-import models.Forskare;
-import models.Question;
+import models.Konferens;
 import play.mvc.Controller;
 import se.aimday.scheduler.AIMDay;
 import se.aimday.scheduler.Scheduler;
@@ -30,6 +26,18 @@ public class Application extends Controller {
 		render();
 	}
 
+	public static void scheduleAPI(String json) {
+		try {
+			KonferensJson konf = new Gson().fromJson(json, KonferensJson.class);
+
+			// Prova att parsa en gång så att vi är säkra på att vi gillar formatet
+			Konferens.fromAPI(konf);
+		} catch (InconsistentJsonException e) {
+			error(e.getMessage());
+		}
+		renderTemplate("schedule", json);
+	}
+
 	public static void schedule(int tracks, int sessions, int generations, String json, int placeWeight, int wsWeight,
 			int agendaWeight) {
 
@@ -43,14 +51,11 @@ public class Application extends Controller {
 			agendaWeight = 10;
 		}
 
-		List<Forskare> allParticipants = null;
-		List<ForetagsRepresentant> foretagare = null;
-		Map<String, Question> allQuestions = null;
+
+		Konferens k = null;
 		try {
 			KonferensJson konf = new Gson().fromJson(json, KonferensJson.class);
-			foretagare = ForetagsRepresentant.fromAPI(konf.företagsrepresentanter);
-			allQuestions = Question.fromAPI(konf.frågor);
-			allParticipants = Forskare.fromAPI(konf.forskare, konf.senioritetsgrader, allQuestions);
+			k = Konferens.fromAPI(konf);
 		} catch (InconsistentJsonException e) {
 			error(e.getMessage());
 		}
@@ -58,14 +63,13 @@ public class Application extends Controller {
 
 		generations = Math.min(100000, generations);
 		System.out.println("num gs" + generations);
-		Scheduler scheduler = new Scheduler(tracks, sessions, 10, allQuestions.values(), allParticipants, null,
-				foretagare, generations, placeWeight, wsWeight, agendaWeight);
+		Scheduler scheduler = new Scheduler(tracks, sessions, 10, k, generations, placeWeight, wsWeight, agendaWeight);
 		AIMDay schedule = scheduler.lägg();
 		ArrayList<Integer> spår = new ArrayList<Integer>();
 		for (int i = 1; i <= tracks; i++) {
 			spår.add(i);
 		}
 
-		render(schedule, spår);
+		render(schedule, spår, json);
 	}
 }

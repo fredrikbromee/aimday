@@ -46,17 +46,21 @@ public class SchemaläggarTest {
 		ARNE.önskarSe(fråga1, fråga2);
 		BJARNE.setHarVikt(true);
 		BJARNE.önskarSe(fråga1, fråga2);
+		CHRISTER.önskarSe(fråga1, fråga2);
+		DAVID.önskarSe(fråga1);
+
 		fråga1.setVikt(5);
 
-		läggare = new Scheduler.Byggare(2).mednumSessions(1).medMaxAntalDeltagarePerMöte(3).medDeltagare(ARNE, BJARNE)
-				.medFrågor(fråga1, fråga2).bygg();
+		läggare = new Scheduler.Byggare(2).mednumSessions(1).medMaxAntalDeltagarePerMöte(3)
+				.medDeltagare(ARNE, BJARNE, CHRISTER, DAVID).medFrågor(fråga1, fråga2).bygg();
 
 		AIMDay bästSchema = läggare.lägg();
 		System.out.println("Valt schema:\n" + bästSchema);
 		System.out.println(bästSchema.getScore());
 
-		Assert.assertNotNull("Fråga 1 borde ha blivit utplacerad eftersom den är viktad",
-				bästSchema.getSessionFor(fråga1));
+		Assert.assertNotNull("Fråga 1 borde ha blivit utplacerad", bästSchema.getSessionFor(fråga1));
+		Assert.assertTrue("Bjarne borde vara med på ettan för han är den enda med klinisk erfarenhet!", bästSchema
+				.getWorkshop(fråga1).isAttendedBy(BJARNE));
 	}
 
 	@Test

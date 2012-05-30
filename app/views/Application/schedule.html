@@ -1,42 +1,120 @@
 #{extends 'main.html' /}
 #{set title:'Home' /}
 
-Det här schemats poäng är ${schedule.score.format('#.##')} (1=idealt schema, 0=sämst tänkbara).<br>
- <table class="table table-striped table-condensed">
-     <thead>
-         <tr>
-	         <th></th>
-	         #{list spår, as:'spårnr'}
-	             <th>Rum ${spårnr}</th>
-		     #{/list}
-         </tr>
-     </thead>
-     <tbody>
-         #{list schedule.sessions, as:'session'}
-             <tr>
-                 <td><b>S${session.sessionNumber}:</b></td> 
-		         #{list session.workshops, as:'workshop'}
-		                 <td><b>Fråga ${workshop.question.q}:</b><br> 
-		                 #{list workshop.participants, as:'participant'}
-				                 <i class="icon-fire"></i>
-		                         ${participant.first_name}<br>
-		                 #{/list}		                 
-		                 </td>
-		         #{/list}
-             </tr>
-         #{/list}
-     </tbody>
- </table>
- 
-#{if schedule.unplacedQuestions}
-	<br>I det här schemat misslyckades vi att placera ut:
-	#{list schedule.unplacedQuestions, as:'unplaced'}
-	        Fråga ${unplaced.q}
-	#{/list}                        
+#{if schedule}
+
+	Det här schemats poäng är ${schedule.score.format('#.##')} (1=idealt schema, 0=sämst tänkbara).<br>
+	 <table class="table table-striped table-condensed">
+	     <thead>
+	         <tr>
+		         <th></th>
+		         #{list spår, as:'spårnr'}
+		             <th>Rum ${spårnr}</th>
+			     #{/list}
+	         </tr>
+	     </thead>
+	     <tbody>
+	         #{list schedule.sessions, as:'session'}
+	             <tr>
+	                 <td><b>S${session.sessionNumber}:</b></td> 
+			         #{list session.workshops, as:'workshop'}
+			                 <td><b>Fråga ${workshop.question.q}:</b><br> 
+			                 #{list workshop.participants, as:'participant'}
+					                 <i class="icon-fire"></i>
+			                         ${participant.first_name}<br>
+			                 #{/list}		                 
+			                 </td>
+			         #{/list}
+	             </tr>
+	         #{/list}
+	     </tbody>
+	 </table>
+	 
+	#{if schedule.unplacedQuestions}
+		<br>I det här schemat misslyckades vi att placera ut:
+		#{list schedule.unplacedQuestions, as:'unplaced'}
+		        Fråga ${unplaced.q}
+		#{/list}
+	#{/if}
+	<p>
+	#{if schedule.unsatisfied}
+		I det här schemat fick följande (${schedule.unsatisfied.size} st) deltagare inte vara med på hela sin önskelista:
+		#{list schedule.unsatisfied, as:'un'}
+		         <div "unsatisfied_participant">${un.participant.first_name} önskade ${un.wishedNumber} st, fick se ${un.assignedNumber} st </div>
+		#{/list}                        
+	#{/if}
 #{/if}
+
 <p>
-I det här schemat fick följande (${schedule.unsatisfied.size} st) deltagare inte vara med på hela sin önskelista:
-#{list schedule.unsatisfied, as:'un'}
-         <div "unsatisfied_participant">${un.participant.first_name} önskade ${un.wishedNumber} st, fick se ${un.assignedNumber} st </div>
-#{/list}                        
+Frågor
+<table>
+    <thead>
+    </thead>
+    <tbody data-bind="foreach: model.frågor">
+        <tr>
+            <td data-bind="text: id"></td>
+            <td data-bind="text: fråga"></td>
+            <td data-bind="text: låst"></td>
+        </tr>
+    </tbody>
+</table>
+
+<p>
+Anmälda forskare
+<table>
+    <thead>
+    </thead>
+    <tbody data-bind="foreach: model.forskare">
+        <tr>
+            <td data-bind="text: id"></td>
+            <td data-bind="text: namn"></td>
+        </tr>
+    </tbody>
+</table>
+<lista över alla frågor: anmälda, låst till session>
+<lista över alla forskare: vilka frågor, låst till session, låst till fråga >
+<script type="text/javascript">
+
+	var json = ${json.raw()};
+	var model = new KonferensModel();
+	model.id = json.id;
+	model.namn = json.namn;
+	model.optimeringsInformation = json.optimeringsInformation;
+	model.senioritetsgrader = json.senioritetsgrader;
+	model.företagsrepresentanter = json.företagsrepresentanter;
+	model.schema = json.schema;
+
+	for (var i = 0; i < json.frågor.length; i++) {
+	    var f = json.frågor[i];
+		model.frågor.push(new Fråga(f));
+	}
+	for (var i = 0; i < json.forskare.length; i++) {
+	    var f = json.forskare[i];
+		model.forskare.push(new Forskare(f));
+	}
+	ko.applyBindings(model);
+
+    function Fråga(f){
+    	var self = this;
+    	self.id = ko.observable(f.id);
+    	self.fråga = ko.observable(f.fråga);
+    	self.låst = ko.observable(f.låst);
+    }
+    
+    function Forskare(f){
+    	var self = this;
+    	self.id = ko.observable(f.id);
+    	self.harVikt = ko.observable(f.harVikt);
+    	self.kontakt = ko.observable(f.kontakt);
+    	self.namn = ko.computed(function(){return self.kontakt().fornamn + " " + self.kontakt().efternamn;}, this);
+    }
+    
+    function KonferensModel(){
+    	var self = this;
+    	self.frågor = ko.observableArray();
+    	self.forskare = ko.observableArray();
+    }
+	
+</script>
+
 

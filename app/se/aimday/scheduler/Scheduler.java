@@ -10,6 +10,7 @@ import java.util.TreeMap;
 
 import models.ForetagsRepresentant;
 import models.Forskare;
+import models.Konferens;
 import models.Question;
 
 /**
@@ -44,22 +45,21 @@ public class Scheduler {
 	public Scheduler(int numParallelTracks, int numSessions, int maxAttendantsPerWS, Collection<Question> questions,
 			List<Forskare> erfarna, List<Forskare> oerfarna, List<ForetagsRepresentant> foretagare,
 			int generations) {
-		this(numParallelTracks, numSessions, maxAttendantsPerWS, questions, erfarna, oerfarna, foretagare, generations,
-				10, 10, 10);
+		this(numParallelTracks, numSessions, maxAttendantsPerWS, new Konferens(erfarna, foretagare, questions),
+				generations, 10, 10, 10);
 
 	}
 
-	public Scheduler(int numParallelTracks, int numSessions, int maxAttendantsPerWS, Collection<Question> questions,
-			List<Forskare> erfarna, List<Forskare> oerfarna, List<ForetagsRepresentant> foretagare, int generations,
+	public Scheduler(int numParallelTracks, int numSessions, int maxAttendantsPerWS, Konferens k, int generations,
 			int placeWeight, int wsWeight, int agendaWeight) {
 		this.numParallelTracks = numParallelTracks;
 		this.numSessions = numSessions;
 		this.maxAttendantsPerWS = maxAttendantsPerWS;
-		this.questions = questions;
+		this.questions = k.getFrågor();
 		this.placeWeight = placeWeight;
 		this.wsWeight = wsWeight;
 		this.agendaWeight = agendaWeight;
-		this.allParticipants.addAll(erfarna);
+		this.allParticipants.addAll(k.getDeltagare());
 
 		frågor = new TreeMap<String, FragaMedDeltagare>();
 		for (Question q : questions) {
@@ -67,13 +67,13 @@ public class Scheduler {
 			frågor.put(q.getQ(), f);
 		}
 
-		for (Forskare deltagare : erfarna) {
+		for (Forskare deltagare : k.getDeltagare()) {
 			for (Question fråga : deltagare.getÖnskelista()) {
 				frågor.get(fråga.getQ()).läggTillDeltagare(deltagare);
 			}
 		}
 
-		for (ForetagsRepresentant f : foretagare) {
+		for (ForetagsRepresentant f : k.getForetagare()) {
 			for (Question fråga : f.getFrågelista()) {
 				frågor.get(fråga.getQ()).läggTillFöretagare(f);
 			}
