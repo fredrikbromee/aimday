@@ -46,7 +46,7 @@
 #{/if}
 
 <p>
-Frågor
+Frågor (lägg låsning i en pop-over)
 <table>
     <thead>
     </thead>
@@ -54,7 +54,13 @@ Frågor
         <tr>
             <td data-bind="text: id"></td>
             <td data-bind="text: fråga"></td>
-            <td data-bind="text: låst"></td>
+            <td data-bind="visible: ärLåst">Låst till session <span data-bind="text: låst"> </span></td>
+            <td><select data-bind="options: sessioner, selectedOptions: låst" multiple="true"></select></td>
+            <td data-bind="visible: ärLåst">
+            	<form data-bind="submit: removeLås">
+	    			<button type="submit">Ta bort alla lås för den här frågan</button>
+				</form>
+            </td>
         </tr>
     </tbody>
 </table>
@@ -98,7 +104,13 @@ Anmälda forskare
     	var self = this;
     	self.id = ko.observable(f.id);
     	self.fråga = ko.observable(f.fråga);
-    	self.låst = ko.observable(f.låst);
+    	self.låst = ko.observableArray(f.låst);
+    	self.ärLåst = ko.computed(function(){return self.låst() != null && self.låst().length > 0;}, this);
+//    	self.kanLåsas =  not! ärLåst;
+		self.sessioner = [1,2,3,4,5,6];
+		self.removeLås = function(formElement) {
+			self.låst.removeAll();
+        }
     }
     
     function Forskare(f){
