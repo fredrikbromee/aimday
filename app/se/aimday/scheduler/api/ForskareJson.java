@@ -1,5 +1,6 @@
 package se.aimday.scheduler.api;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ForskareJson {
@@ -22,4 +23,7 @@ public class ForskareJson {
 	public List<String> frågor;
 	public boolean joker;
 	public KontaktJson kontakt;
+	public List<String> låstaFrågor = new ArrayList<String>();
+	public List<Integer> låstaSessioner = new ArrayList<Integer>();
+
 }

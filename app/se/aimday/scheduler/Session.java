@@ -43,6 +43,9 @@ public class Session {
 		if (!q.kanPlacerasISessionNummer(sessionNumber)) {
 			return false;
 		}
+		if (!p.kanPlacerasISessionNummer(sessionNumber)) {
+			return false;
+		}
 		if (isAttendedByAnyOf(Collections.singletonList(p))) {
 			return false;
 		}

@@ -2,7 +2,10 @@
 #{set title:'Home' /}
 
 #{if schedule}
-
+<section id="schema">
+  <div class="page-header">
+    <h1>Schema</h1>
+  </div>
 	Det här schemats poäng är ${schedule.score.format('#.##')} (1=idealt schema, 0=sämst tänkbara).<br>
 	 <table class="table table-striped table-condensed">
 	     <thead>
@@ -43,68 +46,90 @@
 		         <div "unsatisfied_participant">${un.participant.first_name} önskade ${un.wishedNumber} st, fick se ${un.assignedNumber} st </div>
 		#{/list}                        
 	#{/if}
+</section>
 #{/if}
+<section id="fragor">
+  <div class="page-header">
+    <h1>Frågor <small>(lägg låsning i en pop-over?)</small></h1>
+  </div>
 
-<p>
-Frågor (lägg låsning i en pop-over)
-<table>
-    <thead>
-    </thead>
-    <tbody data-bind="foreach: model.fragor">
-        <tr>
-            <td data-bind="text: id"></td>
-            <td data-bind="text: fråga"></td>
-            <td data-bind="visible: ärLåst">Låst till session <span data-bind="text: låst"> </span></td>
-            <td><select data-bind="options: model.sessioner, selectedOptions: låst" multiple="true"></select></td>
-            <td data-bind="visible: ärLåst">
-            	<form data-bind="submit: removeLås">
-	    			<button type="submit">Ta bort alla lås för den här frågan</button>
-				</form>
-            </td>
-        </tr>
-    </tbody>
-</table>
+	<table>
+	    <thead>
+	    </thead>
+	    <tbody data-bind="foreach: model.fragor">
+	        <tr>
+	            <td data-bind="text: id"></td>
+	            <td data-bind="text: fråga"></td>
+	            <td data-bind="visible: ärLåst">Låst till session <span data-bind="text: låst"> </span></td>
+	            <td><select data-bind="options: model.sessioner, selectedOptions: låst" multiple="true"></select></td>
+	            <td data-bind="visible: ärLåst">
+	            	<form data-bind="submit: removeLås">
+		    			<button type="submit">Ta bort alla lås för den här frågan</button>
+					</form>
+	            </td>
+	        </tr>
+	    </tbody>
+	</table>
 
-<p>
-Anmälda forskare
-<table>
-    <thead>
-    </thead>
-    <tbody data-bind="foreach: model.forskare">
-        <tr>
-            <td data-bind="text: id"></td>
-            <td data-bind="text: namn"></td>
-        </tr>
-    </tbody>
-</table>
-<lista över alla frågor: anmälda, låst till session>
-<lista över alla forskare: vilka frågor, låst till session, låst till fråga >
-<p>
-* Kolla sektioner /avdelning med bootstrap
-* popovers
-* loopa över spår när man lägger ut frågor
-<p>
-<p>
-Kolla med UU innov om de vill öppna i en ny tab i stället (lägg till  target="_blank" till formuläret isf)
-<p>
-<form action="@{Application.schedule()}" method="POST" accept-charset="${_response_encoding}" data-bind="submit: model.generera">
-     <label for="tracks">Antal parallella spår</label>
-     <input type="text" name="tracks" value="10" id="tracks" />
-     <label for="sessions">Antal sessioner</label>
-     <input type="text" name="sessions" value="5" id="sessions" />
-     <label for="generations">Antal generationer</label>
-     <input type="text" name="generations" value="2000" id="generations" />
-     <label for="placeWeight">Att frågor är utplacerade</label>
-     <input type="text" name="placeWeight" value="10" id="placeWeight" />
-     <label for="wsWeight">Att varje fråga har fyllts med erfarna deltagare (och att den har kliniker om det behövs)</label>
-     <input type="text" name="wsWeight" value="10" id="wsWeight" />
-     <label for="agendaWeight">Att forskarnas önskemål är tillgodosedda</label>
-     <input type="text" name="agendaWeight" value="10" id="agendaWeight" />
-     <input type="hidden" data-bind="value: model.genereradJson" name="json"></input>
-     &nbsp;
-	<button type="submit">Generera nytt schema</button>
- </form>
+</section>
+<section id="forskare">
+  <div class="page-header">
+    <h1>Forskare</h1>
+  </div>
+	
+	<table>
+	    <thead>
+	    </thead>
+	    <tbody data-bind="foreach: model.forskare">
+	        <tr>
+	            <td data-bind="text: id"></td>
+	            <td data-bind="text: namn"></td>
+	            <td data-bind="visible: ärLåst">Låst till session <span data-bind="text: låstaSessioner"> </span></td>
+	            <td><select data-bind="options: model.sessioner, selectedOptions: låstaSessioner" multiple="true"></select></td>
+	            <td data-bind="visible: ärLåst">
+	            	<form data-bind="submit: removeLås">
+		    			<button type="submit">Ta bort alla lås för den här frågan</button>
+					</form>
+	            </td>
+	        </tr>
+	    </tbody>
+	</table>
+</section>
+	
+<section id="generera">
+  <div class="page-header">
+    <h1>Generera nytt schema</h1>
+  </div>
 
+	<form action="@{Application.schedule()}" method="POST" accept-charset="${_response_encoding}" data-bind="submit: model.generera">
+	     <label for="tracks">Antal parallella spår</label>
+	     <input type="text" name="tracks" value="10" id="tracks" />
+	     <label for="sessions">Antal sessioner</label>
+	     <input type="text" name="sessions" value="5" id="sessions" />
+	     <label for="generations">Antal generationer</label>
+	     <input type="text" name="generations" value="2000" id="generations" />
+	     <label for="placeWeight">Att frågor är utplacerade</label>
+	     <input type="text" name="placeWeight" value="10" id="placeWeight" />
+	     <label for="wsWeight">Att varje fråga har fyllts med erfarna deltagare (och att den har kliniker om det behövs)</label>
+	     <input type="text" name="wsWeight" value="10" id="wsWeight" />
+	     <label for="agendaWeight">Att forskarnas önskemål är tillgodosedda</label>
+	     <input type="text" name="agendaWeight" value="10" id="agendaWeight" />
+	     <input type="hidden" data-bind="value: model.genereradJson" name="json"></input>
+	     &nbsp;
+		<button type="submit">Generera nytt schema</button>
+	 </form>
+</section>
+
+<section id="todo">
+  <div class="page-header">
+    <h1>TODOs</h1>
+  </div>
+	<p>
+	* popovers
+	* loopa över spår när man lägger ut frågor
+	* Kolla med UU innov om de vill öppna i en ny tab i stället (lägg till  target="_blank" till formuläret isf)
+	<p>
+</section>
 
 <script type="text/javascript">
 
@@ -147,6 +172,11 @@ Kolla med UU innov om de vill öppna i en ny tab i stället (lägg till  target=
     	self.grad = f.grad;
     	self.joker = f.joker;
     	self.frågor = f.frågor;
+    	self.låstaSessioner = ko.observableArray(f.låstaSessioner);
+    	self.ärLåst = ko.computed(function(){return self.låstaSessioner() != null && self.låstaSessioner().length > 0;}, this);
+		self.removeLås = function(formElement) {
+			self.låstaSessioner.removeAll();
+        }
     }
     
     function KonferensModel(){

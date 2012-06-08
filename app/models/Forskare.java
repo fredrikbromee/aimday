@@ -23,6 +23,8 @@ public class Forskare {
 	private int grad;
 	private final String id;
 	private boolean harVikt;
+	private List<Integer> låstaSessioner = new ArrayList<Integer>();
+	private List<String> låstaFrågor = new ArrayList<String>();
 
 	public Forskare(String id, String förnamn, String efternamn, int grad, String gradStr) {
 		this.id = id;
@@ -120,6 +122,15 @@ public class Forskare {
 			Forskare forskaren = new Forskare(f.id, f.kontakt.fornamn, f.kontakt.efternamn, f.grad, gradStr);
 			forskaren.isJoker = f.joker;
 			forskaren.harVikt = f.harVikt;
+
+			if (null != f.låstaSessioner) {
+				forskaren.låstaSessioner.addAll(f.låstaSessioner);
+			}
+
+			if (null != f.låstaFrågor) {
+				forskaren.låstaFrågor.addAll(f.låstaFrågor);
+			}
+
 			for (String qId : f.frågor) {
 				forskaren.önskarSe(allQuestions.get(qId));
 			}
@@ -136,5 +147,17 @@ public class Forskare {
 	public boolean harVikt() {
 		return harVikt;
 	}
+
+	private boolean ärLåstTillSessioner() {
+		return !låstaSessioner.isEmpty();
+	}
+
+	public boolean kanPlacerasISessionNummer(int sessionsNummer) {
+		if (!ärLåstTillSessioner()) {
+			return true;
+		}
+		return låstaSessioner.contains(sessionsNummer);
+	}
+
 }
 
