@@ -24,7 +24,7 @@ public class Konferens {
 		List<ForetagsRepresentant> foretagare = null;
 		Map<String, Question> allQuestions = null;
 		foretagare = ForetagsRepresentant.fromAPI(konf.företagsrepresentanter);
-		allQuestions = Question.fromAPI(konf.frågor);
+		allQuestions = Question.fromAPI(konf.fragor);
 		allParticipants = Forskare.fromAPI(konf.forskare, konf.senioritetsgrader, allQuestions);
 		return new Konferens(allParticipants, foretagare, allQuestions.values());
 	}

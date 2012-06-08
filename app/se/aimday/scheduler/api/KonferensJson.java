@@ -21,7 +21,7 @@ public class KonferensJson {
 	public String namn;
 	public OptimeringsInformation optimeringsInformation;
 	public List<String> senioritetsgrader;
-	public List<FragaJson> frågor;
+	public List<FragaJson> fragor;
 	public List<ForetagsRepresentantJson> företagsrepresentanter;
 	public List<ForskareJson> forskare;
 	public SchemaJson schema;

@@ -50,12 +50,12 @@ Frågor (lägg låsning i en pop-over)
 <table>
     <thead>
     </thead>
-    <tbody data-bind="foreach: model.frågor">
+    <tbody data-bind="foreach: model.fragor">
         <tr>
             <td data-bind="text: id"></td>
             <td data-bind="text: fråga"></td>
             <td data-bind="visible: ärLåst">Låst till session <span data-bind="text: låst"> </span></td>
-            <td><select data-bind="options: sessioner, selectedOptions: låst" multiple="true"></select></td>
+            <td><select data-bind="options: model.sessioner, selectedOptions: låst" multiple="true"></select></td>
             <td data-bind="visible: ärLåst">
             	<form data-bind="submit: removeLås">
 	    			<button type="submit">Ta bort alla lås för den här frågan</button>
@@ -79,6 +79,27 @@ Anmälda forskare
 </table>
 <lista över alla frågor: anmälda, låst till session>
 <lista över alla forskare: vilka frågor, låst till session, låst till fråga >
+
+Kolla med UU innov om de vill öppna i en ny tab i stället (lägg till  target="_blank" till formuläret isf)
+<form action="@{Application.schedule()}" method="POST" accept-charset="${_response_encoding}" data-bind="submit: model.generera">
+     <label for="tracks">Antal parallella spår</label>
+     <input type="text" name="tracks" value="10" id="tracks" />
+     <label for="sessions">Antal sessioner</label>
+     <input type="text" name="sessions" value="5" id="sessions" />
+     <label for="generations">Antal generationer</label>
+     <input type="text" name="generations" value="2000" id="generations" />
+     <label for="placeWeight">Att frågor är utplacerade</label>
+     <input type="text" name="placeWeight" value="10" id="placeWeight" />
+     <label for="wsWeight">Att varje fråga har fyllts med erfarna deltagare (och att den har kliniker om det behövs)</label>
+     <input type="text" name="wsWeight" value="10" id="wsWeight" />
+     <label for="agendaWeight">Att forskarnas önskemål är tillgodosedda</label>
+     <input type="text" name="agendaWeight" value="10" id="agendaWeight" />
+     <input type="hidden" data-bind="value: model.genereradJson" name="json"></input>
+     &nbsp;
+	<button type="submit">Generera nytt schema</button>
+ </form>
+
+
 <script type="text/javascript">
 
 	var json = ${json.raw()};
@@ -90,9 +111,9 @@ Anmälda forskare
 	model.företagsrepresentanter = json.företagsrepresentanter;
 	model.schema = json.schema;
 
-	for (var i = 0; i < json.frågor.length; i++) {
-	    var f = json.frågor[i];
-		model.frågor.push(new Fråga(f));
+	for (var i = 0; i < json.fragor.length; i++) {
+	    var f = json.fragor[i];
+		model.fragor.push(new Fråga(f));
 	}
 	for (var i = 0; i < json.forskare.length; i++) {
 	    var f = json.forskare[i];
@@ -106,8 +127,6 @@ Anmälda forskare
     	self.fråga = ko.observable(f.fråga);
     	self.låst = ko.observableArray(f.låst);
     	self.ärLåst = ko.computed(function(){return self.låst() != null && self.låst().length > 0;}, this);
-//    	self.kanLåsas =  not! ärLåst;
-		self.sessioner = [1,2,3,4,5,6];
 		self.removeLås = function(formElement) {
 			self.låst.removeAll();
         }
@@ -119,12 +138,23 @@ Anmälda forskare
     	self.harVikt = ko.observable(f.harVikt);
     	self.kontakt = ko.observable(f.kontakt);
     	self.namn = ko.computed(function(){return self.kontakt().fornamn + " " + self.kontakt().efternamn;}, this);
+    	self.grad = f.grad;
+    	self.joker = f.joker;
+    	self.frågor = f.frågor;
     }
     
     function KonferensModel(){
     	var self = this;
-    	self.frågor = ko.observableArray();
+		self.sessioner = [1,2,3,4,5,6]; // Antar att vi bara tillåter så här många sessioner
+    	self.fragor = ko.observableArray();
     	self.forskare = ko.observableArray();
+		self.genereradJson = ko.observable();
+		self.generera = function(formElement) {
+			var newJson = ko.toJSON(self);
+			self.genereradJson(newJson);
+			console.log(newJson);
+			return true;
+        }
     }
 	
 </script>

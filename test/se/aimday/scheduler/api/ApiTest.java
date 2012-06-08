@@ -17,7 +17,7 @@ public class ApiTest {
 		konferens.namn = "Aimday life science";
 		konferens.företagsrepresentanter = enFöretagsRep();
 		konferens.forskare = treForskare();
-		konferens.frågor = fyraFrågor();
+		konferens.fragor = fyraFrågor();
 		konferens.senioritetsgrader = Arrays.asList("Överl.", "Prof.", "Doc.", "Dr.", "Doktorand");
 		konferens.schema = schemaMedFyraFrågor();
 		OptimeringsInformation optimeringsInformation = new OptimeringsInformation();
