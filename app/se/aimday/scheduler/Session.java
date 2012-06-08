@@ -19,7 +19,7 @@ public class Session {
 
 	private List<Workshop> workshops;
 	private final int numParalllelTracks;
-	private final int sessionNumber;
+	private final int sessionNumber; // Dagens första session har nummer 1 (inte 0)
 
 	public Session(int sessionNumber, int numParallelTracks) {
 		this.sessionNumber = sessionNumber;
@@ -40,6 +40,9 @@ public class Session {
 	}
 
 	public boolean place(Question q, Forskare p, Collection<ForetagsRepresentant> lyssnare) {
+		if (!q.kanPlacerasISessionNummer(sessionNumber)) {
+			return false;
+		}
 		if (isAttendedByAnyOf(Collections.singletonList(p))) {
 			return false;
 		}

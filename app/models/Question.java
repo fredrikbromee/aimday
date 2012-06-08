@@ -1,5 +1,6 @@
 package models;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ public class Question implements Comparable<Question> {
 
 	public String id;
 	private int vikt = 0;
+	private List<Integer> låst = new ArrayList<Integer>();
 
 	public Question(String q) {
 		this.id = q;
@@ -44,7 +46,11 @@ public class Question implements Comparable<Question> {
 		for (FragaJson fragaJson : json) {
 			Question question = new Question(fragaJson.id);
 			question.vikt = fragaJson.vikt;
+			if (null != fragaJson.låst) {
+				question.låst.addAll(fragaJson.låst);
+			}
 			frågor.put(fragaJson.id, question);
+
 		}
 		return frågor;
 	}
@@ -76,6 +82,17 @@ public class Question implements Comparable<Question> {
 
 	public void setVikt(int i) {
 		this.vikt = i;
+	}
+
+	private boolean ärLåst() {
+		return !låst.isEmpty();
+	}
+
+	public boolean kanPlacerasISessionNummer(int sessionsNummer) {
+		if (!ärLåst()) {
+			return true;
+		}
+		return låst.contains(sessionsNummer);
 	}
 
 }

@@ -79,8 +79,14 @@ Anmälda forskare
 </table>
 <lista över alla frågor: anmälda, låst till session>
 <lista över alla forskare: vilka frågor, låst till session, låst till fråga >
-
+<p>
+* Kolla sektioner /avdelning med bootstrap
+* popovers
+* loopa över spår när man lägger ut frågor
+<p>
+<p>
 Kolla med UU innov om de vill öppna i en ny tab i stället (lägg till  target="_blank" till formuläret isf)
+<p>
 <form action="@{Application.schedule()}" method="POST" accept-charset="${_response_encoding}" data-bind="submit: model.generera">
      <label for="tracks">Antal parallella spår</label>
      <input type="text" name="tracks" value="10" id="tracks" />
