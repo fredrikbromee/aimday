@@ -2,6 +2,7 @@ package models;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -57,8 +58,21 @@ public class Forskare {
 
 	public List<Question> getRandomizedWishlist() {
 		List<Question> shuffled = new ArrayList<Question>(prio);
+
+		if (ärLåstTillFrågor()) {
+			for (Iterator<Question> iterator = shuffled.iterator(); iterator.hasNext();) {
+				Question question = iterator.next();
+				if (låstaFrågor.contains(question.id)) {
+					iterator.remove();
+				}
+			}
+		}
 		Collections.shuffle(shuffled);
 		return shuffled;
+	}
+
+	public boolean ärLåstTillFrågor() {
+		return !låstaFrågor.isEmpty();
 	}
 
 	@Override
@@ -159,5 +173,8 @@ public class Forskare {
 		return låstaSessioner.contains(sessionsNummer);
 	}
 
+	public List<String> getLåstaFrågor() {
+		return Collections.unmodifiableList(låstaFrågor);
+	}
 }
 

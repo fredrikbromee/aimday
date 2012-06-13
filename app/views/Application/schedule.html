@@ -61,7 +61,7 @@
 	            <td data-bind="text: id"></td>
 	            <td data-bind="text: fråga"></td>
 	            <td data-bind="visible: ärLåst">Låst till session <span data-bind="text: låst"> </span></td>
-	            <td><select data-bind="options: model.sessioner, selectedOptions: låst" multiple="true"></select></td>
+	            <td><select data-bind="options: model.sessioner, selectedOptions: låst, optionsCaption: 'Lås till session...'" multiple="true"></select></td>
 	            <td data-bind="visible: ärLåst">
 	            	<form data-bind="submit: removeLås">
 		    			<button type="submit">Ta bort alla lås för den här frågan</button>
@@ -85,10 +85,17 @@
 	            <td data-bind="text: id"></td>
 	            <td data-bind="text: namn"></td>
 	            <td data-bind="visible: ärLåst">Låst till session <span data-bind="text: låstaSessioner"> </span></td>
-	            <td><select data-bind="options: model.sessioner, selectedOptions: låstaSessioner" multiple="true"></select></td>
+	            <td><select data-bind="options: model.sessioner, selectedOptions: låstaSessioner, optionsCaption: 'Lås till session...'" multiple="true"></select></td>
 	            <td data-bind="visible: ärLåst">
 	            	<form data-bind="submit: removeLås">
-		    			<button type="submit">Ta bort alla lås för den här frågan</button>
+		    			<button type="submit">Ta bort alla sessionslås för den här forskaren</button>
+					</form>
+	            </td>
+	            <td data-bind="visible: ärLåstTillFråga">Låst till fråga/frågor <span data-bind="text: låstaFrågor"> </span></td>
+	            <td><select data-bind="options: frageIdn, selectedOptions: låstaFrågor, optionsCaption: 'Lås till fråga...'" multiple="true"></select></td>
+	            <td data-bind="visible: ärLåstTillFråga">
+	            	<form data-bind="submit: removeFrågeLås">
+		    			<button type="submit">Ta bort alla frågelås för den här forskaren</button>
 					</form>
 	            </td>
 	        </tr>
@@ -125,6 +132,8 @@
     <h1>TODOs</h1>
   </div>
 	<p>
+	* post-url i json
+	* måste finnas en spara-knapp nånstans 
 	* popovers
 	* loopa över spår när man lägger ut frågor
 	* Kolla med UU innov om de vill öppna i en ny tab i stället (lägg till  target="_blank" till formuläret isf)
@@ -176,6 +185,15 @@
     	self.ärLåst = ko.computed(function(){return self.låstaSessioner() != null && self.låstaSessioner().length > 0;}, this);
 		self.removeLås = function(formElement) {
 			self.låstaSessioner.removeAll();
+        }
+        self.frageIdn = ko.observableArray();
+		for (var i = 0; i < f.frågor.length; i++) {
+	    	self.frageIdn.push(f.frågor[i]);
+		}
+    	self.låstaFrågor = ko.observableArray(f.låstaFrågor);
+    	self.ärLåstTillFråga = ko.computed(function(){return self.låstaFrågor() != null && self.låstaFrågor().length > 0;}, this);
+		self.removeFrågeLås = function(formElement) {
+			self.låstaFrågor.removeAll();
         }
     }
     
