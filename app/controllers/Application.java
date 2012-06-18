@@ -26,6 +26,10 @@ public class Application extends Controller {
 		render();
 	}
 
+	public static void form2() {
+		render();
+	}
+
 	public static void scheduleAPI(String json) {
 		try {
 			KonferensJson konf = new Gson().fromJson(json, KonferensJson.class);
@@ -35,7 +39,7 @@ public class Application extends Controller {
 		} catch (InconsistentJsonException e) {
 			error(e.getMessage());
 		}
-		renderTemplate("schedule", json);
+		renderTemplate("Application/schedule.html", json);
 	}
 
 	public static void schedule(int tracks, int sessions, int generations, String json, int placeWeight, int wsWeight,
