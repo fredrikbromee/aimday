@@ -127,12 +127,6 @@ public class Scheduler {
 		AIMDay schema = new AIMDay(numParallelTracks, numSessions, allParticipants, questions);
 
 		// Tanken är här att man skulle kunna börja med att lägga ut de frågor som har forskare låsta till sig
-		// Ett problem är att det kan resultera i omöjliga utläggningar (eller så placerar man dem?)JA!!!
-
-		// hitta alla frågelåsta forskare
-		// för varje frågelåst forskare
-		// för varje låst fråga
-		// placera ut frågan på schemat.
 		List<Forskare> frågelåsta = getFrågelåstaForskare();
 		for (Forskare p : frågelåsta) {
 			for (String qId : p.getLåstaFrågor()) {
@@ -141,6 +135,7 @@ public class Scheduler {
 			}
 		}
 
+		// och sen lägger man ut alla andra
 		for (Forskare p : sorteradeDeltagare) {
 			for (Question q : p.getRandomizedWishlist()) {
 				FragaMedDeltagare medDeltagare = frågor.get(q.getQ());

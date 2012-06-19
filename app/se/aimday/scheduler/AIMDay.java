@@ -2,6 +2,7 @@ package se.aimday.scheduler;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -19,6 +20,13 @@ import models.Question;
  */
 public class AIMDay {
 
+	private static final Comparator<? super Session> filledComparator = new Comparator<Session>() {
+
+		@Override
+		public int compare(Session session1, Session session2) {
+			return Integer.valueOf(session1.getNumberOfScheduledWS()).compareTo(session2.getNumberOfScheduledWS());
+		}
+	};
 	private double score;
 	private List<Session> sessions = new ArrayList<Session>();
 	private HashMap<Forskare, IndividualAgenda> allAgendas;
@@ -79,9 +87,11 @@ public class AIMDay {
 			return gotAPlace;
 		}
 
-		// Prova att sortera sessioner så att den session med minst antal workshops kommer först! Vi vill fylla
+		// Sortera sessioner så att den session med minst antal workshops kommer först! Vi vill fylla
 		// sessioner lika mycket.
-		for (Session session : sessions) {
+		ArrayList<Session> copy = new ArrayList<Session>(sessions);
+		Collections.sort(copy, filledComparator);
+		for (Session session : copy) {
 			gotAPlace = session.place(q, p, lyssnare);
 			if (gotAPlace)
 				break;
@@ -91,6 +101,7 @@ public class AIMDay {
 		}
 		return gotAPlace;
 	}
+
 
 	public int getNumberOfScheduledWS() {
 		int num = 0;
