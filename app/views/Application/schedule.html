@@ -23,8 +23,18 @@
 			         #{list session.workshops, as:'workshop'}
 			                 <td><b>Fråga ${workshop.question.q}:</b><br> 
 			                 #{list workshop.participants, as:'participant'}
-					                 <i class="icon-fire"></i>
-			                         ${participant.first_name}<br>
+			                 		
+					                 <!--<i class="icon-arrow-left"></i>
+					                 	Tanken här är att pilarna ska bli synliga när man hovrar över forskaren, de ska 
+					                 	ligga i en     <div data-bind="visible: pilarSynliga">
+					                 	 
+					                 	 Och forskaren ligger i en sån här div:
+					                 	 <div data-bind="event: { mouseover: visaPilar, mouseout: tabortPilar }">
+					                 -->
+			                         <div>
+			                         	${participant.first_name}, Inst för neurologi, Uppsala Universitet
+			                         </div>
+					                 <!--<i class="icon-arrow-right"></i>-->
 			                 #{/list}		                 
 			                 </td>
 			         #{/list}
@@ -58,7 +68,7 @@
             <div class="modal-body">
               <h4>Det här funkar inte riktigt</h4>
               <p>Det som kommer att hända här är att schemat skickas tillbaka till registreringsmodulen för att sparas i 
-              dess databas. Den delen är inte gjord än 
+              dess databas. Den delen är inte gjord än... 
             </div>
             <div class="modal-footer">
               <a href="#" class="btn btn-primary" data-dismiss="modal">OK</a>
@@ -82,13 +92,11 @@
 	        <tr>
 	            <td data-bind="text: id"></td>
 	            <td data-bind="text: fråga"></td>
-	            <td data-bind="visible: ärLåst">Låst till session <span data-bind="text: låst"> </span></td>
-	            <td><select data-bind="options: model.sessioner, selectedOptions: låst, optionsCaption: 'Lås till session...'" multiple="true"></select></td>
-	            <td data-bind="visible: ärLåst">
-	            	<form data-bind="submit: removeLås">
-		    			<button type="submit">Ta bort alla lås för den här frågan</button>
-					</form>
+	            <td data-bind="visible: !editing()">
+	            	<a href="#" data-bind="click: edit">Låst till session <span data-bind="text: låst"</a>
+	            	<a href="#" data-bind="visible: ärLåst, click: removeLås"> (ta bort alla sessionslås)</a> 
 	            </td>
+	            <td><select data-bind="visible: editing, hasfocus: editing, options: model.sessioner, selectedOptions: låst" multiple="true"></select></td>
 	        </tr>
 	    </tbody>
 	</table>
@@ -104,22 +112,19 @@
 	    </thead>
 	    <tbody data-bind="foreach: model.forskare">
 	        <tr>
-	            <td data-bind="text: id"></td>
 	            <td data-bind="text: namn"></td>
-	            <td data-bind="visible: ärLåst">Låst till session <span data-bind="text: låstaSessioner"> </span></td>
-	            <td><select data-bind="options: model.sessioner, selectedOptions: låstaSessioner, optionsCaption: 'Lås till session...'" multiple="true"></select></td>
-	            <td data-bind="visible: ärLåst">
-	            	<form data-bind="submit: removeLås">
-		    			<button type="submit">Ta bort alla sessionslås för den här forskaren</button>
-					</form>
+	            <td data-bind="visible: !editingSession()">
+	            	<a href="#" data-bind="click: edit">Låst till session <span data-bind="text: låstaSessioner"</a>
+	            	<a href="#" data-bind="visible: ärLåst, click: removeLås"> (ta bort alla sessionslås)</a> 
 	            </td>
-	            <td data-bind="visible: ärLåstTillFråga">Låst till fråga/frågor <span data-bind="text: låstaFrågor"> </span></td>
-	            <td><select data-bind="options: frageIdn, selectedOptions: låstaFrågor, optionsCaption: 'Lås till fråga...'" multiple="true"></select></td>
-	            <td data-bind="visible: ärLåstTillFråga">
-	            	<form data-bind="submit: removeFrågeLås">
-		    			<button type="submit">Ta bort alla frågelås för den här forskaren</button>
-					</form>
+	            <td><select data-bind="visible: editingSession, hasfocus: editingSession, options: model.sessioner, selectedOptions: låstaSessioner" multiple="true"></select></td>
+
+	            <td data-bind="visible: !editingFraga()">
+	            	<a href="#" data-bind="click: editFraga">Låst till fråga <span data-bind="text: låstaFrågor"</a>
+	            	<a href="#" data-bind="visible: ärLåstTillFråga, click: removeFrågeLås"> (ta bort alla frågelås)</a> 
 	            </td>
+	            <td><select data-bind="visible: editingFraga, hasfocus: editingFraga, options: frageIdn, selectedOptions: låstaFrågor" multiple="true"></select></td>
+	            
 	        </tr>
 	    </tbody>
 	</table>
@@ -185,7 +190,11 @@
     	self.id = ko.observable(f.id);
     	self.fråga = ko.observable(f.fråga);
     	self.låst = ko.observableArray(f.låst);
-    	self.ärLåst = ko.computed(function(){return self.låst() != null && self.låst().length > 0;}, this);
+
+	    self.editing = ko.observable(false);
+	    self.edit = function() { this.editing(true); }
+	    
+	    self.ärLåst = ko.computed(function(){return self.låst() != null && self.låst().length > 0;}, this);
 		self.removeLås = function(formElement) {
 			self.låst.removeAll();
         }
@@ -201,19 +210,27 @@
     	self.joker = f.joker;
     	self.frågor = f.frågor;
     	self.låstaSessioner = ko.observableArray(f.låstaSessioner);
-    	self.ärLåst = ko.computed(function(){return self.låstaSessioner() != null && self.låstaSessioner().length > 0;}, this);
-		self.removeLås = function(formElement) {
-			self.låstaSessioner.removeAll();
-        }
         self.frageIdn = ko.observableArray();
 		for (var i = 0; i < f.frågor.length; i++) {
 	    	self.frageIdn.push(f.frågor[i]);
 		}
     	self.låstaFrågor = ko.observableArray(f.låstaFrågor);
+        
+        
+	    self.editingSession = ko.observable(false);
+	    self.edit = function() { this.editingSession(true); }
+	    self.ärLåst = ko.computed(function(){return self.låstaSessioner() != null && self.låstaSessioner().length > 0;}, this);
+		self.removeLås = function(formElement) {
+			self.låstaSessioner.removeAll();
+        }
+
+	    self.editingFraga = ko.observable(false);
+	    self.editFraga = function() { this.editingFraga(true); }
     	self.ärLåstTillFråga = ko.computed(function(){return self.låstaFrågor() != null && self.låstaFrågor().length > 0;}, this);
 		self.removeFrågeLås = function(formElement) {
 			self.låstaFrågor.removeAll();
         }
+	    
     }
     
     function KonferensModel(){
@@ -222,6 +239,9 @@
     	self.fragor = ko.observableArray();
     	self.forskare = ko.observableArray();
 		self.genereradJson = ko.observable();
+
+		// när generera-knappen trycks så måste vi plocka ut de ändringar som gjorts (låsningar) och
+		// skicka med dem till servern
 		self.generera = function(formElement) {
 			var newJson = ko.toJSON(self);
 			self.genereradJson(newJson);
@@ -231,5 +251,3 @@
     }
 	
 </script>
-
-
