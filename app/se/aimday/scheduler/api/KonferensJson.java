@@ -25,6 +25,4 @@ public class KonferensJson {
 	public List<ForetagsRepresentantJson> företagsrepresentanter;
 	public List<ForskareJson> forskare;
 	public SchemaJson schema;
-
-	// Kvar: hur markera om forskare är klinisk? Hur markera om en fråga bör ha kliniska forskare med?
 }

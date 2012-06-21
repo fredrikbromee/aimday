@@ -7,6 +7,7 @@ import java.util.List;
 import models.ForetagsRepresentant;
 import models.Forskare;
 import models.Question;
+import se.aimday.scheduler.api.WorkshopJson;
 
 /**
  * Ett schemalagt mötestillfälle där forskare och industrireps träffas för att diskutera en fråga
@@ -132,6 +133,21 @@ public class Workshop {
 		}
 
 		return 0.5;
+	}
+
+	public WorkshopJson toAPI() {
+		WorkshopJson workshopJson = new WorkshopJson();
+		workshopJson.frageId = question.id;
+		workshopJson.score = score;
+		workshopJson.forskare = new ArrayList<String>();
+		for (Forskare forskare : participants) {
+			workshopJson.forskare.add(forskare.id);
+		}
+		workshopJson.foretagsrepresentanter = new ArrayList<String>();
+		for (ForetagsRepresentant rep : lyssnare) {
+			workshopJson.foretagsrepresentanter.add(rep.id);
+		}
+		return workshopJson;
 	}
 
 }

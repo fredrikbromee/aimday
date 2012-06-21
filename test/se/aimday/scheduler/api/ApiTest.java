@@ -79,7 +79,7 @@ public class ApiTest {
 		SessionJson session1 = new SessionJson();
 		session1.workshops = new ArrayList<WorkshopJson>();
 		WorkshopJson workshopF1 = new WorkshopJson("f1", "id1");
-		workshopF1.företagsrepresentanter = Arrays.asList("rep1");
+		workshopF1.foretagsrepresentanter = Arrays.asList("rep1");
 		session1.workshops.add(workshopF1);
 		session1.workshops.add(new WorkshopJson("f2", "id1"));
 		

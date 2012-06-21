@@ -17,11 +17,26 @@
 	         </tr>
 	     </thead>
 	     <tbody>
-	         #{list schedule.sessions, as:'session'}
-	             <tr>
-	                 <td><b>S${session.sessionNumber}:</b></td> 
+	     	<!-- ko foreach: model.schema.sessioner -->
+			<tr>
+				<td><b>S<span data-bind="text: $index"></span>:</b></td>
+		     	<!-- ko foreach: workshops -->
+					<td>
+						<b>Fråga <span data-bind="text: frageId"></b>
+						<ul data-bind="foreach: forskare" class="unstyled">
+							<li data-bind="with: model.getForskare($data)">
+							    <span data-bind="text: model.getGrad(grad)"></span>&nbsp<span data-bind="text: namn"></span>, <span data-bind="text: kontakt().avdelning"></span> 
+							</li>
+						</ul> 
+					
+					</td>
+					
+					
+					
+					
+<!--
 			         #{list session.workshops, as:'workshop'}
-			                 <td><b>Fråga ${workshop.question.q}:</b><br> 
+			                 <td><b>Fråga ${workshop.question.q}:</b><br>
 			                 #{list workshop.participants, as:'participant'}
 			                 		
 					                 <!--<i class="icon-arrow-left"></i>
@@ -30,17 +45,26 @@
 					                 	 
 					                 	 Och forskaren ligger i en sån här div:
 					                 	 <div data-bind="event: { mouseover: visaPilar, mouseout: tabortPilar }">
-					                 -->
+					                 ->
 			                         <div>
 			                         	${participant.first_name}, Inst för neurologi, Uppsala Universitet
 			                         </div>
-					                 <!--<i class="icon-arrow-right"></i>-->
+					                 <!--<i class="icon-arrow-right"></i> ->
 			                 #{/list}		                 
 			                 </td>
 			         #{/list}
-	             </tr>
-	         #{/list}
-	     </tbody>
+-->	             
+
+					
+					
+					
+					
+					
+				<!-- /ko -->
+			</tr>
+			<!-- /ko -->
+			
+		</tbody>
 	 </table>
 	 
 	#{if schedule.unplacedQuestions}
@@ -93,7 +117,7 @@
 	            <td data-bind="text: id"></td>
 	            <td data-bind="text: fråga"></td>
 	            <td data-bind="visible: !editing()">
-	            	<a href="#" data-bind="click: edit">Låst till session <span data-bind="text: låst"</a>
+	            	<a href="#" data-bind="click: edit">Låst till session <span data-bind="text: låst"></a>
 	            	<a href="#" data-bind="visible: ärLåst, click: removeLås"> (ta bort alla sessionslås)</a> 
 	            </td>
 	            <td><select data-bind="visible: editing, hasfocus: editing, options: model.sessioner, selectedOptions: låst" multiple="true"></select></td>
@@ -114,13 +138,13 @@
 	        <tr>
 	            <td data-bind="text: namn"></td>
 	            <td data-bind="visible: !editingSession()">
-	            	<a href="#" data-bind="click: edit">Låst till session <span data-bind="text: låstaSessioner"</a>
+	            	<a href="#" data-bind="click: edit">Låst till session <span data-bind="text: låstaSessioner"></a>
 	            	<a href="#" data-bind="visible: ärLåst, click: removeLås"> (ta bort alla sessionslås)</a> 
 	            </td>
 	            <td><select data-bind="visible: editingSession, hasfocus: editingSession, options: model.sessioner, selectedOptions: låstaSessioner" multiple="true"></select></td>
 
 	            <td data-bind="visible: !editingFraga()">
-	            	<a href="#" data-bind="click: editFraga">Låst till fråga <span data-bind="text: låstaFrågor"</a>
+	            	<a href="#" data-bind="click: editFraga">Låst till fråga <span data-bind="text: låstaFrågor"></a>
 	            	<a href="#" data-bind="visible: ärLåstTillFråga, click: removeFrågeLås"> (ta bort alla frågelås)</a> 
 	            </td>
 	            <td><select data-bind="visible: editingFraga, hasfocus: editingFraga, options: frageIdn, selectedOptions: låstaFrågor" multiple="true"></select></td>
@@ -173,7 +197,7 @@
 	model.optimeringsInformation = json.optimeringsInformation;
 	model.senioritetsgrader = json.senioritetsgrader;
 	model.företagsrepresentanter = json.företagsrepresentanter;
-	model.schema = json.schema;
+	model.schema = new Schema(json.schema);
 
 	for (var i = 0; i < json.fragor.length; i++) {
 	    var f = json.fragor[i];
@@ -185,6 +209,34 @@
 	}
 	ko.applyBindings(model);
 
+    function Schema(s){
+    	var self = this;
+		self.sessioner = ko.observableArray();
+		for (var i = 0; i < s.sessioner.length; i++) {
+		    var session = s.sessioner[i];
+			self.sessioner.push(new Session(session));
+		}
+    }
+    
+    function Session(s){
+    	var self = this;
+		self.workshops = ko.observableArray();
+		for (var i = 0; i < s.workshops.length; i++) {
+		    var workshop = s.workshops[i];
+			self.workshops.push(new Workshop(workshop));
+		}
+    }
+    
+    function Workshop(s){
+    	var self = this;
+    	self.frageId = s.frageId;
+		self.forskare = ko.observableArray();
+		for (var i = 0; i < s.forskare.length; i++) {
+		    var f = s.forskare[i];
+			self.forskare.push(f);
+		}
+    }
+    
     function Fråga(f){
     	var self = this;
     	self.id = ko.observable(f.id);
@@ -248,6 +300,23 @@
 			console.log(newJson);
 			return true;
         }
+        
+        self.getForskare = function(id){
+        	var len = self.forskare().length;
+        	for(var i = 0 ; i < len; i ++){
+	        	var f = self.forskare()[i];
+	        	
+	        	if (f.id() === id){
+	        		return f;
+	        	}
+        	}
+        	console.log("failed to find forskare with id " + id);
+        }
+        
+        self.getGrad = function(grad){
+        	return self.senioritetsgrader[grad];
+        }
+        
     }
 	
 </script>

@@ -7,6 +7,8 @@ import java.util.List;
 import models.ForetagsRepresentant;
 import models.Forskare;
 import models.Question;
+import se.aimday.scheduler.api.SessionJson;
+import se.aimday.scheduler.api.WorkshopJson;
 
 /**
  * En konferensdag består av ett antal sessioner som följer efter varandra
@@ -123,6 +125,15 @@ public class Session {
 
 	public boolean harFråga(Question fråga) {
 		return getWorkshop(fråga) != null;
+	}
+
+	public SessionJson toAPI() {
+		SessionJson sessionJson = new SessionJson();
+		sessionJson.workshops = new ArrayList<WorkshopJson>();
+		for (Workshop workshop : workshops) {
+			sessionJson.workshops.add(workshop.toAPI());
+		}
+		return sessionJson;
 	}
 
 

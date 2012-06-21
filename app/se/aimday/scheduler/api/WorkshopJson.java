@@ -4,15 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WorkshopJson {
+	public WorkshopJson() {
+
+	}
+
 	public WorkshopJson(String frågeId, String... forskarna) {
-		this.frågeId = frågeId;
+		this.frageId = frågeId;
 		forskare = new ArrayList<String>();
 		for (String forskarId : forskarna) {
 			forskare.add(forskarId);
 		}
 	}
 
-	public String frågeId;
+	public String frageId;
 	public List<String> forskare;
-	public List<String> företagsrepresentanter;
+	public List<String> foretagsrepresentanter;
+	public double score;
 }

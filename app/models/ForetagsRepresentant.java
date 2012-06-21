@@ -15,7 +15,7 @@ public class ForetagsRepresentant {
 	
 	public List<Question> fragor = new ArrayList<Question>();
 	public String namn;
-	private final String id;
+	public final String id;
 
 	public ForetagsRepresentant(String namn, String id) {
 		this.namn = namn;

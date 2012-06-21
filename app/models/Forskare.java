@@ -22,7 +22,7 @@ public class Forskare {
 	public String first_name;
 	public boolean isJoker;
 	private int grad;
-	private final String id;
+	public final String id;
 	private boolean harVikt;
 	private List<Integer> låstaSessioner = new ArrayList<Integer>();
 	private List<String> låstaFrågor = new ArrayList<String>();

@@ -11,6 +11,8 @@ import java.util.TreeSet;
 import models.ForetagsRepresentant;
 import models.Forskare;
 import models.Question;
+import se.aimday.scheduler.api.SchemaJson;
+import se.aimday.scheduler.api.SessionJson;
 
 
 /**
@@ -177,5 +179,26 @@ public class AIMDay {
 			}
 		}
 		return null;
+	}
+
+	public int getMaxNumOfWorkshopsInASession() {
+		int max = 0;
+		for (Session session : sessions) {
+			if (session.getNumberOfScheduledWS() > max) {
+				max = session.getNumberOfScheduledWS();
+			}
+		}
+
+		return max;
+	}
+
+	public SchemaJson toAPI() {
+		SchemaJson schemaJson = new SchemaJson();
+		List<SessionJson> sessioner = new ArrayList<SessionJson>();
+		for (Session sess : sessions) {
+			sessioner.add(sess.toAPI());
+		}
+		schemaJson.sessioner = sessioner;
+		return schemaJson;
 	}
 }

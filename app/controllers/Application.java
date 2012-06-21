@@ -57,8 +57,10 @@ public class Application extends Controller {
 
 
 		Konferens k = null;
+		KonferensJson konf = null;
+		Gson gson = new Gson();
 		try {
-			KonferensJson konf = new Gson().fromJson(json, KonferensJson.class);
+			konf = gson.fromJson(json, KonferensJson.class);
 			k = Konferens.fromAPI(konf);
 		} catch (InconsistentJsonException e) {
 			error(e.getMessage());
@@ -70,9 +72,11 @@ public class Application extends Controller {
 		Scheduler scheduler = new Scheduler(tracks, sessions, 10, k, generations, placeWeight, wsWeight, agendaWeight);
 		AIMDay schedule = scheduler.lägg();
 		ArrayList<Integer> spår = new ArrayList<Integer>();
-		for (int i = 1; i <= tracks; i++) {
+		for (int i = 1; i <= schedule.getMaxNumOfWorkshopsInASession(); i++) {
 			spår.add(i);
 		}
+		konf.schema = schedule.toAPI();
+		json = gson.toJson(konf);
 
 		render(schedule, spår, json);
 	}
