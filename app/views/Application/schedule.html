@@ -24,8 +24,8 @@
 					<td>
 						<b>Fråga <span data-bind="text: frageId"></b>
 						<ul data-bind="foreach: forskare" class="unstyled">
-							<li data-bind="with: model.getForskare($data)">
-							    <span data-bind="text: model.getGrad(grad)"></span>&nbsp<span data-bind="text: namn"></span>, <span data-bind="text: kontakt().avdelning"></span> 
+							<li>
+								<div data-bind="template: { name: 'forskar-template', data: model.getForskare($data) }"></div>
 							</li>
 						</ul> 
 					
@@ -136,7 +136,9 @@
 	    </thead>
 	    <tbody data-bind="foreach: model.forskare">
 	        <tr>
-	            <td data-bind="text: namn"></td>
+	            <td>
+					<div data-bind="template: { name: 'forskar-template' }"></div>
+	            </td>
 	            <td data-bind="visible: !editingSession()">
 	            	<a href="#" data-bind="click: edit">Låst till session <span data-bind="text: låstaSessioner"></a>
 	            	<a href="#" data-bind="visible: ärLåst, click: removeLås"> (ta bort alla sessionslås)</a> 
@@ -187,6 +189,12 @@
 	* Kolla med UU innov om de vill öppna i en ny tab i stället (lägg till  target="_blank" till formuläret isf)
 	<p>
 </section>
+
+
+
+<script type="text/html" id="forskar-template">
+	<span data-bind="text: model.getGrad(grad)"></span>&nbsp<span data-bind="text: namn"></span>, <span data-bind="text: kontakt().avdelning"></span> 
+</script>
 
 <script type="text/javascript">
 
