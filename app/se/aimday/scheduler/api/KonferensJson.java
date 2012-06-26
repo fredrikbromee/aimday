@@ -22,7 +22,7 @@ public class KonferensJson {
 	public OptimeringsInformation optimeringsInformation;
 	public List<String> senioritetsgrader;
 	public List<FragaJson> fragor;
-	public List<ForetagsRepresentantJson> företagsrepresentanter;
+	public List<ForetagsRepresentantJson> foretagsrepresentanter;
 	public List<ForskareJson> forskare;
 	public SchemaJson schema;
 }

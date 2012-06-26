@@ -15,7 +15,7 @@ public class ApiTest {
 		KonferensJson konferens = new KonferensJson();
 		konferens.id = "1";
 		konferens.namn = "Aimday life science";
-		konferens.företagsrepresentanter = enFöretagsRep();
+		konferens.foretagsrepresentanter = enFöretagsRep();
 		konferens.forskare = treForskare();
 		konferens.fragor = fyraFrågor();
 		konferens.senioritetsgrader = Arrays.asList("Överl.", "Prof.", "Doc.", "Dr.", "Doktorand");

@@ -19,7 +19,7 @@
 	     <tbody>
 	     	<!-- ko foreach: model.schema.sessioner -->
 			<tr>
-				<td><b>S<span data-bind="text: $index"></span>:</b></td>
+				<td><b>S<span data-bind="text: $index()+1"></span>:</b></td>
 		     	<!-- ko foreach: workshops -->
 					<td>
 						<b>Fråga <span data-bind="text: frageId"></b>
@@ -27,7 +27,12 @@
 							<li>
 								<div data-bind="template: { name: 'forskar-template', data: model.getForskare($data) }"></div>
 							</li>
-						</ul> 
+						</ul>
+						<a data-toggle="modal" href="#modalFraga" >Se hela frågan</a>
+						<div id="modalFraga" class="modal hide">
+							<div data-bind="template: { name: 'modal-fraga-template'}"></div>
+						</div>
+						
 					
 					</td>
 					
@@ -84,20 +89,20 @@
 	Om du är nöjd med det här schemat så kan du spara det:<br>
 	<a data-toggle="modal" href="#myModal" class="btn btn-primary">Spara schema</a>
 	
-	          <!-- sample modal content -->
-          <div id="myModal" class="modal hide fade">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body">
-              <h4>Det här funkar inte riktigt</h4>
-              <p>Det som kommer att hända här är att schemat skickas tillbaka till registreringsmodulen för att sparas i 
-              dess databas. Den delen är inte gjord än... 
-            </div>
-            <div class="modal-footer">
-              <a href="#" class="btn btn-primary" data-dismiss="modal">OK</a>
-            </div>
-          </div>
+	  <div id="myModal" class="modal hide">
+	    <div class="modal-header">
+	      <button type="button" class="close" data-dismiss="modal">&times;</button>
+	    </div>
+	    <div class="modal-body">
+	      <h4>Det här funkar inte riktigt</h4>
+	      <p>Det som kommer att hända här är att schemat skickas tillbaka till registreringsmodulen för att sparas i 
+	      dess databas. Den delen är inte gjord än... 
+	    </div>
+	    <div class="modal-footer">
+	      <a href="#" class="btn btn-primary" data-dismiss="modal">OK</a>
+	    </div>
+	  </div>
+
 
 	
 	
@@ -196,6 +201,32 @@
 	<span data-bind="text: model.getGrad(grad)"></span>&nbsp<span data-bind="text: namn"></span>, <span data-bind="text: kontakt().avdelning"></span> 
 </script>
 
+<script type="text/html" id="rep-template">
+	<span data-bind="text: namn"></span>, <span data-bind="text: kontakt().avdelning"></span> <span data-bind="text: kontakt().org"></span> 
+</script>
+
+<script type="text/html" id="modal-fraga-template">
+    <div class="modal-header">
+      Fråga <span data-bind="text: frageId"></span><button type="button" class="close" data-dismiss="modal">&times;</button>
+    </div>
+    <div class="modal-body">
+		<ul data-bind="foreach: forskare" class="unstyled">
+			<li>
+				<div data-bind="template: { name: 'forskar-template', data: model.getForskare($data) }"></div>
+			</li>
+		</ul>
+		<ul data-bind="foreach: foretagsrepresentanter" class="unstyled">
+			<li>
+				<div data-bind="template: { name: 'rep-template', data: model.getRep($data) }"></div>
+			</li>
+		</ul>
+    </div>
+    <div class="modal-footer">
+    	<a href="#" class="btn btn-primary" data-dismiss="modal">OK</a>
+    </div>
+</script>
+
+
 <script type="text/javascript">
 
 	var json = ${json.raw()};
@@ -204,9 +235,12 @@
 	model.namn = json.namn;
 	model.optimeringsInformation = json.optimeringsInformation;
 	model.senioritetsgrader = json.senioritetsgrader;
-	model.företagsrepresentanter = json.företagsrepresentanter;
 	model.schema = new Schema(json.schema);
 
+	for (var i = 0; i < json.foretagsrepresentanter.length; i++) {
+	    var f = json.foretagsrepresentanter[i];
+		model.foretagsrepresentanter.push(new Foretagsrepresentant(f));
+	}
 	for (var i = 0; i < json.fragor.length; i++) {
 	    var f = json.fragor[i];
 		model.fragor.push(new Fråga(f));
@@ -239,6 +273,7 @@
     	var self = this;
     	self.frageId = s.frageId;
 		self.forskare = ko.observableArray();
+		self.foretagsrepresentanter = s.foretagsrepresentanter;
 		for (var i = 0; i < s.forskare.length; i++) {
 		    var f = s.forskare[i];
 			self.forskare.push(f);
@@ -260,6 +295,14 @@
         }
     }
     
+    function Foretagsrepresentant(f){
+    	var self = this;
+    	self.id = ko.observable(f.id);
+    	self.kontakt = ko.observable(f.kontakt);
+    	self.namn = ko.computed(function(){return self.kontakt().fornamn + " " + self.kontakt().efternamn;}, this);
+    	self.frågor = f.frågor;
+    }
+
     function Forskare(f){
     	var self = this;
     	self.id = ko.observable(f.id);
@@ -298,6 +341,7 @@
 		self.sessioner = [1,2,3,4,5,6]; // Antar att vi bara tillåter så här många sessioner
     	self.fragor = ko.observableArray();
     	self.forskare = ko.observableArray();
+    	self.foretagsrepresentanter = ko.observableArray();
 		self.genereradJson = ko.observable();
 
 		// när generera-knappen trycks så måste vi plocka ut de ändringar som gjorts (låsningar) och
@@ -321,10 +365,22 @@
         	console.log("failed to find forskare with id " + id);
         }
         
+        self.getRep = function(id){
+        	
+        	var len = self.foretagsrepresentanter().length;
+        	for(var i = 0 ; i < len; i ++){
+	        	var f = self.foretagsrepresentanter()[i];
+	        	
+	        	if (f.id() === id){
+	        		return f;
+	        	}
+        	}
+        	console.log("failed to find foretagsrepresentant with id " + id);
+        }
+        
         self.getGrad = function(grad){
         	return self.senioritetsgrader[grad];
         }
-        
     }
 	
 </script>
