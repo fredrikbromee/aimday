@@ -199,7 +199,9 @@
 
 
 <script type="text/html" id="forskar-template">
-	<span data-bind="text: model.getGrad(grad)"></span>&nbsp<span data-bind="text: namn"></span>, <span data-bind="text: kontakt().avdelning"></span> 
+	<span data-bind="if: joker">
+	<a href="#" title="Den här forskaren är joker"><i class="icon-star"></i></a></span>
+	<span data-bind="text: model.getGrad(grad)"></span>&nbsp<span data-bind="text: namn"></span>	, <span data-bind="text: kontakt().avdelning"></span> 
 </script>
 
 <script type="text/html" id="rep-template">
