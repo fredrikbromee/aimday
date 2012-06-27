@@ -88,6 +88,7 @@
 	<p>
 	Om du är nöjd med det här schemat så kan du spara det:<br>
 	<a data-toggle="modal" href="#myModal" class="btn btn-primary">Spara schema</a>
+	<p>Om inte kan du generera ett nytt schema: 
 	
 	  <div id="myModal" class="modal hide">
 	    <div class="modal-header">
@@ -163,7 +164,7 @@
 	
 <section id="generera">
   <div class="page-header">
-    <h1>Generera nytt schema</h1>
+    <h1></h1>
   </div>
 
 	<form action="@{Application.schedule()}" method="POST" accept-charset="${_response_encoding}" data-bind="submit: model.generera">
@@ -180,8 +181,8 @@
 	     <label for="agendaWeight">Att forskarnas önskemål är tillgodosedda</label>
 	     <input type="text" name="agendaWeight" value="10" id="agendaWeight" />
 	     <input type="hidden" data-bind="value: model.genereradJson" name="json"></input>
-	     &nbsp;
-		<button type="submit">Generera nytt schema</button>
+	     <br>
+		<button type="submit" class="btn btn-primary" >Generera nytt schema</button>
 	 </form>
 </section>
 
@@ -384,3 +385,4 @@
     }
 	
 </script>
+	
