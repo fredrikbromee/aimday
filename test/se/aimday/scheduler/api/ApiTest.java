@@ -21,7 +21,7 @@ public class ApiTest {
 		konferens.senioritetsgrader = Arrays.asList("Överl.", "Prof.", "Doc.", "Dr.", "Doktorand");
 		konferens.schema = schemaMedFyraFrågor();
 		OptimeringsInformation optimeringsInformation = new OptimeringsInformation();
-		optimeringsInformation.användVikter = true;
+		optimeringsInformation.anvandVikter = true;
 		optimeringsInformation.viktNamn = "Har klinisk erfarenhet";
 		konferens.optimeringsInformation = optimeringsInformation;
 

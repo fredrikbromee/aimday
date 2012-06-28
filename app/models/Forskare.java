@@ -20,7 +20,7 @@ public class Forskare {
 	public List<Question> prio = new ArrayList<Question>();
 	private boolean isErfaren = true;
 	public String first_name;
-	public boolean isJoker;
+	private boolean isJoker;
 	private int grad;
 	public final String id;
 	private boolean harVikt;
