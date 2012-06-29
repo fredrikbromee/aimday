@@ -37,11 +37,13 @@ public class AIMDay {
 	private Set<Question> unplacedQuestions = new TreeSet<Question>();
 	private final List<Forskare> allParticipants;
 	private final int spår;
+	private final int maxDeltagarePerWS;
 
 	public AIMDay(int antalParallellaSpår, int antalSessioner, List<Forskare> allParticipants,
-			Collection<Question> questions) {
+			Collection<Question> questions, int maxDeltagarePerWS) {
 		this.spår = antalParallellaSpår;
 		this.allParticipants = allParticipants;
+		this.maxDeltagarePerWS = maxDeltagarePerWS;
 		for (int i = 0; i < antalSessioner; i++) {
 			sessions.add(new Session(i + 1, antalParallellaSpår));
 		}
@@ -81,7 +83,7 @@ public class AIMDay {
 		boolean gotAPlace = false;
 		Session sessionWithQ = getSessionFor(q);
 		if (sessionWithQ != null) {
-			gotAPlace = sessionWithQ.place(q, p);
+			gotAPlace = sessionWithQ.place(q, p, maxDeltagarePerWS);
 			// Logger.info("Failed to place %s at %s in session %s", p, q, sessionWithQ);
 			if (gotAPlace) {
 				unplacedQuestions.remove(q);
@@ -94,7 +96,7 @@ public class AIMDay {
 		ArrayList<Session> copy = new ArrayList<Session>(sessions);
 		Collections.sort(copy, filledComparator);
 		for (Session session : copy) {
-			gotAPlace = session.place(q, p, lyssnare);
+			gotAPlace = session.place(q, p, lyssnare, maxDeltagarePerWS);
 			if (gotAPlace)
 				break;
 		}
@@ -200,5 +202,14 @@ public class AIMDay {
 		}
 		schemaJson.sessioner = sessioner;
 		return schemaJson;
+	}
+
+	public void taBortFrågorMedFörFåDeltagare(int minDeltagarePerWS) {
+		allAgendas = null;
+		score = 0;
+		
+		for (Session s : sessions) {
+			unplacedQuestions.addAll(s.taBortFrågorMedFörFåDeltagare(minDeltagarePerWS));
+		}
 	}
 }

@@ -43,7 +43,7 @@ public class Application extends Controller {
 	}
 
 	public static void schedule(int tracks, int sessions, int generations, String json, int placeWeight, int wsWeight,
-			int agendaWeight) {
+			int agendaWeight, int max_antal_deltagare, int min_antal_deltagare) {
 
 		if (placeWeight < 0) {
 			placeWeight = 10;
@@ -53,6 +53,13 @@ public class Application extends Controller {
 		}
 		if (agendaWeight < 0) {
 			agendaWeight = 10;
+		}
+
+		if (max_antal_deltagare > 15 || max_antal_deltagare < 0) {
+			throw new RuntimeException("Felaktigt antal max deltagare, fick " + max_antal_deltagare);
+		}
+		if (min_antal_deltagare > 15 || min_antal_deltagare < 0) {
+			throw new RuntimeException("Felaktigt minimi-antal  deltagare, fick " + min_antal_deltagare);
 		}
 
 
@@ -68,8 +75,10 @@ public class Application extends Controller {
 
 
 		generations = Math.min(100000, generations);
+		ScheduleRequest scheduleRequest = new ScheduleRequest(tracks, sessions, generations, placeWeight, wsWeight,
+				agendaWeight, max_antal_deltagare, min_antal_deltagare);
 		System.out.println("num gs" + generations);
-		Scheduler scheduler = new Scheduler(tracks, sessions, 10, k, generations, placeWeight, wsWeight, agendaWeight);
+		Scheduler scheduler = new Scheduler(k, scheduleRequest);
 		AIMDay schedule = scheduler.lägg();
 		ArrayList<Integer> spår = new ArrayList<Integer>();
 		for (int i = 1; i <= schedule.getMaxNumOfWorkshopsInASession(); i++) {

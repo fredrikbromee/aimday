@@ -12,6 +12,7 @@ import models.ForetagsRepresentant;
 import models.Forskare;
 import models.Konferens;
 import models.Question;
+import controllers.ScheduleRequest;
 
 /**
  * Spottar ut sig ett schema givet input om vilka frågor som skall diskuteras och vilka som vill vara med och diskutera
@@ -28,7 +29,7 @@ public class Scheduler {
 
 	private int numSessions;
 
-	private int maxAttendantsPerWS;
+	private int maxDeltagarePerWS;
 
 	private final Collection<Question> questions;
 
@@ -42,23 +43,25 @@ public class Scheduler {
 
 	private final int agendaWeight;
 
+	private int minDeltagarePerWS;
+
 	public Scheduler(int numParallelTracks, int numSessions, int maxAttendantsPerWS, Collection<Question> questions,
 			List<Forskare> erfarna, List<Forskare> oerfarna, List<ForetagsRepresentant> foretagare,
 			int generations) {
-		this(numParallelTracks, numSessions, maxAttendantsPerWS, new Konferens(erfarna, foretagare, questions),
-				generations, 10, 10, 10);
+		this(new Konferens(erfarna, foretagare, questions), new ScheduleRequest(numParallelTracks, numSessions,
+				generations, 10, 10, 10, maxAttendantsPerWS, 0));
 
 	}
 
-	public Scheduler(int numParallelTracks, int numSessions, int maxAttendantsPerWS, Konferens k, int generations,
-			int placeWeight, int wsWeight, int agendaWeight) {
-		this.numParallelTracks = numParallelTracks;
-		this.numSessions = numSessions;
-		this.maxAttendantsPerWS = maxAttendantsPerWS;
+	public Scheduler(Konferens k, ScheduleRequest r) {
+		this.numParallelTracks = r.tracks;
+		this.numSessions = r.sessions;
+		this.maxDeltagarePerWS = r.maxAntalDeltagare;
+		this.minDeltagarePerWS = r.minAntalDeltagare;
 		this.questions = k.getFrågor();
-		this.placeWeight = placeWeight;
-		this.wsWeight = wsWeight;
-		this.agendaWeight = agendaWeight;
+		this.placeWeight = r.placeWeight;
+		this.wsWeight = r.wsWeight;
+		this.agendaWeight = r.agendaWeight;
 		this.allParticipants.addAll(k.getDeltagare());
 
 		frågor = new TreeMap<String, FragaMedDeltagare>();
@@ -83,6 +86,7 @@ public class Scheduler {
 
 		// TODO tills vidare, hoppa över de oerfarna
 	}
+
 
 	public AIMDay lägg() {
 		// do first try based on how many workshops each candidate has
@@ -124,7 +128,7 @@ public class Scheduler {
 	}
 
 	private AIMDay schedule(List<Forskare> sorteradeDeltagare) {
-		AIMDay schema = new AIMDay(numParallelTracks, numSessions, allParticipants, questions);
+		AIMDay schema = new AIMDay(numParallelTracks, numSessions, allParticipants, questions, maxDeltagarePerWS);
 
 		// Tanken är här att man skulle kunna börja med att lägga ut de frågor som har forskare låsta till sig
 		List<Forskare> frågelåsta = getFrågelåstaForskare();
@@ -142,6 +146,9 @@ public class Scheduler {
 				schema.place(q, p, medDeltagare.getFrågare());
 			}
 		}
+
+		// Här tar vi bort alla frågor som inte har fått tillräckligt antal deltagare
+		schema.taBortFrågorMedFörFåDeltagare(minDeltagarePerWS);
 
 		score(schema);
 		return schema;

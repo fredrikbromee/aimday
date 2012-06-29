@@ -2,6 +2,7 @@ package se.aimday.scheduler;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import models.ForetagsRepresentant;
@@ -37,11 +38,11 @@ public class Session {
 		return workshops;
 	}
 
-	public boolean place(Question q, Forskare p) {
-		return place(q, p, Collections.<ForetagsRepresentant>emptyList());
+	public boolean place(Question q, Forskare p, int maxDeltagarePerWS) {
+		return place(q, p, Collections.<ForetagsRepresentant> emptyList(), maxDeltagarePerWS);
 	}
 
-	public boolean place(Question q, Forskare p, Collection<ForetagsRepresentant> lyssnare) {
+	public boolean place(Question q, Forskare p, Collection<ForetagsRepresentant> lyssnare, int maxDeltagarePerWS) {
 		if (!q.kanPlacerasISessionNummer(sessionNumber)) {
 			return false;
 		}
@@ -58,6 +59,9 @@ public class Session {
 
 		Workshop ws = getWorkshop(q);
 		if (ws != null) {
+			if (ws.getNumberOfAttendants() >= maxDeltagarePerWS) {
+				return false;
+			}
 			ws.add(p);
 			ws.add(lyssnare);
 			return true;
@@ -136,5 +140,16 @@ public class Session {
 		return sessionJson;
 	}
 
+	public Collection<? extends Question> taBortFrågorMedFörFåDeltagare(int minDeltagarePerWS) {
+		Collection<Question> removed = new ArrayList<Question>();
+		for (Iterator<Workshop> iterator = workshops.iterator(); iterator.hasNext();) {
+			Workshop workshop = iterator.next();
+			if (workshop.getNumberOfAttendants() < minDeltagarePerWS) {
+				iterator.remove();
+				removed.add(workshop.question);
+			}
+		}
+		return removed;
+	}
 
 }
