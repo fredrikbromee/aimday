@@ -24,10 +24,10 @@
 	     	<!-- ko foreach: model.schema.sessioner -->
 			<tr>
 				<td><b>S<span data-bind="text: $index()+1"></span>:</b></td>
-		     	<!-- ko foreach: workshops -->
+	     	<!-- ko foreach: workshops -->
 					<td>
 						<b>Fråga <span data-bind="text: frageId"></b>
-						<ul data-bind="foreach: forskare" class="unstyled">
+						<ul data-bind="sortable: forskare" class="unstyled">
 							<li>
 								<div data-bind="template: { name: 'forskar-template', data: model.getForskare($data) }"></div>
 							</li>
@@ -328,6 +328,8 @@
 		model.forskare.push(new Forskare(f));
 	}
 	ko.applyBindings(model);
+	ko.bindingHandlers.sortable.beforeMove = model.verifyMoves;
+	
 
     function Schema(s){
     	var self = this;
@@ -459,6 +461,19 @@
         self.getGrad = function(grad){
         	return self.senioritetsgrader[grad];
         }
+        
+        this.verifyMoves = function(arg) {
+        var gender, found,
+            parent = arg.targetParent;
+
+        if (parent.id !== "Available Students" && parent().length === 3 && parent.indexOf(arg.item) < 0) {
+            gender = arg.item.gender;
+            if (!ko.utils.arrayFirst(parent(), function(student) { return student.gender !== gender;})) {
+                self.lastError("Cannot move " + arg.item.name() + " to " + arg.targetParent.id + " because there would be too many " + gender + " students");
+                arg.cancelDrop = true;
+            }
+        }
+    };
     }
 	
 </script>

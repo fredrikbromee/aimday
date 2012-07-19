@@ -55,7 +55,7 @@ public class Application extends Controller {
 			agendaWeight = 10;
 		}
 
-		if (max_antal_deltagare > 15 || max_antal_deltagare < 0) {
+		if ((max_antal_deltagare > 15 || max_antal_deltagare < 0) && max_antal_deltagare != 100) {
 			throw new RuntimeException("Felaktigt antal max deltagare, fick " + max_antal_deltagare);
 		}
 		if (min_antal_deltagare > 15 || min_antal_deltagare < 0) {
