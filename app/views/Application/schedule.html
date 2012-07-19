@@ -75,6 +75,8 @@
 			
 		</tbody>
 	 </table>
+	 <span class="label label-important">Important</span>
+	 <div id="error" data-bind="flash: lastError" class="label label-important"></div>
 	 
 	#{if schedule.unplacedQuestions}
 		<br>I det här schemat misslyckades vi att placera ut:
@@ -307,6 +309,25 @@
 
 <script type="text/javascript">
 
+ko.bindingHandlers.flash = {
+    init: function(element) {
+        $(element).hide();
+    },
+    update: function(element, valueAccessor) {
+        var value = ko.utils.unwrapObservable(valueAccessor());
+        if (value) {
+            $(element).stop().hide().text(value).fadeIn(function() {
+                clearTimeout($(element).data("timeout"));
+                $(element).data("timeout", setTimeout(function() {
+                    $(element).fadeOut();
+                    valueAccessor()(null);
+                }, 3000));
+            });
+        }
+    },
+    timeout: null
+};
+
 	var json = ${json.raw()};
 	var model = new KonferensModel();
 	model.id = json.id;
@@ -327,8 +348,8 @@
 	    var f = json.forskare[i];
 		model.forskare.push(new Forskare(f));
 	}
-	ko.applyBindings(model);
 	ko.bindingHandlers.sortable.beforeMove = model.verifyMoves;
+	ko.applyBindings(model);
 	
 
     function Schema(s){
@@ -353,6 +374,7 @@
     	var self = this;
     	self.frageId = s.frageId;
 		self.forskare = ko.observableArray();
+		self.forskare.id = s.frageId;
 		self.foretagsrepresentanter = s.foretagsrepresentanter;
 		for (var i = 0; i < s.forskare.length; i++) {
 		    var f = s.forskare[i];
@@ -423,6 +445,8 @@
     	self.forskare = ko.observableArray();
     	self.foretagsrepresentanter = ko.observableArray();
 		self.genereradJson = ko.observable();
+		this.lastError = ko.observable();
+		
 
 		// när generera-knappen trycks så måste vi plocka ut de ändringar som gjorts (låsningar) och
 		// skicka med dem till servern
@@ -463,8 +487,24 @@
         }
         
         this.verifyMoves = function(arg) {
+	        console.log("Trying to move scientist " + arg.item + " from " + arg.sourceParent.id + " to " + arg.targetParent.id);
+	        
+	        if (arg.sourceParent().length<2){
+                self.lastError("Kan inte flytta sista forskaren i frågan!");	        
+                arg.cancelDrop = true;	        	
+	        }
+	        if (arg.targetParent.indexOf(arg.item) >= 0){
+                self.lastError("Forskaren är redan i den frågan!");	        
+                arg.cancelDrop = true;	        	
+	        }
+	        // ingen fråga parallell med till-frågan innehåller forskaren
+	        
+	        // flasha om det gick fel inkl anledning
+	        
         var gender, found,
             parent = arg.targetParent;
+            
+            
 
         if (parent.id !== "Available Students" && parent().length === 3 && parent.indexOf(arg.item) < 0) {
             gender = arg.item.gender;
