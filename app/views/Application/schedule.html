@@ -32,8 +32,8 @@
 								<div data-bind="template: { name: 'forskar-template', data: model.getForskare($data) }"></div>
 							</li>
 						</ul>
-						<a data-toggle="modal" href="#modalFraga" >Se hela frågan</a>
-						<div id="modalFraga" class="modal hide">
+						<a data-toggle="modal" data-bind="attr: {href:'#'+frageId}" >Se hela frågan</a>
+						<div data-bind="attr: {id:frageId}" class="modal hide">
 							<div data-bind="template: { name: 'modal-fraga-template'}"></div>
 						</div>
 						
