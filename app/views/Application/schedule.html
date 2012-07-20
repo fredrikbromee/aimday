@@ -75,9 +75,19 @@
 			
 		</tbody>
 	 </table>
-	 <span class="label label-important">Important</span>
-	 <div id="error" data-bind="flash: lastError" class="label label-important"></div>
 	 
+	  <div id="dragWarningModal" class="modal hide">
+	    <div class="modal-header">
+	      Kan inte flytta <button type="button" class="close" data-dismiss="modal">&times;</button>
+	    </div>
+	    <div class="modal-body" data-bind="text: lastError">
+	    </div>
+	    <div class="modal-footer">
+	      <a href="#" class="btn btn-primary" data-dismiss="modal">OK</a>
+	    </div>
+	  </div>
+	 
+	 	 
 	#{if schedule.unplacedQuestions}
 		<br>I det här schemat misslyckades vi att placera ut:
 		#{list schedule.unplacedQuestions, as:'unplaced'}
@@ -285,7 +295,7 @@
     <div class="modal-header">
       Fråga <span data-bind="text: frageId"></span>
 <!-- Måste slå upp frågan:
-      <span data-bind="text: fråga"></span>
+      <span data-bind="text: model.getFraga(frageId)"></span>
 -->
       <button type="button" class="close" data-dismiss="modal">&times;</button>
     </div>
@@ -309,24 +319,6 @@
 
 <script type="text/javascript">
 
-ko.bindingHandlers.flash = {
-    init: function(element) {
-        $(element).hide();
-    },
-    update: function(element, valueAccessor) {
-        var value = ko.utils.unwrapObservable(valueAccessor());
-        if (value) {
-            $(element).stop().hide().text(value).fadeIn(function() {
-                clearTimeout($(element).data("timeout"));
-                $(element).data("timeout", setTimeout(function() {
-                    $(element).fadeOut();
-                    valueAccessor()(null);
-                }, 3000));
-            });
-        }
-    },
-    timeout: null
-};
 
 	var json = ${json.raw()};
 	var model = new KonferensModel();
@@ -486,6 +478,15 @@ ko.bindingHandlers.flash = {
         	return self.senioritetsgrader[grad];
         }
         
+/*        self.getFraga = function(frageId){
+        	fråga schemat typ:
+        	
+        	   return ko.utils.arrayFirst(this.filteredItems(), function(item) {
+            return ko.utils.stringStartsWith(item.name().toLowerCase(), search);
+        });
+        	return self.senioritetsgrader[grad];
+        }*/
+        
         this.verifyMoves = function(arg) {
 	        console.log("Trying to move scientist " + arg.item + " from " + arg.sourceParent.id + " to " + arg.targetParent.id);
 	        
@@ -497,22 +498,12 @@ ko.bindingHandlers.flash = {
                 self.lastError("Forskaren är redan i den frågan!");	        
                 arg.cancelDrop = true;	        	
 	        }
-	        // ingen fråga parallell med till-frågan innehåller forskaren
+	        //TODO: ingen fråga parallell med till-frågan innehåller forskaren
 	        
-	        // flasha om det gick fel inkl anledning
-	        
-        var gender, found,
-            parent = arg.targetParent;
-            
-            
-
-        if (parent.id !== "Available Students" && parent().length === 3 && parent.indexOf(arg.item) < 0) {
-            gender = arg.item.gender;
-            if (!ko.utils.arrayFirst(parent(), function(student) { return student.gender !== gender;})) {
-                self.lastError("Cannot move " + arg.item.name() + " to " + arg.targetParent.id + " because there would be too many " + gender + " students");
-                arg.cancelDrop = true;
-            }
-        }
+	        // flasha om det gick fel inkl anledning:
+	        if (arg.cancelDrop){
+	        	$('#dragWarningModal').modal('show')
+	        }
     };
     }
 	
