@@ -293,10 +293,8 @@
 
 <script type="text/html" id="modal-fraga-template">
     <div class="modal-header">
-      Fråga <span data-bind="text: frageId"></span>
-<!-- Måste slå upp frågan:
-      <span data-bind="text: model.getFraga(frageId)"></span>
--->
+      Fråga <span data-bind="text: frageId"></span>: 
+      <span data-bind="text: model.getFraga(frageId).fråga"></span>
       <button type="button" class="close" data-dismiss="modal">&times;</button>
     </div>
     <div class="modal-body">
@@ -450,27 +448,16 @@
         }
         
         self.getForskare = function(id){
-        	var len = self.forskare().length;
-        	for(var i = 0 ; i < len; i ++){
-	        	var f = self.forskare()[i];
-	        	
-	        	if (f.id() === id){
-	        		return f;
-	        	}
-        	}
+        	return ko.utils.arrayFirst(self.forskare(), function(f) {
+	            return (f.id() === id);
+	        });
         	console.log("failed to find forskare with id " + id);
         }
         
         self.getRep = function(id){
-        	
-        	var len = self.foretagsrepresentanter().length;
-        	for(var i = 0 ; i < len; i ++){
-	        	var f = self.foretagsrepresentanter()[i];
-	        	
-	        	if (f.id() === id){
-	        		return f;
-	        	}
-        	}
+        	return ko.utils.arrayFirst(self.foretagsrepresentanter(), function(f) {
+	            return (f.id() === id);
+	        });
         	console.log("failed to find foretagsrepresentant with id " + id);
         }
         
@@ -478,14 +465,11 @@
         	return self.senioritetsgrader[grad];
         }
         
-/*        self.getFraga = function(frageId){
-        	fråga schemat typ:
-        	
-        	   return ko.utils.arrayFirst(this.filteredItems(), function(item) {
-            return ko.utils.stringStartsWith(item.name().toLowerCase(), search);
-        });
-        	return self.senioritetsgrader[grad];
-        }*/
+        self.getFraga = function(frageId){
+        	return ko.utils.arrayFirst(self.fragor(), function(f) {
+	            return (f.id() === frageId);
+	        });
+        }
         
         this.verifyMoves = function(arg) {
 	        console.log("Trying to move scientist " + arg.item + " from " + arg.sourceParent.id + " to " + arg.targetParent.id);
