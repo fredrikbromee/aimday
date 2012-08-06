@@ -6,7 +6,6 @@ import java.util.Map;
 import models.Konferens;
 import play.Logger;
 import play.mvc.Controller;
-import play.mvc.Http.Request;
 import se.aimday.scheduler.AIMDay;
 import se.aimday.scheduler.Scheduler;
 import se.aimday.scheduler.api.InconsistentJsonException;
@@ -34,12 +33,16 @@ public class Application extends Controller {
 	}
 
 	public static void scheduleAPI(String json) {
-		Request reqt = request;
 		Logger.info("params:" + params.toString());
 
 		Map<String, String> allSimple = params.allSimple();
 		for (String key : allSimple.keySet()) {
 			Logger.info("%s : %s", key, allSimple.get(key));
+		}
+
+		Logger.info("----------------------------");
+		for (String key : request.headers.keySet()) {
+			Logger.info("%s : %s", key, request.headers.get(key));
 		}
 
 		try {

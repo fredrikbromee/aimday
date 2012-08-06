@@ -73,7 +73,11 @@ public class ForetagsRepresentant {
 
 	public static ForetagsRepresentant fromApi(ForetagsRepresentantJson json) throws InconsistentJsonException {
 		if (json.kontakt == null){
-			throw new InconsistentJsonException(String.format("Företagsrepresentant %s has no contact info", json.id));
+			throw new InconsistentJsonException(String.format("Företagsrepresentant %s har ingen kontaktinfo", json.id));
+		}
+		if (json.frågor == null) {
+			throw new InconsistentJsonException(String.format(
+					"Företagsrepresentant %s har inga frågor. Hela json-noden är %s", json.id, json));
 		}
 		ForetagsRepresentant rep = new ForetagsRepresentant(json.kontakt.fornamn + json.kontakt.efternamn, json.id);
 		for (String qId : json.frågor) {
