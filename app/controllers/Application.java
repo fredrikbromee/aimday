@@ -44,16 +44,27 @@ public class Application extends Controller {
 		for (String key : request.headers.keySet()) {
 			Logger.info("%s : %s", key, request.headers.get(key));
 		}
+		Logger.info("qs:" + request.querystring);
 
+		KonferensJson konf = null;
 		try {
-			KonferensJson konf = new Gson().fromJson(json, KonferensJson.class);
+			konf = new Gson().fromJson(json, KonferensJson.class);
 
 			// Prova att parsa en gång så att vi är säkra på att vi gillar formatet
 			Konferens.fromAPI(konf);
 		} catch (InconsistentJsonException e) {
 			error(e.getMessage());
 		}
-		renderTemplate("Application/schedule.html", json);
+		String postback_url = getPostBackURL(konf);
+
+		renderTemplate("Application/schedule.html", json, postback_url);
+	}
+
+	private static String getPostBackURL(KonferensJson konf) {
+		if (konf.postback_url != null) {
+			return konf.postback_url;
+		}
+		return "http://aimdaylabb.se.preview.binero.se/materials/parse-json/";
 	}
 
 	public static void schedule(int tracks, int sessions, int generations, String json, int placeWeight, int wsWeight,
@@ -100,7 +111,8 @@ public class Application extends Controller {
 		}
 		konf.schema = schedule.toAPI();
 		json = gson.toJson(konf);
+		String postback_url = getPostBackURL(konf);
 
-		render(schedule, spår, json);
+		render(schedule, spår, json, postback_url);
 	}
 }

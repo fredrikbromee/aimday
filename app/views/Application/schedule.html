@@ -99,25 +99,12 @@
 	#{/if}
 	<p>
 	Om du är nöjd med det här schemat så kan du spara det:<br>
-	<a data-toggle="modal" href="#myModal" class="btn btn-primary">Spara schema</a>
+	<form class="form-horizontal" action="${postback_url}" method="POST" data-bind="submit: model.generera">
+		<input type="hidden" data-bind="value: model.genereradJson" name="json"></input>
+		<button type="submit" class="btn btn-primary" >Spara schema</button>		
+	</form>
+	
 	<p>Om inte kan du generera ett nytt schema: 
-	
-	  <div id="myModal" class="modal hide">
-	    <div class="modal-header">
-	      <button type="button" class="close" data-dismiss="modal">&times;</button>
-	    </div>
-	    <div class="modal-body">
-	      <h4>Det här funkar inte riktigt</h4>
-	      <p>Det som kommer att hända här är att schemat skickas tillbaka till registreringsmodulen för att sparas i 
-	      dess databas. Den delen är inte gjord än... 
-	    </div>
-	    <div class="modal-footer">
-	      <a href="#" class="btn btn-primary" data-dismiss="modal">OK</a>
-	    </div>
-	  </div>
-
-
-	
 	
 	
 </section>
@@ -321,6 +308,7 @@
 	model.optimeringsInformation = json.optimeringsInformation;
 	model.senioritetsgrader = json.senioritetsgrader;
 	model.schema = new Schema(json.schema);
+	model.postback_url = json.postback_url;
 
 	for (var i = 0; i < json.foretagsrepresentanter.length; i++) {
 	    var f = json.foretagsrepresentanter[i];

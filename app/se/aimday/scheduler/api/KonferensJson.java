@@ -18,6 +18,7 @@ import java.util.List;
  */
 public class KonferensJson {
 	public String id;
+	public String postback_url;
 	public String namn;
 	public OptimeringsInformation optimeringsInformation;
 	public List<String> senioritetsgrader;
