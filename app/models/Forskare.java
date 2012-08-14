@@ -126,13 +126,13 @@ public class Forskare {
 			throws InconsistentJsonException {
 		ArrayList<Forskare> forskare = new ArrayList<Forskare>();
 		for (ForskareJson f : json) {
-			if (f.grad<0 || f.grad > senioritetsgrader.size()){
+			if (f.grad < 1 || f.grad > senioritetsgrader.size()) {
 				String errMsg = String.format(
 						"Forskare %s (id:%s) har en grad som är inkorrekt eller ej angiven i senioritetsmappningen."
 								+ " Hans grad är %s", f.kontakt.efternamn, f.id, f.grad);
 				throw new InconsistentJsonException(errMsg);
 			}
-			String gradStr = senioritetsgrader.get(f.grad);
+			String gradStr = senioritetsgrader.get(f.grad - 1);
 			Forskare forskaren = new Forskare(f.id, f.kontakt.fornamn, f.kontakt.efternamn, f.grad, gradStr);
 			forskaren.isJoker = f.joker;
 			forskaren.harVikt = f.harVikt;
