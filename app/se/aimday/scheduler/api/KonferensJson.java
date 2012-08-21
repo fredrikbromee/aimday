@@ -39,10 +39,10 @@ public class KonferensJson {
 			try {
 				int id = Integer.parseInt(fraga.id);
 				if (id > 17) {
-					fraga.id = (id - 12) + "";
+					fraga.id = (id - 14) + "";
 				} else {
 					if (id > 12) {
-						fraga.id = (id - 14) + "";
+						fraga.id = (id - 12) + "";
 					}
 				}
 			} catch (RuntimeException re) {
