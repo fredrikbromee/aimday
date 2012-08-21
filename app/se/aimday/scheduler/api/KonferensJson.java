@@ -2,6 +2,8 @@ package se.aimday.scheduler.api;
 
 import java.util.List;
 
+import play.Logger;
+
 /**
  * Konferens -id/namn -lista med frågor -lista med forskare -lista med företagsrepresentanter -schema där alla är
  * utplacerade (första gången man anropar optimeraren är denna tom, tanken är att arrangörerna ska kunna ändra i schemat
@@ -26,4 +28,27 @@ public class KonferensJson {
 	public List<ForetagsRepresentantJson> foretagsrepresentanter;
 	public List<ForskareJson> forskare;
 	public SchemaJson schema;
+
+	public void resetFrågeNummerFrånTretton() {
+
+		if (fragor == null || fragor.isEmpty()) {
+			return;
+		}
+
+		for (FragaJson fraga : fragor) {
+			try {
+				int id = Integer.parseInt(fraga.id);
+				if (id > 17) {
+					fraga.id = (id - 12) + "";
+				} else {
+					if (id > 12) {
+						fraga.id = (id - 14) + "";
+					}
+				}
+			} catch (RuntimeException re) {
+				Logger.error(re, "failed to reset fråga nummer %s", fraga.id);
+			}
+		}
+
+	}
 }

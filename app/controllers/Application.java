@@ -48,10 +48,14 @@ public class Application extends Controller {
 
 		KonferensJson konf = null;
 		try {
-			konf = new Gson().fromJson(json, KonferensJson.class);
+			Gson gson = new Gson();
+			konf = gson.fromJson(json, KonferensJson.class);
 
 			// Prova att parsa en gång så att vi är säkra på att vi gillar formatet
 			Konferens.fromAPI(konf);
+
+			konf.resetFrågeNummerFrånTretton();
+			json = gson.toJson(konf);
 		} catch (InconsistentJsonException e) {
 			error(e.getMessage());
 		}
