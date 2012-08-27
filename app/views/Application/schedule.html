@@ -21,7 +21,7 @@
 	     </thead>
 	     <tbody>
 	     	<!-- ko foreach: model.schema.sessioner -->
-			<tr data-bind="sortable: { data: workshops,  connectClass:'workshopz' }" class="workshopz">
+			<tr data-bind="sortable: { data: workshops,  connectClass:model.getUniqueConnectClass }" class="workshopz">
 					<td>
 						<b>Fråga <span data-bind="text: frageId"></b>
 						<ul data-bind="sortable: {data:forskare, beforeMove: model.verifyMoves}" class="unstyled">
@@ -33,39 +33,7 @@
 						<div data-bind="attr: {id:frageId}" class="modal hide">
 							<div data-bind="template: { name: 'modal-fraga-template'}"></div>
 						</div>
-						
-					
 					</td>
-					
-					
-					
-					
-<!--
-			         #{list session.workshops, as:'workshop'}
-			                 <td><b>Fråga ${workshop.question.q}:</b><br>
-			                 #{list workshop.participants, as:'participant'}
-			                 		
-					                 <!--<i class="icon-arrow-left"></i>
-					                 	Tanken här är att pilarna ska bli synliga när man hovrar över forskaren, de ska 
-					                 	ligga i en     <div data-bind="visible: pilarSynliga">
-					                 	 
-					                 	 Och forskaren ligger i en sån här div:
-					                 	 <div data-bind="event: { mouseover: visaPilar, mouseout: tabortPilar }">
-					                 ->
-			                         <div>
-			                         	${participant.first_name}, Inst för neurologi, Uppsala Universitet
-			                         </div>
-					                 <!--<i class="icon-arrow-right"></i> ->
-			                 #{/list}		                 
-			                 </td>
-			         #{/list}
--->	             
-
-					
-					
-					
-					
-					
 			</tr>
 			<!-- /ko -->
 			
