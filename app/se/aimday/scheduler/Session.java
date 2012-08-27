@@ -59,7 +59,7 @@ public class Session {
 
 		Workshop ws = getWorkshop(q);
 		if (ws != null) {
-			if (ws.getNumberOfAttendants() >= maxDeltagarePerWS) {
+			if (ws.getAntalDeltagare() >= maxDeltagarePerWS) {
 				return false;
 			}
 			ws.add(p);
@@ -144,7 +144,7 @@ public class Session {
 		Collection<Question> removed = new ArrayList<Question>();
 		for (Iterator<Workshop> iterator = workshops.iterator(); iterator.hasNext();) {
 			Workshop workshop = iterator.next();
-			if (workshop.getNumberOfAttendants() < minDeltagarePerWS) {
+			if (workshop.getAntalForskare() < minDeltagarePerWS) {
 				iterator.remove();
 				removed.add(workshop.question);
 			}

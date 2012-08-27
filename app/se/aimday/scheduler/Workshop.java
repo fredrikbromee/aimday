@@ -60,7 +60,11 @@ public class Workshop {
 		return question;
 	}
 
-	public int getNumberOfAttendants() {
+	public int getAntalDeltagare() {
+		return participants.size() + lyssnare.size();
+	}
+
+	public int getAntalForskare() {
 		return participants.size();
 	}
 
@@ -122,13 +126,13 @@ public class Workshop {
 	}
 
 	private double scoreOneWorkshopUnweighted(FragaMedDeltagare frågaMedDeltagare) {
-		if (getNumberOfAttendants() >= 2) {
+		if (getAntalForskare() >= 2) {
 			return 1;
 		}
-		if (frågaMedDeltagare.antalKandidater() == 1 && getNumberOfAttendants() == 1) {
+		if (frågaMedDeltagare.antalKandidater() == 1 && getAntalForskare() == 1) {
 			return 1;
 		}
-		if (frågaMedDeltagare.antalKandidater() == 0 && getNumberOfAttendants() == 0) {
+		if (frågaMedDeltagare.antalKandidater() == 0 && getAntalForskare() == 0) {
 			return 1;
 		}
 
