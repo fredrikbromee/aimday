@@ -152,4 +152,8 @@ public class Session {
 		return removed;
 	}
 
+	public void addCompleteWorkshop(Workshop workshop) {
+		workshops.add(workshop);
+	}
+
 }

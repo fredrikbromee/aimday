@@ -40,4 +40,22 @@ public class Konferens {
 	public Collection<Question> getFrågor() {
 		return frågor;
 	}
+
+	public ForetagsRepresentant getFöretagsrep(String id) {
+		for (ForetagsRepresentant f : foretagare) {
+			if (f.id.equals(id)) {
+				return f;
+			}
+		}
+		return null;
+	}
+
+	public Forskare getForskare(String id) {
+		for (Forskare f : deltagare) {
+			if (f.id.equals(id)) {
+				return f;
+			}
+		}
+		return null;
+	}
 }

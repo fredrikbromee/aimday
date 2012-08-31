@@ -19,8 +19,8 @@ public class Question implements Comparable<Question> {
 	private int vikt = 0;
 	private List<Integer> låst = new ArrayList<Integer>();
 
-	public Question(String q) {
-		this.id = q;
+	public Question(String id) {
+		this.id = id;
 	}
 
 	public int getVikt() {

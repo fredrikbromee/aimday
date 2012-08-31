@@ -26,15 +26,4 @@ public class KonferensJson {
 	public List<ForetagsRepresentantJson> foretagsrepresentanter;
 	public List<ForskareJson> forskare;
 	public SchemaJson schema;
-
-	public void resetFrågeNummerFrånTretton() {
-		return;
-		/*
-		 * if (fragor == null || fragor.isEmpty()) { return; }
-		 * 
-		 * for (FragaJson fraga : fragor) { try { int id = Integer.parseInt(fraga.id); if (id > 17) { fraga.id = (id -
-		 * 14) + ""; } else { if (id > 12) { fraga.id = (id - 12) + ""; } } } catch (RuntimeException re) {
-		 * Logger.error(re, "failed to reset fråga nummer %s", fraga.id); } }
-		 */
-	}
 }

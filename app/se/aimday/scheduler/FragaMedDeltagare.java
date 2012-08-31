@@ -1,6 +1,7 @@
 package se.aimday.scheduler;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import models.ForetagsRepresentant;
 import models.Forskare;
@@ -57,5 +58,9 @@ public class FragaMedDeltagare {
 
 	public Collection<ForetagsRepresentant> getFrågare() {
 		return lyssnare;
+	}
+
+	public List<Forskare> getKandidater() {
+		return new ArrayList<Forskare>(kandidater);
 	}
 }

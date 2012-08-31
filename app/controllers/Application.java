@@ -47,20 +47,30 @@ public class Application extends Controller {
 		Logger.info("qs:" + request.querystring);
 
 		KonferensJson konf = null;
+		AIMDay schedule = null;
 		try {
 			Gson gson = new Gson();
 			konf = gson.fromJson(json, KonferensJson.class);
 
 			// Prova att parsa en gång så att vi är säkra på att vi gillar formatet
-			Konferens.fromAPI(konf);
+			Konferens k = Konferens.fromAPI(konf);
 
-			konf.resetFrågeNummerFrånTretton();
+			if (konf.schema != null){
+				schedule = AIMDay.fromJson(konf.schema, k);
+			}
 			json = gson.toJson(konf);
 		} catch (InconsistentJsonException e) {
 			error(e.getMessage());
 		}
 		String postback_url = getPostBackURL(konf);
 
+		
+		if (schedule != null) {
+			schedule.scoreIndividualAgendas();
+			ArrayList<Integer> spår = getSpårArray(schedule);
+			renderTemplate("Application/schedule.html", schedule, spår, json, postback_url);
+		}
+		
 		renderTemplate("Application/schedule.html", json, postback_url);
 	}
 
@@ -69,6 +79,41 @@ public class Application extends Controller {
 			return konf.postback_url;
 		}
 		return "http://aimdaylabb.se.preview.binero.se/materials/parse-json/";
+	}
+
+	public static void reSchedule(String json) {
+		Konferens k = null;
+		KonferensJson konf = null;
+		Gson gson = new Gson();
+		AIMDay befintligtSchema = null;
+		try {
+			konf = gson.fromJson(json, KonferensJson.class);
+			k = Konferens.fromAPI(konf);
+			if (konf.schema == null){
+				renderText("Finns inget befintligt schema att lägga till i!");
+			}
+			befintligtSchema = AIMDay.fromJson(konf.schema, k);
+		} catch (InconsistentJsonException e) {
+			error(e.getMessage());
+		}
+
+
+		Scheduler scheduler = new Scheduler(k, befintligtSchema);
+		AIMDay schedule = scheduler.läggInIBefintligtSchema();
+		ArrayList<Integer> spår = getSpårArray(schedule);
+		konf.schema = schedule.toAPI();
+		json = gson.toJson(konf);
+		String postback_url = getPostBackURL(konf);
+
+		renderTemplate("Application/schedule.html", schedule, spår, json, postback_url);
+	}
+
+	private static ArrayList<Integer> getSpårArray(AIMDay schedule) {
+		ArrayList<Integer> spår = new ArrayList<Integer>();
+		for (int i = 1; i <= schedule.getMaxNumOfWorkshopsInASession(); i++) {
+			spår.add(i);
+		}
+		return spår;
 	}
 
 	public static void schedule(int tracks, int sessions, int generations, String json, int placeWeight, int wsWeight,
@@ -106,13 +151,9 @@ public class Application extends Controller {
 		generations = Math.min(100000, generations);
 		ScheduleRequest scheduleRequest = new ScheduleRequest(tracks, sessions, generations, placeWeight, wsWeight,
 				agendaWeight, max_antal_deltagare, min_antal_deltagare);
-		System.out.println("num gs" + generations);
 		Scheduler scheduler = new Scheduler(k, scheduleRequest);
 		AIMDay schedule = scheduler.lägg();
-		ArrayList<Integer> spår = new ArrayList<Integer>();
-		for (int i = 1; i <= schedule.getMaxNumOfWorkshopsInASession(); i++) {
-			spår.add(i);
-		}
+		ArrayList<Integer> spår = getSpårArray(schedule);
 		konf.schema = schedule.toAPI();
 		json = gson.toJson(konf);
 		String postback_url = getPostBackURL(konf);

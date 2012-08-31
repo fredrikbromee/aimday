@@ -10,9 +10,11 @@ import java.util.TreeSet;
 
 import models.ForetagsRepresentant;
 import models.Forskare;
+import models.Konferens;
 import models.Question;
 import se.aimday.scheduler.api.SchemaJson;
 import se.aimday.scheduler.api.SessionJson;
+import se.aimday.scheduler.api.WorkshopJson;
 
 
 /**
@@ -48,6 +50,20 @@ public class AIMDay {
 			sessions.add(new Session(i + 1, antalParallellaSpår));
 		}
 		unplacedQuestions.addAll(questions);
+	}
+
+	private AIMDay(int antalParallellaSpår, int size, List<Forskare> deltagare, Collection<Question> frågor,
+			int maxAntalDeltagareIEnWS, List<Session> existingSchedule) {
+		this.spår = antalParallellaSpår;
+		this.allParticipants = deltagare;
+		this.maxDeltagarePerWS = maxAntalDeltagareIEnWS;
+		this.sessions = existingSchedule;
+		unplacedQuestions.addAll(frågor);
+		for (Session session : existingSchedule) {
+			for (Workshop ws : session.getAllWorkshops()) {
+				unplacedQuestions.remove(ws.question);
+			}
+		}
 	}
 
 	public int getSpår() {
@@ -211,5 +227,78 @@ public class AIMDay {
 		for (Session s : sessions) {
 			unplacedQuestions.addAll(s.taBortFrågorMedFörFåDeltagare(minDeltagarePerWS));
 		}
+	}
+
+	public static AIMDay fromJson(SchemaJson schema, Konferens k) {
+
+		/*
+		 * Det här måste göras:
+		 * 
+		 * this.spår = antalParallellaSpår; this.allParticipants = allParticipants; this.maxDeltagarePerWS =
+		 * maxDeltagarePerWS; for (int i = 0; i < antalSessioner; i++) { sessions.add(new Session(i + 1,
+		 * antalParallellaSpår)); } unplacedQuestions.addAll(questions);
+		 */
+		int antalParallellaSpår = 0;
+		for (SessionJson sessionJson : schema.sessioner) {
+			antalParallellaSpår = Math.max(antalParallellaSpår, sessionJson.workshops.size());
+		}
+		int sessionsNummer = 1;
+		List<Session> theseSessions = new ArrayList<Session>();
+
+		int maxAntalDeltagareIEnWS = 10;
+		for (SessionJson sessionJson : schema.sessioner) {
+			Session session = new Session(sessionsNummer, antalParallellaSpår);
+			theseSessions.add(session);
+			sessionsNummer++;
+
+			for (WorkshopJson workshopJson : sessionJson.workshops) {
+				List<String> foretagsrepresentanter = workshopJson.foretagsrepresentanter;
+				List<ForetagsRepresentant> reps = new ArrayList<ForetagsRepresentant>();
+				for (String id : foretagsrepresentanter) {
+					reps.add(k.getFöretagsrep(id));
+				}
+				Workshop workshop = new Workshop(new Question(workshopJson.frageId));
+				workshop.add(reps);
+
+				List<String> forskare = workshopJson.forskare;
+				for (String id : forskare) {
+					workshop.add(k.getForskare(id));
+				}
+				session.addCompleteWorkshop(workshop);
+				maxAntalDeltagareIEnWS = Math.max(workshop.getAntalDeltagare(), maxAntalDeltagareIEnWS);
+			}
+		}
+
+		return new AIMDay(antalParallellaSpår, schema.sessioner.size(), k.getDeltagare(), k.getFrågor(),
+				maxAntalDeltagareIEnWS, theseSessions);
+	}
+
+	public int getNumberOfSessions() {
+		return sessions.size();
+	}
+
+	public int getMaxDeltagarePerWS() {
+		return maxDeltagarePerWS;
+	}
+
+	public int getMinAntalDeltagareIEnWS() {
+		int min = 0;
+		for (Session session : sessions) {
+			for (Workshop ws : session.getAllWorkshops()) {
+				min = Math.min(min, ws.getAntalDeltagare());
+			}
+		}
+		return min;
+	}
+
+	public double scoreIndividualAgendas() {
+		double cumulativePrioScore = 0;
+		for (IndividualAgenda agenda : getAllIndividualAgendas()) {
+			double agendaScore = agenda.score(sessions.size());
+			cumulativePrioScore += agendaScore;
+			agenda.setScore(agendaScore);
+		}
+
+		return cumulativePrioScore;
 	}
 }

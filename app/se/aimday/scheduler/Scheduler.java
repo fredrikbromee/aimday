@@ -45,6 +45,8 @@ public class Scheduler {
 
 	private int minDeltagarePerWS;
 
+	private AIMDay befintligtSchema;
+
 	public Scheduler(int numParallelTracks, int numSessions, int maxAttendantsPerWS, Collection<Question> questions,
 			List<Forskare> erfarna, List<Forskare> oerfarna, List<ForetagsRepresentant> foretagare,
 			int generations) {
@@ -87,6 +89,12 @@ public class Scheduler {
 		// TODO tills vidare, hoppa över de oerfarna
 	}
 
+	public Scheduler(Konferens k, AIMDay befintligtSchema) {
+		this(k, new ScheduleRequest(befintligtSchema.getSpår(), befintligtSchema.getNumberOfSessions(), 500, 1, 1, 1,
+				befintligtSchema.getMaxDeltagarePerWS(), befintligtSchema.getMinAntalDeltagareIEnWS()));
+
+		this.befintligtSchema = befintligtSchema;
+	}
 
 	public AIMDay lägg() {
 		// do first try based on how many workshops each candidate has
@@ -111,6 +119,31 @@ public class Scheduler {
 		// TODO här kan man placera ut de oerfarna
 
 		return bestSoFar;
+	}
+
+	public AIMDay läggInIBefintligtSchema() {
+		if (befintligtSchema == null) {
+			throw new RuntimeException("Finns inget befintligt schema");
+		}
+
+		// Take 2:Gå igenom alla frågor, varenda en. Försök placera alla forskare som inte redan är med i frågan. På
+		// så sätt spelar det ingen roll om de inte var med förra gången eller om de bara inte gick att placera ut
+		Collection<FragaMedDeltagare> frågorMedDeltagare = frågor.values();
+		for (FragaMedDeltagare fragaMedDeltagare : frågorMedDeltagare) {
+			List<Forskare> kandidater = fragaMedDeltagare.getKandidater();
+			for (Forskare forskare : kandidater) {
+				Workshop workshop = befintligtSchema.getWorkshop(fragaMedDeltagare.getFråga());
+				if (workshop != null && !workshop.isAttendedBy(forskare)) {
+					befintligtSchema.place(fragaMedDeltagare.getFråga(), forskare, fragaMedDeltagare.getFrågare());
+				}
+			}
+		}
+
+		// Här tar vi bort alla frågor som inte har fått tillräckligt antal deltagare
+		befintligtSchema.taBortFrågorMedFörFåDeltagare(minDeltagarePerWS);
+
+		score(befintligtSchema);
+		return befintligtSchema;
 	}
 
 	private AIMDay getNewScheduleFrom(AIMDay schedule) {
@@ -191,12 +224,7 @@ public class Scheduler {
 
 		// how well have attendants wishes been filled?
 		int weightPrio = agendaWeight;
-		double cumulativePrioScore = 0;
-		for (IndividualAgenda agenda : schedule.getAllIndividualAgendas()) {
-			double agendaScore = agenda.score(numSessions);
-			cumulativePrioScore += agendaScore;
-			agenda.setScore(agendaScore);
-		}
+		double cumulativePrioScore = schedule.scoreIndividualAgendas();
 		cumulativePrioScore = cumulativePrioScore * weightPrio / allParticipants.size();
 
 		double score = (allQScore + cumulativeWSScore + cumulativePrioScore) / (weightForAllQsPlaced + weightWS + weightPrio);
