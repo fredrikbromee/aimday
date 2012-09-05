@@ -254,8 +254,10 @@ public class AIMDay {
 			for (WorkshopJson workshopJson : sessionJson.workshops) {
 				List<String> foretagsrepresentanter = workshopJson.foretagsrepresentanter;
 				List<ForetagsRepresentant> reps = new ArrayList<ForetagsRepresentant>();
-				for (String id : foretagsrepresentanter) {
-					reps.add(k.getFöretagsrep(id));
+				if (null != foretagsrepresentanter) {
+					for (String id : foretagsrepresentanter) {
+						reps.add(k.getFöretagsrep(id));
+					}
 				}
 				Workshop workshop = new Workshop(new Question(workshopJson.frageId));
 				workshop.add(reps);
