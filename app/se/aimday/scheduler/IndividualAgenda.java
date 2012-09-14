@@ -1,8 +1,12 @@
 package se.aimday.scheduler;
+
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import models.Forskare;
+import play.Logger;
 
 
 public class IndividualAgenda {
@@ -10,6 +14,7 @@ public class IndividualAgenda {
 	private final Forskare participant;
 	private final Map<Session, Workshop> schema = new HashMap();
 	private double score;
+	public Set<String> errors = new HashSet<String>();
 
 	public double getScore() {
 		return score;
@@ -26,8 +31,10 @@ public class IndividualAgenda {
 
 	public void läggTill(Workshop möte, Session session) {
 		if (harMöte(session)) {
-			throw new RuntimeException(String.format("Har redan ett möte denna session! Session %s  \n försöker lägga till %s", session,
-					möte));
+			String error = String.format("%s har mer än ett möte session %s!", participant.first_name,
+					session.getSessionNumber(), möte);
+			errors.add(error);
+			Logger.warn(error);
 		}
 		schema.put(session, möte);
 	}

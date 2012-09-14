@@ -1,7 +1,15 @@
 #{extends 'main.html' /}
 #{set title:'Home' /}
 
+#{if hittadeFel}
+	Varning: det här schemat innehåller fel! Följande fel hittades: 
+     #{list fel, as:'felet'}
+         ${felet}<br>
+     #{/list}
+#{/if}
+
 #{if schedule}
+	
 <section id="schema">
   <div class="page-header">
     <h1>Schema för <span data-bind="text: namn"/></h1>
@@ -270,7 +278,7 @@
 	model.namn = json.namn;
 	model.optimeringsInformation = json.optimeringsInformation;
 	model.senioritetsgrader = json.senioritetsgrader;
-	if (json.schema != null){
+	if (json.schema != null && json.schema.sessioner != null){
 		model.schema = new Schema(json.schema);
 	}
 	model.postback_url = json.postback_url;
@@ -346,7 +354,14 @@
     function Forskare(f){
     	var self = this;
     	self.id = ko.observable(f.id);
-    	self.harVikt = ko.observable(f.harVikt);
+    	if (f.harVikt){
+	    	self.harVikt = ko.observable(f.harVikt);
+	    } else {
+	    	if (f.harVikt === undefined){
+		    	console.log("Men va faaan!"+f.id);
+		    	}
+	    	self.harVikt = ko.observable(false);
+	    }
     	self.kontakt = ko.observable(f.kontakt);
     	self.namn = ko.computed(function(){return self.kontakt().fornamn + " " + self.kontakt().efternamn;}, this);
     	self.grad = f.grad;

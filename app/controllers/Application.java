@@ -1,6 +1,7 @@
 package controllers;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 import models.Konferens;
@@ -55,18 +56,26 @@ public class Application extends Controller {
 			// Prova att parsa en gång så att vi är säkra på att vi gillar formatet
 			Konferens k = Konferens.fromAPI(konf);
 
-			if (konf.schema != null){
+			if (konf.schema != null && konf.schema.sessioner != null) {
 				schedule = AIMDay.fromJson(konf.schema, k);
 			}
 			json = gson.toJson(konf);
 		} catch (InconsistentJsonException e) {
-			error(e.getMessage());
+			String felMeddelande = e.getMessage();
+			System.out.println(felMeddelande);
+			renderTemplate("Application/fel.html", felMeddelande);
 		}
 		String postback_url = getPostBackURL(konf);
 
 		
 		if (schedule != null) {
 			schedule.scoreIndividualAgendas();
+			Collection<String> fel = schedule.getAllScheduleErrors();
+			boolean hittadeFel = !fel.isEmpty();
+			if (hittadeFel) {
+				renderTemplate("Application/schedule.html", json, postback_url, hittadeFel, fel);
+			}
+
 			ArrayList<Integer> spår = getSpårArray(schedule);
 			renderTemplate("Application/schedule.html", schedule, spår, json, postback_url);
 		}
@@ -94,7 +103,9 @@ public class Application extends Controller {
 			}
 			befintligtSchema = AIMDay.fromJson(konf.schema, k);
 		} catch (InconsistentJsonException e) {
-			error(e.getMessage());
+			String felMeddelande = e.getMessage();
+			System.out.println(felMeddelande);
+			renderTemplate("Application/fel.html", felMeddelande);
 		}
 
 
@@ -144,7 +155,9 @@ public class Application extends Controller {
 			konf = gson.fromJson(json, KonferensJson.class);
 			k = Konferens.fromAPI(konf);
 		} catch (InconsistentJsonException e) {
-			error(e.getMessage());
+			String felMeddelande = e.getMessage();
+			System.out.println(felMeddelande);
+			renderTemplate("Application/fel.html", felMeddelande);
 		}
 
 

@@ -1,0 +1,9 @@
+#{extends 'main.html' /}
+#{set title:'Fel' /}
+
+Något gick fel:
+             ${felMeddelande}<br>
+         #{list fel, as:'felet'}
+             ${felet}<br>
+	     #{/list}
+	

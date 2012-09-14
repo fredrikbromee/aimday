@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -83,7 +84,7 @@ public class AIMDay {
 		return allAgendas.values();
 	}
 
-	public IndividualAgenda personalAgendaFor(Forskare deltagare) {
+	private IndividualAgenda personalAgendaFor(Forskare deltagare) {
 		IndividualAgenda schema = new IndividualAgenda(deltagare);
 		for (Session session : sessions) {
 			for (Workshop möte : session.getMöten()) {
@@ -231,13 +232,6 @@ public class AIMDay {
 
 	public static AIMDay fromJson(SchemaJson schema, Konferens k) {
 
-		/*
-		 * Det här måste göras:
-		 * 
-		 * this.spår = antalParallellaSpår; this.allParticipants = allParticipants; this.maxDeltagarePerWS =
-		 * maxDeltagarePerWS; for (int i = 0; i < antalSessioner; i++) { sessions.add(new Session(i + 1,
-		 * antalParallellaSpår)); } unplacedQuestions.addAll(questions);
-		 */
 		int antalParallellaSpår = 0;
 		for (SessionJson sessionJson : schema.sessioner) {
 			antalParallellaSpår = Math.max(antalParallellaSpår, sessionJson.workshops.size());
@@ -302,5 +296,14 @@ public class AIMDay {
 		}
 
 		return cumulativePrioScore;
+	}
+
+	public Collection<String> getAllScheduleErrors() {
+		HashSet<String> allErrors = new HashSet<String>();
+		Collection<IndividualAgenda> allIndividualAgendas = getAllIndividualAgendas();
+		for (IndividualAgenda individualAgenda : allIndividualAgendas) {
+			allErrors.addAll(individualAgenda.errors);
+		}
+		return allErrors;
 	}
 }

@@ -23,7 +23,7 @@ import controllers.ScheduleRequest;
  */
 public class Scheduler {
 
-	private final int generations = 2000;
+	private int generations;
 
 	private int numParallelTracks;
 
@@ -65,6 +65,7 @@ public class Scheduler {
 		this.wsWeight = r.wsWeight;
 		this.agendaWeight = r.agendaWeight;
 		this.allParticipants.addAll(k.getDeltagare());
+		this.generations = r.generations;
 
 		frågor = new TreeMap<String, FragaMedDeltagare>();
 		for (Question q : questions) {
@@ -107,9 +108,10 @@ public class Scheduler {
 
 		for (int i = 0; i < generations; i++) {
 			AIMDay newSchedule = getNewScheduleFrom(schedule);
-			System.out.println("New schedule: \n" + newSchedule);
+			// System.out.println("New schedule: \n" + newSchedule);
+			System.out.print('.');
 			if (newSchedule.isBetterThan(bestSoFar)) {
-				System.out.println("Better schedule: \n" + schedule);
+				System.out.println("\nBetter schedule: \n" + schedule);
 
 				bestSoFar = newSchedule;
 			}
