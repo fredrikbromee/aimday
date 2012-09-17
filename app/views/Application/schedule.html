@@ -103,7 +103,7 @@
 	    <tbody data-bind="foreach: model.fragor">
 	        <tr>
 	            <td data-bind="text: id"></td>
-	            <td data-bind="text: fråga"></td>
+	            <td data-bind="text: cappadFråga"></td>
 	            <td data-bind="visible: !editing()">
 	            	<a href="#" data-bind="click: edit">Låst till session <span data-bind="text: låst"></a>
 	            	<a href="#" data-bind="visible: ärLåst, click: removeLås"> (ta bort alla sessionslås)</a> 
@@ -337,6 +337,12 @@
 	    self.editing = ko.observable(false);
 	    self.edit = function() { this.editing(true); }
 	    
+	    self.cappadFråga = ko.computed(function(){
+	    	if (self.fråga().length < 140){
+	    		return self.fråga();
+	    	}
+	    	return self.fråga().slice(0,140) + "...";
+	    }, this);
 	    self.ärLåst = ko.computed(function(){return self.låst() != null && self.låst().length > 0;}, this);
 		self.removeLås = function(formElement) {
 			self.låst.removeAll();

@@ -146,7 +146,14 @@ public class Forskare {
 			}
 
 			for (String qId : f.frågor) {
-				forskaren.önskarSe(allQuestions.get(qId));
+				Question question = allQuestions.get(qId);
+				if (question == null) {
+					throw new InconsistentJsonException(String.format(
+							"Forskare %s är anmäld till en fråga som inte finns! Frågeid: %s", forskaren.first_name,
+							qId));
+
+				}
+				forskaren.önskarSe(question);
 			}
 			forskare.add(forskaren);
 
