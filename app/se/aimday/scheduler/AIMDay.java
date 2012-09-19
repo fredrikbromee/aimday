@@ -253,7 +253,7 @@ public class AIMDay {
 						reps.add(k.getFöretagsrep(id));
 					}
 				}
-				Workshop workshop = new Workshop(new Question(workshopJson.frageId));
+				Workshop workshop = new Workshop(k.getFråga(workshopJson.frageId));
 				workshop.add(reps);
 
 				List<String> forskare = workshopJson.forskare;

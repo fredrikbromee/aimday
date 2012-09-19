@@ -63,8 +63,9 @@
 	#{if schedule.unplacedQuestions}
 		<br>I det här schemat misslyckades vi att placera ut:
 		#{list schedule.unplacedQuestions, as:'unplaced'}
-		        Fråga ${unplaced.q}
-		#{/list}
+		        Fråga ${unplaced.q}#{if unplaced.hasZeroAttendants}*#{/if}
+		#{/list}<br>
+		En eventuell asterisk (*) efter en fråga betyder att den frågan inte har någon forskare anmäld till sig. <p> 
 	#{/if}
 	<p>
 	#{if schedule.unsatisfied}

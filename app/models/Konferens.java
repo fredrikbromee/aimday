@@ -1,6 +1,7 @@
 package models;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,10 +12,20 @@ public class Konferens {
 
 	private final List<Forskare> deltagare;
 	private final List<ForetagsRepresentant> foretagare;
-	private final Collection<Question> frågor;
+	private final Map<String, Question> frågor;
 
 	public Konferens(List<Forskare> deltagare, List<ForetagsRepresentant> foretagare, Collection<Question> frågor) {
+		HashMap<String, Question> qs = new HashMap<String, Question>();
+		for (Question q : frågor) {
+			qs.put(q.id, q);
+		}
 		this.deltagare = deltagare;
+		this.foretagare = foretagare;
+		this.frågor = qs;
+	}
+
+	public Konferens(List<Forskare> allParticipants, List<ForetagsRepresentant> foretagare, Map<String, Question> frågor) {
+		this.deltagare = allParticipants;
 		this.foretagare = foretagare;
 		this.frågor = frågor;
 	}
@@ -27,7 +38,19 @@ public class Konferens {
 		foretagare = ForetagsRepresentant.fromAPI(konf.foretagsrepresentanter);
 		allQuestions = Question.fromAPI(konf.fragor);
 		allParticipants = Forskare.fromAPI(konf.forskare, konf.senioritetsgrader, allQuestions);
-		return new Konferens(allParticipants, foretagare, allQuestions.values());
+		for (Question q : allQuestions.values()) {
+			boolean ingenSomVillGå = true;
+			for (Forskare forskare : allParticipants) {
+				if (forskare.villGåPå(q)) {
+					ingenSomVillGå = false;
+					continue;
+				}
+			}
+			if (ingenSomVillGå) {
+				q.setIngenSomVillGå(true);
+			}
+		}
+		return new Konferens(allParticipants, foretagare, allQuestions);
 	}
 
 	public List<Forskare> getDeltagare() {
@@ -39,7 +62,7 @@ public class Konferens {
 	}
 
 	public Collection<Question> getFrågor() {
-		return frågor;
+		return frågor.values();
 	}
 
 	public ForetagsRepresentant getFöretagsrep(String id) {
@@ -58,5 +81,9 @@ public class Konferens {
 			}
 		}
 		return null;
+	}
+
+	public Question getFråga(String frageId) {
+		return frågor.get(frageId);
 	}
 }

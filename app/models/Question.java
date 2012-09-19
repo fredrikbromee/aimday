@@ -18,6 +18,7 @@ public class Question implements Comparable<Question> {
 	public String id;
 	private int vikt = 0;
 	private List<Integer> låst = new ArrayList<Integer>();
+	public boolean hasZeroAttendants;
 
 	public Question(String id) {
 		this.id = id;
@@ -94,5 +95,10 @@ public class Question implements Comparable<Question> {
 		}
 		return låst.contains(sessionsNummer);
 	}
+
+	public void setIngenSomVillGå(boolean ingenSomVillGå) {
+		this.hasZeroAttendants = true;
+	}
+
 
 }

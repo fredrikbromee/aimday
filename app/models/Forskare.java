@@ -183,5 +183,9 @@ public class Forskare {
 	public List<String> getLåstaFrågor() {
 		return Collections.unmodifiableList(låstaFrågor);
 	}
+
+	public boolean villGåPå(Question q) {
+		return prio.contains(q);
+	}
 }
 
