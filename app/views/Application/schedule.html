@@ -370,7 +370,7 @@
 	    	self.harVikt = ko.observable(false);
 	    }
     	self.kontakt = ko.observable(f.kontakt);
-    	self.namn = ko.computed(function(){return self.kontakt().fornamn + " " + self.kontakt().efternamn;}, this);
+    	self.namn = ko.computed(function(){return self.kontakt().fornamn.charAt(0) +'.' + " " + self.kontakt().efternamn;}, this);
     	self.grad = f.grad;
     	self.joker = f.joker;
     	self.frågor = f.frågor;
