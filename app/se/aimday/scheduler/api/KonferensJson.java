@@ -1,5 +1,7 @@
 package se.aimday.scheduler.api;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -26,4 +28,35 @@ public class KonferensJson {
 	public List<ForetagsRepresentantJson> foretagsrepresentanter;
 	public List<ForskareJson> forskare;
 	public SchemaJson schema;
+
+	public void förkortaSenioritetsGrader() {
+		this.senioritetsgrader = förkorta(senioritetsgrader);
+	}
+
+	private List<String> förkorta(List<String> senioritetsgrader) {
+		List<String> listaMedFörkortningar = new ArrayList<String>();
+		for (String grad : senioritetsgrader) {
+			String förkortadGrad = förkorta(grad);
+			listaMedFörkortningar.add(förkortadGrad);
+		}
+		return listaMedFörkortningar;
+	}
+
+	private static HashMap<String, String> förkortningar = new HashMap<String, String>();
+	static {
+		förkortningar.put("Doctor", "Dr.");
+		förkortningar.put("Professor", "Prof.");
+		förkortningar.put("Docent", "Doc.");
+		förkortningar.put("PhD student year 4-5", "PhD");
+		förkortningar.put("PhD student year 1-3", "phd");
+	}
+
+	private String förkorta(String grad) {
+		String förkortning = förkortningar.get(grad.trim());
+		if (förkortning != null) {
+			return förkortning;
+		}
+		return grad;
+	}
+
 }

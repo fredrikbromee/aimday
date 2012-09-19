@@ -20,6 +20,7 @@ public class Konferens {
 	}
 
 	public static Konferens fromAPI(KonferensJson konf) throws InconsistentJsonException {
+		konf.förkortaSenioritetsGrader();
 		List<Forskare> allParticipants = null;
 		List<ForetagsRepresentant> foretagare = null;
 		Map<String, Question> allQuestions = null;

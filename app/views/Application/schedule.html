@@ -238,11 +238,11 @@
 	<a href="#" title="Den här forskaren är markerad att ha specifik kompetens för den här konferensen (har vikt som används i optimeringen)"><i class="icon-flag"></i></a></span>
 	<span data-bind="if: joker">
 	<a href="#" title="Den här forskaren är joker och placeras ut sist av alla på de frågor som behöver mer kompetens"><i class="icon-star"></i></a></span>
-	<span data-bind="text: model.getGrad(grad)"></span>&nbsp<span data-bind="text: namn"></span>, <span data-bind="text: kontakt().avdelning"></span> 
+	<span data-bind="text: namn"></span>, <span data-bind="text: model.getGrad(grad)"> </span>&nbsp<span data-bind="text: kontakt().avdelning"></span> 
 </script>
 
 <script type="text/html" id="rep-template">
-	<span data-bind="text: namn"></span>, <span data-bind="text: kontakt().avdelning"></span> <span data-bind="text: kontakt().org"></span> 
+	<span data-bind="text: namn"></span>,  <span data-bind="text: kontakt().org"></span> 
 </script>
 
 <script type="text/html" id="modal-fraga-template">
