@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import controllers.ScheduleRequest;
+
 /**
  * Konferens -id/namn -lista med frågor -lista med forskare -lista med företagsrepresentanter -schema där alla är
  * utplacerade (första gången man anropar optimeraren är denna tom, tanken är att arrangörerna ska kunna ändra i schemat
@@ -28,6 +30,7 @@ public class KonferensJson {
 	public List<ForetagsRepresentantJson> foretagsrepresentanter;
 	public List<ForskareJson> forskare;
 	public SchemaJson schema;
+	public ScheduleRequest scheduleRequest;
 
 	public void förkortaSenioritetsGrader() {
 		this.senioritetsgrader = förkorta(senioritetsgrader);

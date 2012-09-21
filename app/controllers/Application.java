@@ -168,6 +168,7 @@ public class Application extends Controller {
 		AIMDay schedule = scheduler.lägg();
 		ArrayList<Integer> spår = getSpårArray(schedule);
 		konf.schema = schedule.toAPI();
+		konf.scheduleRequest = scheduleRequest;
 		json = gson.toJson(konf);
 		String postback_url = getPostBackURL(konf);
 

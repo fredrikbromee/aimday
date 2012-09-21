@@ -71,7 +71,8 @@
 	#{if schedule.unsatisfied}
 		I det här schemat fick följande (${schedule.unsatisfied.size} st) deltagare inte vara med på hela sin önskelista:
 		#{list schedule.unsatisfied, as:'un'}
-		         <div "unsatisfied_participant">${un.participant.first_name} önskade ${un.wishedNumber} st, fick se ${un.assignedNumber} st (${un.agenda}) </div>
+		         <div "unsatisfied_participant">${un.participant.first_name} önskade ${un.wishedNumber} st, fick se 
+		         ${un.assignedNumber} st ${un.agenda} </div>
 		#{/list}                        
 	#{/if}
 	<p>
@@ -155,14 +156,14 @@
 	     <div class="control-group">
 	     <label class="control-label" for="tracks">Antal parallella spår</label>
             <div class="controls">
-	     <input type="text" name="tracks" value="10" id="tracks" />
+	     <input type="text" name="tracks" value="10" id="tracks"  data-bind="value:scheduleRequest.tracks"/>
 	     </div>
 	     </div>
 
 	     <div class="control-group">
 	     <label class="control-label" for="sessions">Antal sessioner</label>
             <div class="controls">
-	     <input type="text" name="sessions" value="5" id="sessions" />
+	     <input type="text" name="sessions" value="5" id="sessions" data-bind="value:scheduleRequest.sessions"/>
 	     </div>
 
 	     </div>
@@ -171,14 +172,14 @@
 	     <div class="control-group">
 	     <label class="control-label" for="generations">Antal generationer</label>
             <div class="controls">
-	     <input type="text" name="generations" value="2000" id="generations" />
+	     <input type="text" name="generations" value="2000" id="generations" data-bind="value:scheduleRequest.generations"/>
 	     </div>
 	     </div>
 
 	     <div class="control-group">
 	     <label class="control-label" for="placeWeight">Utplaceringsvikt</label>
             <div class="controls">
-	     <input type="text" name="placeWeight" value="10" id="placeWeight" />
+	     <input type="text" name="placeWeight" value="10" id="placeWeight" data-bind="value:scheduleRequest.placeWeight"/>
 	     <span class="help-inline">Hur viktigt är det att varje fråga är utplacerad?</span>
 	     </div>
 	     </div>
@@ -186,7 +187,7 @@
 	     <div class="control-group">
 	     <label class="control-label">Frågevikt</label>
             <div class="controls">
-	     <input type="text" name="wsWeight" value="10" id="wsWeight" />
+	     <input type="text" name="wsWeight" value="10" id="wsWeight" data-bind="value:scheduleRequest.wsWeight"/>
 	     <span class="help-inline">Hur viktigt är det att varje fråga har fyllts med erfarna deltagare?</span>
 	     </div>
 	     </div>
@@ -194,7 +195,7 @@
 	     <div class="control-group">
 	     <label class="control-label" for="agendaWeight">Forskarvikt</label>
             <div class="controls">
-	     <input type="text" name="agendaWeight" value="10" id="agendaWeight" />
+	     <input type="text" name="agendaWeight" value="10" id="agendaWeight" data-bind="value:scheduleRequest.agendaWeight"/>
 	     <span class="help-inline">Hur viktigt är det att uppfylla forskarnas önskemål?</span>
               <p class="help-block">Vikterna är relativt varandra, så om du t ex sätter frågevikt 1 och forskarvikt 2 betyder det att det är dubbelt så viktigt att forskarnas önskemål uppfyllts än att frågor fyllts med erfarna forskare</p>
 	     </div>
@@ -203,7 +204,7 @@
 	     <div class="control-group">
 	     <label class="control-label">Max antal</label>
             <div class="controls">
-		     <select name="max_antal_deltagare">
+		     <select name="max_antal_deltagare" data-bind="value:scheduleRequest.maxAntalDeltagare">
 			  <option value="100">ingen begränsning</option>
 			  <option value="10">10 deltagare</option>
 			  <option value="11">11 deltagare</option>
@@ -216,7 +217,7 @@
 	     <div class="control-group">
 	     <label class="control-label">Minimi-antal</label>
             <div class="controls">
-		     <select name="min_antal_deltagare">
+		     <select name="min_antal_deltagare" data-bind="value:scheduleRequest.minAntalDeltagare">
 			  <option value="0">inget minimi-antal</option>
 			  <option value="2">2 forskare</option>
 			  <option value="3">3 forskare</option>
@@ -279,6 +280,13 @@
 	model.namn = json.namn;
 	model.optimeringsInformation = json.optimeringsInformation;
 	model.senioritetsgrader = json.senioritetsgrader;
+	if (json.scheduleRequest === undefined){
+		model.scheduleRequest = {tracks:10, sessions:5, generations:1973, placeWeight:10, wsWeight:10, agendaWeight:10,
+		 maxAntalDeltagare:100, minAntalDeltagare:1};
+	} else {
+		model.scheduleRequest = json.scheduleRequest;
+	}
+	
 	if (json.schema != null && json.schema.sessioner != null){
 		model.schema = new Schema(json.schema);
 	}
