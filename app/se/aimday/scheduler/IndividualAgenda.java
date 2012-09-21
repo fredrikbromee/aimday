@@ -3,9 +3,11 @@ package se.aimday.scheduler;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import models.Forskare;
+import models.Question;
 import play.Logger;
 
 
@@ -78,5 +80,31 @@ public class IndividualAgenda {
 
 	public int getAssignedNumber() {
 		return schema.size();
+	}
+
+	public String getAgenda() {
+		StringBuilder sb = new StringBuilder();
+		for (Question q : participant.getÖnskelista()) {
+			sb.append("Q" + q.id);
+			if (skaSe(q)) {
+				sb.append("(S" + vilkenSession(q) + ")");
+			}
+			sb.append(' ');
+		}
+		return sb.toString();
+	}
+
+	private int vilkenSession(Question q) {
+		Set<Entry<Session, Workshop>> entrySet = schema.entrySet();
+		for (Entry<Session, Workshop> entry : entrySet) {
+			if (entry.getValue().isFor(q)) {
+				return entry.getKey().getSessionNumber();
+			}
+		}
+		return 0;
+	}
+
+	private boolean skaSe(Question q) {
+		return vilkenSession(q) > 0;
 	}
 }

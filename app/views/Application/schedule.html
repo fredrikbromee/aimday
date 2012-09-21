@@ -71,7 +71,7 @@
 	#{if schedule.unsatisfied}
 		I det här schemat fick följande (${schedule.unsatisfied.size} st) deltagare inte vara med på hela sin önskelista:
 		#{list schedule.unsatisfied, as:'un'}
-		         <div "unsatisfied_participant">${un.participant.first_name} önskade ${un.wishedNumber} st, fick se ${un.assignedNumber} st </div>
+		         <div "unsatisfied_participant">${un.participant.first_name} önskade ${un.wishedNumber} st, fick se ${un.assignedNumber} st (${un.agenda}) </div>
 		#{/list}                        
 	#{/if}
 	<p>
