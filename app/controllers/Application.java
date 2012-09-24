@@ -77,7 +77,8 @@ public class Application extends Controller {
 			}
 
 			ArrayList<Integer> spår = getSpårArray(schedule);
-			renderTemplate("Application/schedule.html", schedule, spår, json, postback_url);
+			boolean sparatSchema = true;
+			renderTemplate("Application/schedule.html", schedule, spår, json, postback_url, sparatSchema);
 		}
 		
 		renderTemplate("Application/schedule.html", json, postback_url);

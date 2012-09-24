@@ -12,13 +12,23 @@
 	
 <section id="schema">
   <div class="page-header">
-    <h1>Schema för <span data-bind="text: namn"/></h1>
+    <h1>
+  	#{if sparatSchema}
+  		Sparat schema
+	#{/if}
+  	#{else}
+  		Optimerat schema (fortfarande inte sparat)
+	#{/else}
+  
+    för <span data-bind="text: namn"/></h1>
     <span data-bind="if: optimeringsInformation.anvandVikter">
 	    Vid optimering av det här schemat används viktning, dvs hänsyn tas till att forskare <span data-bind="text: optimeringsInformation.viktNamn"></span>
 	</span>
     
   </div>
-	Det här schemats poäng är ${schedule.score.format('#.##')} (1=idealt schema, 0=sämst tänkbara).<br>
+	#{if !sparatSchema}
+		Det här schemats poäng är ${schedule.score.format('#.##')} (1=idealt schema, 0=sämst tänkbara).<br>
+	#{/if}
 	 <table class="table table-striped table-condensed">
 	     <thead>
 	         <tr>
@@ -76,18 +86,23 @@
 		#{/list}                        
 	#{/if}
 	<p>
-	Om du är nöjd med det här schemat så kan du spara det:<br>
-	<form class="form-horizontal" action="${postback_url}" method="POST" data-bind="submit: model.generera">
-		<input type="hidden" data-bind="value: model.genereradJson" name="json"></input>
-		<button type="submit" class="btn btn-primary" >Spara schema</button>		
-	</form>
+	#{if !sparatSchema}
+		Om du är nöjd med det här schemat så kan du spara det:<br>
+		<form class="form-horizontal" action="${postback_url}" method="POST" data-bind="submit: model.generera">
+			<input type="hidden" data-bind="value: model.genereradJson" name="json"></input>
+			<button type="submit" class="btn btn-primary" >Spara schema</button>		
+		</form>
+	#{/if}
 	
-	Om du vill låta optimeraren göra ett försök till att placera ut forskare och frågor i det här schemat (utan att flytta
-	på de som redan är med) så kan du lägga till i det:<br>
-	<form class="form-horizontal" action="@{Application.reSchedule()}" method="POST" accept-charset="${_response_encoding}" data-bind="submit: model.generera">
-		<input type="hidden" data-bind="value: model.genereradJson" name="json"></input>
-		<button type="submit" class="btn btn-primary" >Lägg till i befintligt schema</button>		
-	</form>
+	#{if sparatSchema}
+	
+		Om du vill låta optimeraren göra ett försök till att placera ut forskare och frågor i det här sparade schemat 
+		(utan att flytta på de som redan är med) så kan du lägga till i det:<br>
+		<form class="form-horizontal" action="@{Application.reSchedule()}" method="POST" accept-charset="${_response_encoding}" data-bind="submit: model.generera">
+			<input type="hidden" data-bind="value: model.genereradJson" name="json"></input>
+			<button type="submit" class="btn btn-primary" >Lägg till i befintligt schema</button>		
+		</form>
+	#{/if}
 	
 	<p>Om inte kan du generera ett helt nytt schema: 
 	
