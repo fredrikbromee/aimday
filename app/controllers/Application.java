@@ -239,7 +239,7 @@ public class Application extends Controller {
 		String postback_url = getPostBackURL(konf);
 		AIMDay schedule = tuple.schedule;
 		ArrayList<Integer> spår = getSpårArray(schedule);
-		String json = tuple.json;
+		String json = gson.toJson(konf);
 		render(schedule, spår, json, postback_url);
 	}
 }
