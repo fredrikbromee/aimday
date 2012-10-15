@@ -17,7 +17,7 @@
   		Sparat schema
 	#{/if}
   	#{else}
-  		Optimerat schema (fortfarande inte sparat)
+  		Optimerat schema (ännu inte sparat)
 	#{/else}
   
     för <span data-bind="text: namn"/></h1>
@@ -166,19 +166,19 @@
     <h1></h1>
   </div>
 
-	<form class="form-horizontal" action="@{Application.schedule()}" method="POST" accept-charset="${_response_encoding}" data-bind="submit: model.generera">
+	<form class="form-horizontal" action="@{Application.scheduleNew()}" method="POST" accept-charset="${_response_encoding}" data-bind="submit: model.generera">
 	<fieldset>
 	     <div class="control-group">
 	     <label class="control-label" for="tracks">Antal parallella spår</label>
             <div class="controls">
-	     <input type="text" name="tracks" value="10" id="tracks"  data-bind="value:scheduleRequest.tracks"/>
+	     <input type="text" name="tracks" id="tracks"  data-bind="value:scheduleRequest.tracks"/>
 	     </div>
 	     </div>
 
 	     <div class="control-group">
 	     <label class="control-label" for="sessions">Antal sessioner</label>
             <div class="controls">
-	     <input type="text" name="sessions" value="5" id="sessions" data-bind="value:scheduleRequest.sessions"/>
+	     <input type="text" name="sessions" id="sessions" data-bind="value:scheduleRequest.sessions"/>
 	     </div>
 
 	     </div>
@@ -187,14 +187,14 @@
 	     <div class="control-group">
 	     <label class="control-label" for="generations">Antal generationer</label>
             <div class="controls">
-	     <input type="text" name="generations" value="2000" id="generations" data-bind="value:scheduleRequest.generations"/>
+	     <input type="text" name="generations" id="generations" data-bind="value:scheduleRequest.generations"/>
 	     </div>
 	     </div>
 
 	     <div class="control-group">
 	     <label class="control-label" for="placeWeight">Utplaceringsvikt</label>
             <div class="controls">
-	     <input type="text" name="placeWeight" value="10" id="placeWeight" data-bind="value:scheduleRequest.placeWeight"/>
+	     <input type="text" name="placeWeight" id="placeWeight" data-bind="value:scheduleRequest.placeWeight"/>
 	     <span class="help-inline">Hur viktigt är det att varje fråga är utplacerad?</span>
 	     </div>
 	     </div>
@@ -202,7 +202,7 @@
 	     <div class="control-group">
 	     <label class="control-label">Frågevikt</label>
             <div class="controls">
-	     <input type="text" name="wsWeight" value="10" id="wsWeight" data-bind="value:scheduleRequest.wsWeight"/>
+	     <input type="text" name="wsWeight" id="wsWeight" data-bind="value:scheduleRequest.wsWeight"/>
 	     <span class="help-inline">Hur viktigt är det att varje fråga har fyllts med erfarna deltagare?</span>
 	     </div>
 	     </div>
@@ -210,7 +210,7 @@
 	     <div class="control-group">
 	     <label class="control-label" for="agendaWeight">Forskarvikt</label>
             <div class="controls">
-	     <input type="text" name="agendaWeight" value="10" id="agendaWeight" data-bind="value:scheduleRequest.agendaWeight"/>
+	     <input type="text" name="agendaWeight" id="agendaWeight" data-bind="value:scheduleRequest.agendaWeight"/>
 	     <span class="help-inline">Hur viktigt är det att uppfylla forskarnas önskemål?</span>
               <p class="help-block">Vikterna är relativt varandra, så om du t ex sätter frågevikt 1 och forskarvikt 2 betyder det att det är dubbelt så viktigt att forskarnas önskemål uppfyllts än att frågor fyllts med erfarna forskare</p>
 	     </div>

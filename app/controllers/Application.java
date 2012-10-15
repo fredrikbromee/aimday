@@ -1,11 +1,16 @@
 package controllers;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import models.Konferens;
 import play.Logger;
+import play.cache.Cache;
+import play.jobs.Job;
 import play.mvc.Controller;
 import se.aimday.scheduler.AIMDay;
 import se.aimday.scheduler.Scheduler;
@@ -20,6 +25,48 @@ import com.google.gson.Gson;
  * 
  */
 public class Application extends Controller {
+
+	public static class RequestAndScheduleTuple implements Serializable {
+
+		public final AIMDay schedule;
+		public final ScheduleRequest scheduleRequest;
+		public final String json;
+
+		public RequestAndScheduleTuple(AIMDay schedule, ScheduleRequest scheduleRequest, String json) {
+			this.schedule = schedule;
+			this.scheduleRequest = scheduleRequest;
+			this.json = json;
+		}
+
+	}
+
+	public static class AimdayJob extends Job {
+
+		@Override
+		public void doJob() throws Exception {
+			Cache.set(id, "asdfopoasdfhn", "10min");
+			AIMDay schedule = scheduler.lägg();
+
+			RequestAndScheduleTuple tuple = new RequestAndScheduleTuple(schedule, scheduleRequest, json);
+			Logger.info("Caching new schedule with id %s", id);
+			Cache.set(id, tuple, "1h");
+
+		}
+
+		private final Scheduler scheduler;
+		private final String id;
+		private final ScheduleRequest scheduleRequest;
+		private final String json;
+
+		public AimdayJob(Scheduler scheduler, String id, ScheduleRequest scheduleRequest, String json) {
+			this.scheduler = scheduler;
+			this.id = id;
+			this.scheduleRequest = scheduleRequest;
+			this.json = json;
+
+		}
+
+	}
 
 	public static void index() {
 		render();
@@ -128,8 +175,10 @@ public class Application extends Controller {
 		return spår;
 	}
 
-	public static void schedule(int tracks, int sessions, int generations, String json, int placeWeight, int wsWeight,
-			int agendaWeight, int max_antal_deltagare, int min_antal_deltagare) {
+	public static void scheduleNew(int tracks, int sessions, int generations, String json, int placeWeight,
+			int wsWeight,
+			int agendaWeight, int max_antal_deltagare, int min_antal_deltagare) throws InterruptedException,
+			ExecutionException {
 
 		if (placeWeight < 0) {
 			placeWeight = 10;
@@ -148,7 +197,6 @@ public class Application extends Controller {
 			throw new RuntimeException("Felaktigt minimi-antal  deltagare, fick " + min_antal_deltagare);
 		}
 
-
 		Konferens k = null;
 		KonferensJson konf = null;
 		Gson gson = new Gson();
@@ -161,18 +209,37 @@ public class Application extends Controller {
 			renderTemplate("Application/fel.html", felMeddelande);
 		}
 
-
 		generations = Math.min(100000, generations);
 		ScheduleRequest scheduleRequest = new ScheduleRequest(tracks, sessions, generations, placeWeight, wsWeight,
 				agendaWeight, max_antal_deltagare, min_antal_deltagare);
 		Scheduler scheduler = new Scheduler(k, scheduleRequest);
-		AIMDay schedule = scheduler.lägg();
-		ArrayList<Integer> spår = getSpårArray(schedule);
-		konf.schema = schedule.toAPI();
-		konf.scheduleRequest = scheduleRequest;
-		json = gson.toJson(konf);
-		String postback_url = getPostBackURL(konf);
 
+		String randomId = UUID.randomUUID().toString();
+
+		new AimdayJob(scheduler, randomId, scheduleRequest, json).now();
+		render(randomId);
+	}
+
+	public static void schedule(String id) {
+		Object object = Cache.get(id.trim());
+		if (object == null) {
+			renderText("Ledsen, hittade inte det här schemat i cachen.");
+		}
+		if (!(object instanceof RequestAndScheduleTuple)) {
+			String felMeddelande = "Schemat inte klart än. Fredrik ska göra en ticker här, och en pollning i bakgrunden så man inte behöver hålla koll själv";
+			String randomId = id;
+			renderTemplate("Application/scheduleNew.html", randomId, felMeddelande);
+		}
+
+		RequestAndScheduleTuple tuple = (RequestAndScheduleTuple) object;
+		Gson gson = new Gson();
+		KonferensJson konf = gson.fromJson(tuple.json, KonferensJson.class);
+		konf.schema = tuple.schedule.toAPI();
+		konf.scheduleRequest = tuple.scheduleRequest;
+		String postback_url = getPostBackURL(konf);
+		AIMDay schedule = tuple.schedule;
+		ArrayList<Integer> spår = getSpårArray(schedule);
+		String json = tuple.json;
 		render(schedule, spår, json, postback_url);
 	}
 }

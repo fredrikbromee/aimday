@@ -1,4 +1,6 @@
 package se.aimday.scheduler;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,7 +25,7 @@ import se.aimday.scheduler.api.WorkshopJson;
  * @author fredrikbromee
  *
  */
-public class AIMDay {
+public class AIMDay implements Serializable {
 
 	private static final Comparator<? super Session> filledComparator = new Comparator<Session>() {
 

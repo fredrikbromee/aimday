@@ -1,6 +1,8 @@
 package controllers;
 
-public class ScheduleRequest {
+import java.io.Serializable;
+
+public class ScheduleRequest implements Serializable {
 
 	public final int tracks;
 	public final int sessions;
