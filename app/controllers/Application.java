@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import models.Konferens;
 import play.Logger;
@@ -44,8 +45,9 @@ public class Application extends Controller {
 
 		@Override
 		public void doJob() throws Exception {
-			Cache.set(id, "asdfopoasdfhn", "10min");
-			AIMDay schedule = scheduler.lägg();
+			AtomicInteger progress = new AtomicInteger();
+			Cache.set(id, progress, "10min");
+			AIMDay schedule = scheduler.lägg(progress);
 
 			RequestAndScheduleTuple tuple = new RequestAndScheduleTuple(schedule, scheduleRequest, json);
 			Logger.info("Caching new schedule with id %s", id);
@@ -220,15 +222,28 @@ public class Application extends Controller {
 		render(randomId);
 	}
 
+	public static void progress(String id) {
+		Object object = Cache.get(id.trim());
+
+		if (object != null && object instanceof AtomicInteger) {
+			int progress = ((AtomicInteger) object).get();
+			renderJSON(progress);
+		}
+		if (object != null && object instanceof RequestAndScheduleTuple) {
+			renderJSON(100);
+		}
+		renderJSON(-1);
+	}
+
 	public static void schedule(String id) {
 		Object object = Cache.get(id.trim());
 		if (object == null) {
 			renderText("Ledsen, hittade inte det här schemat i cachen.");
 		}
-		if (!(object instanceof RequestAndScheduleTuple)) {
-			String felMeddelande = "Schemat inte klart än. Fredrik ska göra en ticker här, och en pollning i bakgrunden så man inte behöver hålla koll själv";
+		if (object instanceof AtomicInteger) {
 			String randomId = id;
-			renderTemplate("Application/scheduleNew.html", randomId, felMeddelande);
+			int progress = ((AtomicInteger) object).get();
+			renderTemplate("Application/scheduleNew.html", progress, randomId);
 		}
 
 		RequestAndScheduleTuple tuple = (RequestAndScheduleTuple) object;

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import models.ForetagsRepresentant;
 import models.Forskare;
@@ -97,7 +98,8 @@ public class Scheduler {
 		this.befintligtSchema = befintligtSchema;
 	}
 
-	public AIMDay lägg() {
+	public AIMDay lägg(AtomicInteger progress) {
+
 		// do first try based on how many workshops each candidate has
 
 		List<Forskare> sorteradeDeltagare = new ArrayList<Forskare>(this.allParticipants);
@@ -116,6 +118,9 @@ public class Scheduler {
 				bestSoFar = newSchedule;
 			}
 			schedule = newSchedule;
+
+			int soFar = (i * 100) / generations;
+			progress.set(soFar);
 		}
 
 		// TODO här kan man placera ut de oerfarna
