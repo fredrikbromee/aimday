@@ -86,8 +86,6 @@ public class Scheduler {
 			}
 		}
 
-		// TODO lägg frågor helt utan anmälda i en egen hög
-
 		// TODO tills vidare, hoppa över de oerfarna
 	}
 
@@ -122,9 +120,6 @@ public class Scheduler {
 			int soFar = (i * 100) / generations;
 			progress.set(soFar);
 		}
-
-		// TODO här kan man placera ut de oerfarna
-
 		return bestSoFar;
 	}
 

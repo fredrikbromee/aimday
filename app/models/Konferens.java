@@ -1,12 +1,17 @@
 package models;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import se.aimday.scheduler.api.ForskareJson;
+import se.aimday.scheduler.api.FragaJson;
 import se.aimday.scheduler.api.InconsistentJsonException;
 import se.aimday.scheduler.api.KonferensJson;
+import se.aimday.scheduler.api.Låsningar.FrågeLås;
+import se.aimday.scheduler.api.Låsningar.SessionsLås;
 
 public class Konferens {
 
@@ -32,7 +37,7 @@ public class Konferens {
 
 	public static Konferens fromAPI(KonferensJson konf) throws InconsistentJsonException {
 		konf.förkortaSenioritetsGrader();
-		List<Forskare> allParticipants = null;
+		Map<String, Forskare> allParticipants = null;
 		List<ForetagsRepresentant> foretagare = null;
 		Map<String, Question> allQuestions = null;
 		foretagare = ForetagsRepresentant.fromAPI(konf.foretagsrepresentanter);
@@ -40,7 +45,7 @@ public class Konferens {
 		allParticipants = Forskare.fromAPI(konf.forskare, konf.senioritetsgrader, allQuestions);
 		for (Question q : allQuestions.values()) {
 			boolean ingenSomVillGå = true;
-			for (Forskare forskare : allParticipants) {
+			for (Forskare forskare : allParticipants.values()) {
 				if (forskare.villGåPå(q)) {
 					ingenSomVillGå = false;
 					continue;
@@ -50,7 +55,42 @@ public class Konferens {
 				q.setIngenSomVillGå(true);
 			}
 		}
-		return new Konferens(allParticipants, foretagare, allQuestions);
+		for (SessionsLås lås : konf.låsningar.frågesessionslås) {
+			Question question = allQuestions.get(lås.id);
+			if (question != null) {
+				question.låsTill(lås.låsttill);
+			}
+		}
+		
+		for (SessionsLås lås : konf.låsningar.forskarsessionslås) {
+			Forskare forskare = allParticipants.get(lås.id);
+			if (forskare != null) {
+				forskare.låsTillSessioner(lås.låsttill);
+			}
+		}
+
+		for (FrågeLås lås : konf.låsningar.forskarfrågelås) {
+			Forskare forskare = allParticipants.get(lås.id);
+			if (forskare != null) {
+				forskare.låsTillFrågor(lås.låsttill);
+			}
+		}
+
+		Konferens konferens = new Konferens(new ArrayList<Forskare>(allParticipants.values()), foretagare, allQuestions);
+
+		// Och så flyttar vi in låsningarna i grunddatat så att knockout kan visa dem också
+		List<FragaJson> fragor = konf.fragor;
+		for (FragaJson fraga : fragor) {
+			Question question = konferens.getFråga(fraga.id);
+			fraga.låst = question.getLås();
+		}
+		for (ForskareJson forskareApi : konf.forskare) {
+			Forskare forskare = konferens.getForskare(forskareApi.id);
+			forskareApi.låstaFrågor = forskare.getLåstaFrågor();
+			forskareApi.låstaSessioner = forskare.getLåstaSessioner();
+		}
+
+		return konferens;
 	}
 
 	public List<Forskare> getDeltagare() {

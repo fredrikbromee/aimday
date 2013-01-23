@@ -1,5 +1,6 @@
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import models.ForetagsRepresentant;
 import models.Forskare;
@@ -34,7 +35,7 @@ public class SchemaläggarTest {
 		läggare = new Scheduler.Byggare(1).mednumSessions(2).medMaxAntalDeltagarePerMöte(3)
 				.medDeltagare(ARNE, BJARNE, CHRISTER, DAVID).medFrågor(fråga1, fråga2).bygg();
 
-		se.aimday.scheduler.AIMDay bästSchema = läggare.lägg();
+		se.aimday.scheduler.AIMDay bästSchema = läggare.lägg(new AtomicInteger(1));
 		System.out.println("Valt schema:\n" + bästSchema);
 
 		// placera ut resten av deltagarna också så skare bli ett
@@ -54,7 +55,7 @@ public class SchemaläggarTest {
 		läggare = new Scheduler.Byggare(2).mednumSessions(1).medMaxAntalDeltagarePerMöte(3)
 				.medDeltagare(ARNE, BJARNE, CHRISTER, DAVID).medFrågor(fråga1, fråga2).bygg();
 
-		AIMDay bästSchema = läggare.lägg();
+		AIMDay bästSchema = läggare.lägg(new AtomicInteger(1));
 		System.out.println("Valt schema:\n" + bästSchema);
 		System.out.println(bästSchema.getScore());
 
@@ -83,7 +84,7 @@ public class SchemaläggarTest {
 				.medDeltagare(ARNE, BJARNE, CHRISTER, DAVID).medFrågor(fråga1, fråga2, fråga3, fråga4)
 				.medDeltagare(lyssnare).bygg();
 
-		AIMDay bästSchema = läggare.lägg();
+		AIMDay bästSchema = läggare.lägg(new AtomicInteger(1));
 		Session sessionMedFråga1 = bästSchema.getSessionFor(fråga1);
 		Assert.assertTrue("Två frågor från samma företag i samma session!", sessionMedFråga1.harFråga(fråga3)
 				|| sessionMedFråga1.harFråga(fråga4));

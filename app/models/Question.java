@@ -47,9 +47,6 @@ public class Question implements Comparable<Question> {
 		for (FragaJson fragaJson : json) {
 			Question question = new Question(fragaJson.id);
 			question.vikt = fragaJson.vikt;
-			if (null != fragaJson.låst) {
-				question.låst.addAll(fragaJson.låst);
-			}
 			frågor.put(fragaJson.id, question);
 
 		}
@@ -100,5 +97,11 @@ public class Question implements Comparable<Question> {
 		this.hasZeroAttendants = true;
 	}
 
+	public void låsTill(List<Integer> låsttill) {
+		this.låst.addAll(låsttill);
+	}
 
+	public List<Integer> getLås() {
+		return låst;
+	}
 }

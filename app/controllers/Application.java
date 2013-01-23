@@ -108,6 +108,7 @@ public class Application extends Controller {
 			if (konf.schema != null && konf.schema.sessioner != null) {
 				schedule = AIMDay.fromJson(konf.schema, k);
 			}
+
 			json = gson.toJson(konf);
 		} catch (InconsistentJsonException e) {
 			String felMeddelande = e.getMessage();
@@ -140,6 +141,8 @@ public class Application extends Controller {
 		return "http://aimdaylabb.se.preview.binero.se/materials/parse-json/";
 	}
 
+	@Deprecated
+	// TODO ta bort när vi har knappen för lås alla
 	public static void reSchedule(String json) {
 		Konferens k = null;
 		KonferensJson konf = null;

@@ -434,8 +434,34 @@
 		// när generera-knappen trycks så måste vi plocka ut de ändringar som gjorts (låsningar) och
 		// skicka med dem till servern
 		self.generera = function(formElement) {
+		
+			var frågelås = [];
+			for (var i = 0; i < self.fragor().length; i++) {
+				var fråga = self.fragor()[i];
+				if (fråga.ärLåst()){
+					var låstFråga = {id:fråga.id(), låsttill:fråga.låst()};
+					frågelås.push(låstFråga);
+				}
+			}
+			
+			var forskarFrågeLås = [];
+			var forskarTidLås = [];
+			for (var i=0; i<self.forskare().length; i++){
+				var forskare = self.forskare()[i];
+				if(forskare.ärLåstTillFråga()){
+					var låstForskare = {id: forskare.id(), låsttill:forskare.låstaFrågor()};
+					forskarFrågeLås.push(låstForskare);
+				}
+				if(forskare.ärLåst()){
+					var låstForskare = {id: forskare.id(), låsttill:forskare.låstaSessioner()};
+					forskarTidLås.push(låstForskare);
+				}
+			}
+			
+			self.låsningar = {frågesessionslås:frågelås, forskarfrågelås:forskarFrågeLås, forskarsessionslås:forskarTidLås};		
 			var newJson = ko.toJSON(self);
 			self.genereradJson(newJson);
+			
 			console.log(newJson);
 			return true;
         }

@@ -2,6 +2,7 @@ package models;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -121,10 +122,10 @@ public class Forskare {
 		return isJoker;
 	}
 
-	public static List<Forskare> fromAPI(List<ForskareJson> json, List<String> senioritetsgrader,
+	public static Map<String, Forskare> fromAPI(List<ForskareJson> json, List<String> senioritetsgrader,
 			Map<String, Question> allQuestions)
 			throws InconsistentJsonException {
-		ArrayList<Forskare> forskare = new ArrayList<Forskare>();
+		Map<String, Forskare> forskare = new HashMap<String, Forskare>();
 		for (ForskareJson f : json) {
 			if (f.grad < 1 || f.grad > senioritetsgrader.size()) {
 				String errMsg = String.format(
@@ -137,14 +138,6 @@ public class Forskare {
 			forskaren.isJoker = f.joker;
 			forskaren.harVikt = f.harVikt;
 
-			if (null != f.låstaSessioner) {
-				forskaren.låstaSessioner.addAll(f.låstaSessioner);
-			}
-
-			if (null != f.låstaFrågor) {
-				forskaren.låstaFrågor.addAll(f.låstaFrågor);
-			}
-
 			for (String qId : f.frågor) {
 				Question question = allQuestions.get(qId);
 				if (question == null) {
@@ -155,7 +148,7 @@ public class Forskare {
 				}
 				forskaren.önskarSe(question);
 			}
-			forskare.add(forskaren);
+			forskare.put(forskaren.id, forskaren);
 
 		}
 		return forskare;
@@ -184,8 +177,20 @@ public class Forskare {
 		return Collections.unmodifiableList(låstaFrågor);
 	}
 
+	public List<Integer> getLåstaSessioner() {
+		return Collections.unmodifiableList(låstaSessioner);
+	}
+
 	public boolean villGåPå(Question q) {
 		return prio.contains(q);
+	}
+
+	public void låsTillSessioner(List<Integer> låsttill) {
+		låstaSessioner.addAll(låsttill);
+	}
+
+	public void låsTillFrågor(List<String> låsttill) {
+		låstaFrågor.addAll(låsttill);
 	}
 }
 
