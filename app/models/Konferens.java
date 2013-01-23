@@ -10,8 +10,8 @@ import se.aimday.scheduler.api.ForskareJson;
 import se.aimday.scheduler.api.FragaJson;
 import se.aimday.scheduler.api.InconsistentJsonException;
 import se.aimday.scheduler.api.KonferensJson;
-import se.aimday.scheduler.api.Låsningar.FrågeLås;
-import se.aimday.scheduler.api.Låsningar.SessionsLås;
+import se.aimday.scheduler.api.Lasningar.FrageLas;
+import se.aimday.scheduler.api.Lasningar.SessionsLas;
 
 public class Konferens {
 
@@ -55,21 +55,21 @@ public class Konferens {
 				q.setIngenSomVillGå(true);
 			}
 		}
-		for (SessionsLås lås : konf.låsningar.frågesessionslås) {
+		for (SessionsLas lås : konf.låsningar.frågesessionslås) {
 			Question question = allQuestions.get(lås.id);
 			if (question != null) {
 				question.låsTill(lås.låsttill);
 			}
 		}
 		
-		for (SessionsLås lås : konf.låsningar.forskarsessionslås) {
+		for (SessionsLas lås : konf.låsningar.forskarsessionslås) {
 			Forskare forskare = allParticipants.get(lås.id);
 			if (forskare != null) {
 				forskare.låsTillSessioner(lås.låsttill);
 			}
 		}
 
-		for (FrågeLås lås : konf.låsningar.forskarfrågelås) {
+		for (FrageLas lås : konf.låsningar.forskarfrågelås) {
 			Forskare forskare = allParticipants.get(lås.id);
 			if (forskare != null) {
 				forskare.låsTillFrågor(lås.låsttill);

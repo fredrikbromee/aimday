@@ -31,7 +31,7 @@ public class KonferensJson {
 	public List<ForskareJson> forskare;
 	public SchemaJson schema;
 	public ScheduleRequest scheduleRequest;
-	public Låsningar låsningar;
+	public Lasningar låsningar;
 
 	public void förkortaSenioritetsGrader() {
 		this.senioritetsgrader = förkorta(senioritetsgrader);
