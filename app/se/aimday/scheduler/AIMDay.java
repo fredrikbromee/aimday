@@ -308,4 +308,10 @@ public class AIMDay implements Serializable {
 		}
 		return allErrors;
 	}
+
+	public void placeraLåstFråga(FragaMedDeltagare fragaMedDeltagare) {
+		Question question = fragaMedDeltagare.getFråga();
+		Session session = sessions.get(question.getLåstSession() - 1);
+		session.placeraLåstFråga(question, fragaMedDeltagare.getFrågare());
+	}
 }

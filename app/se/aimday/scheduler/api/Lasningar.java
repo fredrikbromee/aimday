@@ -3,17 +3,18 @@ package se.aimday.scheduler.api;
 import java.util.List;
 
 public class Lasningar {
-	public class FrageLas {
+	public class StringLas {
 		public String id;
 		public List<String> låsttill;
 	}
 
-	public class SessionsLas {
+	public class IntegerLas {
 		public String id;
 		public List<Integer> låsttill;
 	}
 
-	public List<SessionsLas> frågesessionslås;
-	public List<SessionsLas> forskarsessionslås;
-	public List<FrageLas> forskarfrågelås;
+	public List<IntegerLas> frågesessionslås;
+	public List<IntegerLas> frågerumslås;
+	public List<IntegerLas> forskarsessionslås;
+	public List<StringLas> forskarfrågelås;
 }

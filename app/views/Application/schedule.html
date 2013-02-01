@@ -96,15 +96,12 @@
 	
 	#{if sparatSchema}
 	
-		Om du vill låta optimeraren göra ett försök till att placera ut forskare och frågor i det här sparade schemat 
-		(utan att flytta på de som redan är med) så kan du lägga till i det:<br>
-		<form class="form-horizontal" action="@{Application.reSchedule()}" method="POST" accept-charset="${_response_encoding}" data-bind="submit: model.generera">
-			<input type="hidden" data-bind="value: model.genereradJson" name="json"></input>
-			<button type="submit" class="btn btn-primary" >Lägg till i befintligt schema</button>		
+		Om du vill utgå från det här schemat och lägga till nya frågor eller forskare så kan du låsa hela schemat innan du gör en ny optimering: 
+		<br>
+		<form class="form-horizontal" action="" method="POST" data-bind="submit: model.låsAllt">
+			<button type="submit" class="btn btn-primary" >Lås frågor och forskare till detta schema</button>		
 		</form>
 	#{/if}
-	
-	<p>Om inte kan du generera ett helt nytt schema: 
 	
 	
 </section>
@@ -357,6 +354,7 @@
     	self.id = ko.observable(f.id);
     	self.fråga = ko.observable(f.fråga);
     	self.låst = ko.observableArray(f.låst);
+    	self.låstaRum = ko.observableArray();
 
 	    self.editing = ko.observable(false);
 	    self.edit = function() { this.editing(true); }
@@ -368,6 +366,7 @@
 	    	return self.fråga().slice(0,140) + "...";
 	    }, this);
 	    self.ärLåst = ko.computed(function(){return self.låst() != null && self.låst().length > 0;}, this);
+	    self.ärLåstTillRum = ko.computed(function(){return self.låstaRum() != null && self.låstaRum().length > 0;}, this);
 		self.removeLås = function(formElement) {
 			self.låst.removeAll();
         }
@@ -429,18 +428,56 @@
     	self.foretagsrepresentanter = ko.observableArray();
 		self.genereradJson = ko.observable();
 		this.lastError = ko.observable();
+
+		self.låsAllt = function(formElement){
+			if (self.schema === null){
+				return false;
+			}
+			for(var i = 0; i < self.schema.sessioner().length; i++){
+				var session = self.schema.sessioner()[i];
+				var rumsNummer = 1;
+				ko.utils.arrayForEach(session.workshops(), function(workshop){
+					self.låsFrågaTillSessionOchRum(workshop.frageId, i+1, rumsNummer);
+					ko.utils.arrayForEach(workshop.forskare(), function(forskare){
+						self.låsForskareTillFråga(forskare, workshop.frageId);
+					});
+					rumsNummer++;
+				});
+			}
+			return false;
+		}
 		
+		self.låsFrågaTillSessionOchRum = function(frågeId, sessionsId, rumsNummer){
+			console.log("Låser fråga " + frågeId + " till session " + sessionsId + " och rum " + rumsNummer);
+			var låstaSessioner = self.getFraga(frågeId).låst;
+			låstaSessioner.removeAll();
+			låstaSessioner.push(sessionsId);
+			var låstaRum = self.getFraga(frågeId).låstaRum;
+			låstaRum.removeAll();
+			låstaRum.push(rumsNummer);
+		}
+		self.låsForskareTillFråga = function(forskarId, frågeId){
+			console.log("Låser forskare " + forskarId + " till fråga " + frågeId);
+			var låstaFrågor = self.getForskare(forskarId).låstaFrågor;
+			låstaFrågor.remove(frågeId);
+			låstaFrågor.push(frågeId);
+		}
 
 		// när generera-knappen trycks så måste vi plocka ut de ändringar som gjorts (låsningar) och
 		// skicka med dem till servern
 		self.generera = function(formElement) {
 		
 			var frågelås = [];
+			var frågerumslås = [];
 			for (var i = 0; i < self.fragor().length; i++) {
 				var fråga = self.fragor()[i];
 				if (fråga.ärLåst()){
 					var låstFråga = {id:fråga.id(), låsttill:fråga.låst()};
 					frågelås.push(låstFråga);
+				}
+				if (fråga.ärLåstTillRum()){
+					var låstFråga = {id:fråga.id(), låsttill:fråga.låstaRum()};
+					frågerumslås.push(låstFråga);
 				}
 			}
 			
@@ -458,7 +495,7 @@
 				}
 			}
 			
-			self.låsningar = {frågesessionslås:frågelås, forskarfrågelås:forskarFrågeLås, forskarsessionslås:forskarTidLås};		
+			self.låsningar = {frågesessionslås:frågelås, frågerumslås:frågerumslås, forskarfrågelås:forskarFrågeLås, forskarsessionslås:forskarTidLås};		
 			var newJson = ko.toJSON(self);
 			self.genereradJson(newJson);
 			
@@ -511,5 +548,4 @@
     };
     }
 	
-</script>
-	
+</script>	

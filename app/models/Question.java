@@ -17,7 +17,8 @@ public class Question implements Comparable<Question> {
 
 	public String id;
 	private int vikt = 0;
-	private List<Integer> låst = new ArrayList<Integer>();
+	private List<Integer> låstaSessioner = new ArrayList<Integer>();
+	private List<Integer> låstaRum = new ArrayList<Integer>();
 	public boolean hasZeroAttendants;
 
 	public Question(String id) {
@@ -82,26 +83,49 @@ public class Question implements Comparable<Question> {
 		this.vikt = i;
 	}
 
-	private boolean ärLåst() {
-		return !låst.isEmpty();
+	public boolean ärLåstTillRumOchSession() {
+		return ärLåstTillSession() && ärLåstTillRum();
+	}
+
+	private boolean ärLåstTillSession() {
+		return !låstaSessioner.isEmpty();
+	}
+
+	private boolean ärLåstTillRum() {
+		return !låstaRum.isEmpty();
 	}
 
 	public boolean kanPlacerasISessionNummer(int sessionsNummer) {
-		if (!ärLåst()) {
+		if (!ärLåstTillSession()) {
 			return true;
 		}
-		return låst.contains(sessionsNummer);
+		return låstaSessioner.contains(sessionsNummer);
 	}
 
 	public void setIngenSomVillGå(boolean ingenSomVillGå) {
 		this.hasZeroAttendants = true;
 	}
 
-	public void låsTill(List<Integer> låsttill) {
-		this.låst.addAll(låsttill);
+	public void låsTillSession(List<Integer> låsttill) {
+		this.låstaSessioner.addAll(låsttill);
 	}
 
 	public List<Integer> getLås() {
-		return låst;
+		return låstaSessioner;
 	}
+
+	public void låsTillRum(List<Integer> låsttill) {
+		this.låstaRum.addAll(låsttill);
+	}
+
+	public int getLåstSession() {
+		// när man ställer den här frågan har man i praktiken låst frågan i både x- och y-led så det finns bara en
+		// session
+		return låstaSessioner.get(0);
+	}
+
+	public Integer getLåstRum() {
+		return låstaRum.get(0);
+	}
+
 }

@@ -141,37 +141,6 @@ public class Application extends Controller {
 		return "http://aimdaylabb.se.preview.binero.se/materials/parse-json/";
 	}
 
-	@Deprecated
-	// TODO ta bort när vi har knappen för lås alla
-	public static void reSchedule(String json) {
-		Konferens k = null;
-		KonferensJson konf = null;
-		Gson gson = new Gson();
-		AIMDay befintligtSchema = null;
-		try {
-			konf = gson.fromJson(json, KonferensJson.class);
-			k = Konferens.fromAPI(konf);
-			if (konf.schema == null){
-				renderText("Finns inget befintligt schema att lägga till i!");
-			}
-			befintligtSchema = AIMDay.fromJson(konf.schema, k);
-		} catch (InconsistentJsonException e) {
-			String felMeddelande = e.getMessage();
-			System.out.println(felMeddelande);
-			renderTemplate("Application/fel.html", felMeddelande);
-		}
-
-
-		Scheduler scheduler = new Scheduler(k, befintligtSchema);
-		AIMDay schedule = scheduler.läggInIBefintligtSchema();
-		ArrayList<Integer> spår = getSpårArray(schedule);
-		konf.schema = schedule.toAPI();
-		json = gson.toJson(konf);
-		String postback_url = getPostBackURL(konf);
-
-		renderTemplate("Application/schedule.html", schedule, spår, json, postback_url);
-	}
-
 	private static ArrayList<Integer> getSpårArray(AIMDay schedule) {
 		ArrayList<Integer> spår = new ArrayList<Integer>();
 		for (int i = 1; i <= schedule.getMaxNumOfWorkshopsInASession(); i++) {

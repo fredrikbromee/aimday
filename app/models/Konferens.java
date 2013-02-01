@@ -10,8 +10,8 @@ import se.aimday.scheduler.api.ForskareJson;
 import se.aimday.scheduler.api.FragaJson;
 import se.aimday.scheduler.api.InconsistentJsonException;
 import se.aimday.scheduler.api.KonferensJson;
-import se.aimday.scheduler.api.Lasningar.FrageLas;
-import se.aimday.scheduler.api.Lasningar.SessionsLas;
+import se.aimday.scheduler.api.Lasningar.IntegerLas;
+import se.aimday.scheduler.api.Lasningar.StringLas;
 
 public class Konferens {
 
@@ -55,21 +55,28 @@ public class Konferens {
 				q.setIngenSomVillGå(true);
 			}
 		}
-		for (SessionsLas lås : konf.låsningar.frågesessionslås) {
+		for (IntegerLas lås : konf.låsningar.frågesessionslås) {
 			Question question = allQuestions.get(lås.id);
 			if (question != null) {
-				question.låsTill(lås.låsttill);
+				question.låsTillSession(lås.låsttill);
 			}
 		}
-		
-		for (SessionsLas lås : konf.låsningar.forskarsessionslås) {
+		if (konf.låsningar.frågerumslås != null) {
+			for (IntegerLas lås : konf.låsningar.frågerumslås) {
+				Question question = allQuestions.get(lås.id);
+				if (question != null) {
+					question.låsTillRum(lås.låsttill);
+				}
+			}
+		}
+		for (IntegerLas lås : konf.låsningar.forskarsessionslås) {
 			Forskare forskare = allParticipants.get(lås.id);
 			if (forskare != null) {
 				forskare.låsTillSessioner(lås.låsttill);
 			}
 		}
 
-		for (FrageLas lås : konf.låsningar.forskarfrågelås) {
+		for (StringLas lås : konf.låsningar.forskarfrågelås) {
 			Forskare forskare = allParticipants.get(lås.id);
 			if (forskare != null) {
 				forskare.låsTillFrågor(lås.låsttill);

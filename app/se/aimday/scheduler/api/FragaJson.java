@@ -16,4 +16,5 @@ public class FragaJson {
 	public String fråga;
 	public int vikt = 0;
 	public List<Integer> låst = new ArrayList<Integer>();
+	public List<Integer> låstaRum = new ArrayList<Integer>();
 }

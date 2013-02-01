@@ -2,8 +2,10 @@ package se.aimday.scheduler;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
 
 import models.ForetagsRepresentant;
 import models.Forskare;
@@ -18,28 +20,33 @@ import se.aimday.scheduler.api.WorkshopJson;
  * 
  */
 public class Session {
-	// hashcode och equals
 
-	private List<Workshop> workshops;
+	// Första rummet i en session har nummer 1
+	private Map<Integer, Workshop> frågorPerRum = new TreeMap<Integer, Workshop>();
 	private final int numParalllelTracks;
 	private final int sessionNumber; // Dagens första session har nummer 1 (inte 0)
 
 	public Session(int sessionNumber, int numParallelTracks) {
 		this.sessionNumber = sessionNumber;
 		this.numParalllelTracks = numParallelTracks;
-		workshops = new ArrayList<Workshop>(numParallelTracks);
 	}
 
 	public int getSessionNumber() {
 		return sessionNumber;
 	}
 
-	public List<Workshop> getMöten() {
-		return workshops;
+	public Collection<Workshop> getMöten() {
+		return frågorPerRum.values();
 	}
 
 	public boolean place(Question q, Forskare p, int maxDeltagarePerWS) {
 		return place(q, p, Collections.<ForetagsRepresentant> emptyList(), maxDeltagarePerWS);
+	}
+
+	public void placeraLåstFråga(Question question, Collection<ForetagsRepresentant> lyssnare) {
+		Workshop ws = new Workshop(question);
+		ws.add(lyssnare);
+		frågorPerRum.put(question.getLåstRum(), ws);
 	}
 
 	public boolean place(Question q, Forskare p, Collection<ForetagsRepresentant> lyssnare, int maxDeltagarePerWS) {
@@ -70,16 +77,25 @@ public class Session {
 		ws.add(p);
 		ws.add(lyssnare);
 
-		if (workshops.size() >= numParalllelTracks) {
+		if (frågorPerRum.size() >= numParalllelTracks) {
 			return false;
 		}
 
-		workshops.add(ws);
+		frågorPerRum.put(förstaLedigaRum(), ws);
 		return true;
 	}
 
+	private Integer förstaLedigaRum() {
+		for (int i = 1; i <= numParalllelTracks; i++) {
+			if (!frågorPerRum.containsKey(i)) {
+				return Integer.valueOf(i);
+			}
+		}
+		throw new RuntimeException("hittade inget ledigt rum i sessionen: " + toString());
+	}
+
 	private boolean harFrågaStälldAv(Collection<ForetagsRepresentant> lyssnare) {
-		for (Workshop workshop : workshops) {
+		for (Workshop workshop : frågorPerRum.values()) {
 			for (ForetagsRepresentant kanskeDär : lyssnare) {
 				if (workshop.harFrågeStällare(kanskeDär)) {
 					return true;
@@ -90,7 +106,7 @@ public class Session {
 	}
 
 	public boolean isAttendedByAnyOf(Collection<Forskare> deltagare) {
-		for (Workshop workshop : workshops) {
+		for (Workshop workshop : frågorPerRum.values()) {
 			for (Forskare maybeThere : deltagare) {
 				if (workshop.isAttendedBy(maybeThere)) {
 					return true;
@@ -103,23 +119,22 @@ public class Session {
 	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
-		for (Workshop s : workshops) {
+		for (Workshop s : frågorPerRum.values()) {
 			sb.append(s.toString() + ";");
 		}
 		return sb.toString();
-		// return "Session [workshops=" + workshops + "]";
 	}
 
 	public int getNumberOfScheduledWS() {
-		return workshops.size();
+		return frågorPerRum.size();
 	}
 
 	public Collection<Workshop> getAllWorkshops() {
-		return Collections.unmodifiableCollection(workshops);
+		return Collections.unmodifiableCollection(frågorPerRum.values());
 	}
 
 	public Workshop getWorkshop(Question q) {
-		for (Workshop ws : workshops) {
+		for (Workshop ws : frågorPerRum.values()) {
 			if (ws.isFor(q)) {
 				return ws;
 			}
@@ -134,26 +149,31 @@ public class Session {
 	public SessionJson toAPI() {
 		SessionJson sessionJson = new SessionJson();
 		sessionJson.workshops = new ArrayList<WorkshopJson>();
-		for (Workshop workshop : workshops) {
+		for (Workshop workshop : frågorPerRum.values()) {
 			sessionJson.workshops.add(workshop.toAPI());
 		}
 		return sessionJson;
 	}
 
 	public Collection<? extends Question> taBortFrågorMedFörFåDeltagare(int minDeltagarePerWS) {
+		Set<Entry<Integer, Workshop>> entrySet = frågorPerRum.entrySet();
 		Collection<Question> removed = new ArrayList<Question>();
-		for (Iterator<Workshop> iterator = workshops.iterator(); iterator.hasNext();) {
-			Workshop workshop = iterator.next();
-			if (workshop.getAntalForskare() < minDeltagarePerWS) {
-				iterator.remove();
+		TreeMap<Integer, Workshop> filledWorkshops = new TreeMap<Integer, Workshop>();
+		for (Entry<Integer, Workshop> entry : entrySet) {
+			Workshop workshop = entry.getValue();
+			if (workshop.getAntalForskare() >= minDeltagarePerWS) {
+				filledWorkshops.put(entry.getKey(), entry.getValue());
+			} else {
 				removed.add(workshop.question);
 			}
+
 		}
+		frågorPerRum = filledWorkshops;
 		return removed;
 	}
 
 	public void addCompleteWorkshop(Workshop workshop) {
-		workshops.add(workshop);
+		frågorPerRum.put(förstaLedigaRum(), workshop);
 	}
 
 }

@@ -123,31 +123,6 @@ public class Scheduler {
 		return bestSoFar;
 	}
 
-	public AIMDay läggInIBefintligtSchema() {
-		if (befintligtSchema == null) {
-			throw new RuntimeException("Finns inget befintligt schema");
-		}
-
-		// Take 2:Gå igenom alla frågor, varenda en. Försök placera alla forskare som inte redan är med i frågan. På
-		// så sätt spelar det ingen roll om de inte var med förra gången eller om de bara inte gick att placera ut
-		Collection<FragaMedDeltagare> frågorMedDeltagare = frågor.values();
-		for (FragaMedDeltagare fragaMedDeltagare : frågorMedDeltagare) {
-			List<Forskare> kandidater = fragaMedDeltagare.getKandidater();
-			for (Forskare forskare : kandidater) {
-				Workshop workshop = befintligtSchema.getWorkshop(fragaMedDeltagare.getFråga());
-				if (workshop != null && !workshop.isAttendedBy(forskare)) {
-					befintligtSchema.place(fragaMedDeltagare.getFråga(), forskare, fragaMedDeltagare.getFrågare());
-				}
-			}
-		}
-
-		// Här tar vi bort alla frågor som inte har fått tillräckligt antal deltagare
-		befintligtSchema.taBortFrågorMedFörFåDeltagare(minDeltagarePerWS);
-
-		score(befintligtSchema);
-		return befintligtSchema;
-	}
-
 	private AIMDay getNewScheduleFrom(AIMDay schedule) {
 		// Find pain points in the previous schedule
 		List<IndividualAgenda> allAgendas = new ArrayList<IndividualAgenda>(schedule.getAllIndividualAgendas());
@@ -165,7 +140,13 @@ public class Scheduler {
 	private AIMDay schedule(List<Forskare> sorteradeDeltagare) {
 		AIMDay schema = new AIMDay(numParallelTracks, numSessions, allParticipants, questions, maxDeltagarePerWS);
 
-		// Tanken är här att man skulle kunna börja med att lägga ut de frågor som har forskare låsta till sig
+		// börja med att placera ut rumslåsta frågor!
+		List<Question> låstaFrågor = getLåstaFrågor();
+		for (Question q : låstaFrågor) {
+			schema.placeraLåstFråga(frågor.get(q.id));
+		}
+
+		// Tanken är här att man börjar med att lägga ut de frågor som har forskare låsta till sig
 		List<Forskare> frågelåsta = getFrågelåstaForskare();
 		for (Forskare p : frågelåsta) {
 			for (String qId : p.getLåstaFrågor()) {
@@ -187,6 +168,16 @@ public class Scheduler {
 
 		score(schema);
 		return schema;
+	}
+
+	private List<Question> getLåstaFrågor() {
+		ArrayList<Question> låsta = new ArrayList<Question>();
+		for (Question q : questions) {
+			if (q.ärLåstTillRumOchSession()) {
+				låsta.add(q);
+			}
+		}
+		return låsta;
 	}
 
 	private List<Forskare> getFrågelåstaForskare() {
