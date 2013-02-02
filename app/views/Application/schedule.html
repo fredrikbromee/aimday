@@ -326,6 +326,13 @@
 		    var session = s.sessioner[i];
 			self.sessioner.push(new Session(session));
 		}
+		self.getSessionFörFråga = function(frageId){
+        	var hittadSession = ko.utils.arrayFirst(self.sessioner(), function(s) {
+	            return (s.harFrageId(frageId));
+	        });
+	        return hittadSession;
+        }
+		
     }
     
     function Session(s){
@@ -335,6 +342,22 @@
 		    var workshop = s.workshops[i];
 			self.workshops.push(new Workshop(workshop));
 		}
+		
+		self.harFrageId = function(frageId){
+			var hittadeFråga = false;
+			ko.utils.arrayForEach(self.workshops(), function(workshop){
+				if (workshop.frageId === frageId){
+					hittadeFråga = true;
+				}
+			});
+			return hittadeFråga;
+		}
+		
+		self.harNågonWorkshopMedForskare = function(forskarId){
+        	return ko.utils.arrayFirst(self.workshops(), function(workshop) {
+	            return (workshop.besöksAv(forskarId));
+	        });
+        }
     }
     
     function Workshop(s){
@@ -347,6 +370,11 @@
 		    var f = s.forskare[i];
 			self.forskare.push(f);
 		}
+		self.besöksAv = function(forskarId){
+        	return ko.utils.arrayFirst(self.forskare(), function(f) {
+	            return (f === forskarId);
+	        });
+        }
     }
     
     function Fråga(f){
@@ -539,7 +567,16 @@
                 self.lastError("Forskaren är redan i den frågan!");	        
                 arg.cancelDrop = true;	        	
 	        }
-	        //TODO: ingen fråga parallell med till-frågan innehåller forskaren
+
+	        // ingen fråga parallell med till-frågan innehåller forskaren
+	        var sessionViFlyttarTill = self.schema.getSessionFörFråga(arg.targetParent.id);
+	        var sessionViFlyttarFrån = self.schema.getSessionFörFråga(arg.sourceParent.id);
+	        if (sessionViFlyttarTill !== sessionViFlyttarFrån){
+		        if (sessionViFlyttarTill.harNågonWorkshopMedForskare(arg.item)){
+		        	self.lastError("Forskaren är redan placerad i en fråga den sessionen!");
+		        	arg.cancelDrop = true;
+		        }
+		    }
 	        
 	        // flasha om det gick fel inkl anledning:
 	        if (arg.cancelDrop){
