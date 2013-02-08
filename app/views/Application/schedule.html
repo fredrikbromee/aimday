@@ -41,7 +41,13 @@
 	     	<!-- ko foreach: model.schema.sessioner -->
 			<tr data-bind="sortable: { data: workshops,  connectClass:model.getUniqueConnectClass }" class="workshopz">
 					<td>
-						<b>Fråga <span data-bind="text: frageId"></b>
+						<b>
+							<span data-bind="if: model.getFraga(frageId).ärLåstTillRum">
+							<a href="#" title="Frågan är låst till det här rummet)"><i class="icon-lock"></i></a>
+							</span>
+							Fråga 
+							<span data-bind="text: frageId"/> </span>
+						</b>
 						<ul data-bind="sortable: {data:forskare, beforeMove: model.verifyMoves}" class="unstyled">
 							<li>
 								<div data-bind="template: { name: 'forskar-template', data: model.getForskare($data) }"></div>
@@ -118,11 +124,15 @@
 	        <tr>
 	            <td data-bind="text: id"></td>
 	            <td data-bind="text: cappadFråga"></td>
-	            <td data-bind="visible: !editing()">
+	            <td>
 	            	<a href="#" data-bind="click: edit">Låst till session <span data-bind="text: låst"></a>
 	            	<a href="#" data-bind="visible: ärLåst, click: removeLås"> (ta bort alla sessionslås)</a> 
 	            </td>
 	            <td><select data-bind="visible: editing, hasfocus: editing, options: model.sessioner, selectedOptions: låst" multiple="true"></select></td>
+	            <td data-bind="visible: ärLåstTillRum">
+	            	<a href="#"> Låst till rum  <span data-bind="text: låstaRum"> </a>
+	             	<a href="#" data-bind="click: removeLåstRum"> (ta bort rumslås)</a>
+	            </td> 
 	        </tr>
 	    </tbody>
 	</table>
@@ -141,13 +151,13 @@
 	            <td>
 					<div data-bind="template: { name: 'forskar-template' }"></div>
 	            </td>
-	            <td data-bind="visible: !editingSession()">
+	            <td>
 	            	<a href="#" data-bind="click: edit">Låst till session <span data-bind="text: låstaSessioner"></a>
 	            	<a href="#" data-bind="visible: ärLåst, click: removeLås"> (ta bort alla sessionslås)</a> 
 	            </td>
 	            <td><select data-bind="visible: editingSession, hasfocus: editingSession, options: model.sessioner, selectedOptions: låstaSessioner" multiple="true"></select></td>
 
-	            <td data-bind="visible: !editingFraga()">
+	            <td>
 	            	<a href="#" data-bind="click: editFraga">Låst till fråga <span data-bind="text: låstaFrågor"></a>
 	            	<a href="#" data-bind="visible: ärLåstTillFråga, click: removeFrågeLås"> (ta bort alla frågelås)</a> 
 	            </td>
@@ -249,7 +259,8 @@
 
 <script type="text/html" id="forskar-template">
 	<span data-bind="if: harVikt">
-	<a href="#" title="Den här forskaren är markerad att ha specifik kompetens för den här konferensen (har vikt som används i optimeringen)"><i class="icon-flag"></i></a></span>
+	<a href="#" title="Den här forskaren är markerad att ha specifik kompetens för den här konferensen (har vikt som används i optimeringen)"><i class="icon-flag"></i></a>
+	</span>
 	<span data-bind="if: joker">
 	<a href="#" title="Den här forskaren är joker och placeras ut sist av alla på de frågor som behöver mer kompetens"><i class="icon-star"></i></a></span>
 	<span data-bind="text: namn"></span>, <span data-bind="text: model.getGrad(grad)"> </span>&nbsp<span data-bind="text: kontakt().avdelning"></span> 
@@ -397,6 +408,10 @@
 	    self.ärLåstTillRum = ko.computed(function(){return self.låstaRum() != null && self.låstaRum().length > 0;}, this);
 		self.removeLås = function(formElement) {
 			self.låst.removeAll();
+        }
+        
+        self.removeLåstRum = function(formElement){
+        	self.låstaRum.removeAll();
         }
     }
     
