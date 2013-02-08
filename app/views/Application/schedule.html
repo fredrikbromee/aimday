@@ -12,15 +12,16 @@
 	
 <section id="schema">
   <div class="page-header">
+    <span data-bind="visible: !sparat()">
+    	Det här schemat innehåller osparade ändringar!
+		<form class="form-horizontal" action="${postback_url}" method="POST" data-bind="submit: model.generera">
+			<input type="hidden" data-bind="value: model.genereradJson" name="json"></input>
+			<button type="submit" class="btn btn-primary" >Spara schema</button>		
+		</form>
+    </span>
     <h1>
-  	#{if sparatSchema}
-  		Sparat schema
-	#{/if}
-  	#{else}
-  		Optimerat schema (ännu inte sparat)
-	#{/else}
-  
-    för <span data-bind="text: namn"/></h1>
+    
+    Schema för <span data-bind="text: namn"/></h1>
     <span data-bind="if: optimeringsInformation.anvandVikter">
 	    Vid optimering av det här schemat används viktning, dvs hänsyn tas till att forskare <span data-bind="text: optimeringsInformation.viktNamn"></span>
 	</span>
@@ -92,22 +93,12 @@
 		#{/list}                        
 	#{/if}
 	<p>
-	#{if !sparatSchema}
-		Om du är nöjd med det här schemat så kan du spara det:<br>
-		<form class="form-horizontal" action="${postback_url}" method="POST" data-bind="submit: model.generera">
-			<input type="hidden" data-bind="value: model.genereradJson" name="json"></input>
-			<button type="submit" class="btn btn-primary" >Spara schema</button>		
-		</form>
-	#{/if}
 	
-	#{if sparatSchema}
-	
-		Om du vill utgå från det här schemat och lägga till nya frågor eller forskare så kan du låsa hela schemat innan du gör en ny optimering: 
-		<br>
-		<form class="form-horizontal" action="" method="POST" data-bind="submit: model.låsAllt">
-			<button type="submit" class="btn btn-primary" >Lås frågor och forskare till detta schema</button>		
-		</form>
-	#{/if}
+	Om du vill utgå från det här schemat och lägga till nya frågor eller forskare så kan du låsa hela schemat innan du gör en ny optimering: 
+	<br>
+	<form class="form-horizontal" action="" method="POST" data-bind="submit: model.låsAllt">
+		<button type="submit" class="btn btn-primary" >Lås frågor och forskare till detta schema</button>		
+	</form>
 	
 	
 </section>
@@ -312,6 +303,7 @@
 	
 	if (json.schema != null && json.schema.sessioner != null){
 		model.schema = new Schema(json.schema);
+		model.sparat(json.schema.sparat);
 	}
 	model.postback_url = json.postback_url;
 
@@ -319,14 +311,22 @@
 	    var f = json.foretagsrepresentanter[i];
 		model.foretagsrepresentanter.push(new Foretagsrepresentant(f));
 	}
+	var ändrat = function(){
+		model.sparat(false);
+	}
 	for (var i = 0; i < json.fragor.length; i++) {
 	    var f = json.fragor[i];
-		model.fragor.push(new Fråga(f));
+	    var fraga = new Fråga(f);
+	    fraga.låst.subscribe(ändrat);
+		model.fragor.push(fraga);
 	}
 	for (var i = 0; i < json.forskare.length; i++) {
-	    var f = json.forskare[i];
-		model.forskare.push(new Forskare(f));
+	    var f = new Forskare(json.forskare[i]);
+	    f.låstaSessioner.subscribe(ändrat);
+	    f.låstaFrågor.subscribe(ändrat);
+		model.forskare.push(f);
 	}
+	
 	ko.applyBindings(model);
 	
 
@@ -471,11 +471,14 @@
     	self.foretagsrepresentanter = ko.observableArray();
 		self.genereradJson = ko.observable();
 		this.lastError = ko.observable();
+		self.sparat = ko.observable();
 
 		self.låsAllt = function(formElement){
+			
 			if (self.schema === null){
 				return false;
 			}
+			self.sparat(false);
 			for(var i = 0; i < self.schema.sessioner().length; i++){
 				var session = self.schema.sessioner()[i];
 				var rumsNummer = 1;
@@ -596,6 +599,8 @@
 	        // flasha om det gick fel inkl anledning:
 	        if (arg.cancelDrop){
 	        	$('#dragWarningModal').modal('show')
+	        } else {
+   				self.sparat(false);
 	        }
     };
     }

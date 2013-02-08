@@ -106,6 +106,7 @@ public class Application extends Controller {
 			Konferens k = Konferens.fromAPI(konf);
 
 			if (konf.schema != null && konf.schema.sessioner != null) {
+				konf.schema.sparat = true;
 				schedule = AIMDay.fromJson(konf.schema, k);
 			}
 

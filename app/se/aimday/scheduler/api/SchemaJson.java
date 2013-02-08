@@ -10,4 +10,5 @@ import java.util.List;
  */
 public class SchemaJson {
 	public List<SessionJson> sessioner;
+	public boolean sparat;
 }
