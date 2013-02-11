@@ -9,16 +9,10 @@
 #{/if}
 
 #{if schedule}
-	
+
+<div style="margin-bottom: 70px;">
 <section id="schema">
   <div class="page-header">
-    <span data-bind="visible: !sparat()">
-    	Det här schemat innehåller osparade ändringar!
-		<form class="form-horizontal" action="${postback_url}" method="POST" data-bind="submit: model.generera">
-			<input type="hidden" data-bind="value: model.genereradJson" name="json"></input>
-			<button type="submit" class="btn btn-primary" >Spara schema</button>		
-		</form>
-    </span>
     <h1>
     
     Schema för <span data-bind="text: namn"/></h1>
@@ -44,7 +38,7 @@
 					<td>
 						<b>
 							<span data-bind="if: model.getFraga(frageId).ärLåstTillRum">
-							<a href="#" title="Frågan är låst till det här rummet)"><i class="icon-lock"></i></a>
+							<a href="#" title="Frågan är låst till det här rummet"><i class="icon-lock"></i></a>
 							</span>
 							Fråga 
 							<span data-bind="text: frageId"/> </span>
@@ -247,6 +241,19 @@
 		
 	 </form>
 </section>
+</div>
+<div class="navbar navbar-fixed-bottom" data-bind="visible: !sparat()">
+  <div class="navbar-inner">
+    <div class="container">
+	    <a class="brand" href="#">Schemat innehåller osparade ändringar. </a>
+		<form class="form-horizontal" action="${postback_url}" method="POST" data-bind="submit: model.generera">
+			<input type="hidden" data-bind="value: model.genereradJson" name="json"></input>
+			<button type="submit" class="btn btn-primary" >Spara schema</button>		
+		</form>
+    </div>
+  </div>
+</div>
+
 
 <script type="text/html" id="forskar-template">
 	<span data-bind="if: harVikt">
