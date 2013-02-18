@@ -8,9 +8,9 @@
      #{/list}
 #{/if}
 
-#{if schedule}
+<div id="filler" style="margin-bottom: 70px;">
 
-<div style="margin-bottom: 70px;">
+#{if schedule}
 <section id="schema">
   <div class="page-header">
     <h1>
@@ -308,7 +308,8 @@
 		model.scheduleRequest = json.scheduleRequest;
 	}
 	
-	if (json.schema != null && json.schema.sessioner != null){
+	var finnsEttSchemaAttSpara = json.schema != null && json.schema.sessioner != null
+	if (finnsEttSchemaAttSpara){
 		model.schema = new Schema(json.schema);
 		model.sparat(json.schema.sparat);
 	}
@@ -319,7 +320,9 @@
 		model.foretagsrepresentanter.push(new Foretagsrepresentant(f));
 	}
 	var ändrat = function(){
-		model.sparat(false);
+		if (finnsEttSchemaAttSpara){
+			model.sparat(false);
+		}
 	}
 	for (var i = 0; i < json.fragor.length; i++) {
 	    var f = json.fragor[i];
@@ -478,7 +481,7 @@
     	self.foretagsrepresentanter = ko.observableArray();
 		self.genereradJson = ko.observable();
 		this.lastError = ko.observable();
-		self.sparat = ko.observable();
+		self.sparat = ko.observable(true);
 
 		self.låsAllt = function(formElement){
 			
