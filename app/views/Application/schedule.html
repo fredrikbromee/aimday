@@ -161,9 +161,10 @@
 	<form class="form-horizontal" action="@{Application.scheduleNew()}" method="POST" accept-charset="${_response_encoding}" data-bind="submit: model.generera">
 	<fieldset>
 	     <div class="control-group">
-	     <label class="control-label" for="tracks">Antal parallella spår</label>
+	     <label class="control-label" for="tracks">Maximalt antal rum</label>
             <div class="controls">
 	     <input type="text" name="tracks" id="tracks"  data-bind="value:scheduleRequest.tracks"/>
+	     <span class="help-inline">I schemat får högst så här många rum användas samtidigt</span>
 	     </div>
 	     </div>
 
@@ -180,6 +181,7 @@
 	     <label class="control-label" for="generations">Antal generationer</label>
             <div class="controls">
 	     <input type="text" name="generations" id="generations" data-bind="value:scheduleRequest.generations"/>
+	     <span class="help-inline">Talar om hur länge schemaläggaren skall leta efter det bästa schemat</span>
 	     </div>
 	     </div>
 
@@ -302,7 +304,7 @@
 	model.optimeringsInformation = json.optimeringsInformation;
 	model.senioritetsgrader = json.senioritetsgrader;
 	if (json.scheduleRequest === undefined){
-		model.scheduleRequest = {tracks:10, sessions:5, generations:1973, placeWeight:10, wsWeight:10, agendaWeight:10,
+		model.scheduleRequest = {tracks:10, sessions:5, generations:1000, placeWeight:10, wsWeight:10, agendaWeight:10,
 		 maxAntalDeltagare:100, minAntalDeltagare:1};
 	} else {
 		model.scheduleRequest = json.scheduleRequest;
