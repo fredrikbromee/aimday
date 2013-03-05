@@ -3,6 +3,7 @@ package models;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -37,12 +38,9 @@ public class Konferens {
 
 	public static Konferens fromAPI(KonferensJson konf) throws InconsistentJsonException {
 		konf.förkortaSenioritetsGrader();
-		Map<String, Forskare> allParticipants = null;
-		List<ForetagsRepresentant> foretagare = null;
-		Map<String, Question> allQuestions = null;
-		foretagare = ForetagsRepresentant.fromAPI(konf.foretagsrepresentanter);
-		allQuestions = Question.fromAPI(konf.fragor);
-		allParticipants = Forskare.fromAPI(konf.forskare, konf.senioritetsgrader, allQuestions);
+		Map<String, Question> allQuestions = Question.fromAPI(konf.fragor);
+		List<ForetagsRepresentant> foretagare = ForetagsRepresentant.fromAPI(konf.foretagsrepresentanter);
+		Map<String, Forskare> allParticipants = Forskare.fromAPI(konf.forskare, konf.senioritetsgrader, allQuestions);
 		for (Question q : allQuestions.values()) {
 			boolean ingenSomVillGå = true;
 			for (Forskare forskare : allParticipants.values()) {
@@ -79,6 +77,7 @@ public class Konferens {
 		for (StringLas lås : konf.låsningar.forskarfrågelås) {
 			Forskare forskare = allParticipants.get(lås.id);
 			if (forskare != null) {
+				taBortFrågorSomInteFinnsKvar(allQuestions, lås.låsttill);
 				forskare.låsTillFrågor(lås.låsttill);
 			}
 		}
@@ -98,6 +97,15 @@ public class Konferens {
 		}
 
 		return konferens;
+	}
+
+	private static void taBortFrågorSomInteFinnsKvar(Map<String, Question> allQuestions, List<String> låstafrågor) {
+		for (Iterator<String> iterator = låstafrågor.iterator(); iterator.hasNext();) {
+			String frågeID = iterator.next();
+			if (!allQuestions.containsKey(frågeID)) {
+				iterator.remove();
+			}
+		}
 	}
 
 	public List<Forskare> getDeltagare() {
