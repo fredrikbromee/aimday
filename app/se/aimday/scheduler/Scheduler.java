@@ -146,7 +146,7 @@ public class Scheduler {
 			schema.placeraLåstFråga(frågor.get(q.id));
 		}
 
-		// Tanken är här att man börjar med att lägga ut de frågor som har forskare låsta till sig
+		// Tanken är här att man sen lägger ut de frågor som har forskare låsta till sig
 		List<Forskare> frågelåsta = getFrågelåstaForskare();
 		for (Forskare p : frågelåsta) {
 			for (String qId : p.getLåstaFrågor()) {
