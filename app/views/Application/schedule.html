@@ -16,6 +16,11 @@
     <h1>
     
     Schema för <span data-bind="text: namn"/></h1>
+    <span class="pull-right">
+    	<a href="#helpModal" data-toggle="modal">Need help?</a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+   	</span>
+ 
+    <br>
     <span data-bind="if: optimeringsInformation.anvandVikter">
 	    Vid optimering av det här schemat används viktning, dvs hänsyn tas till att forskare <span data-bind="text: optimeringsInformation.viktNamn"></span>
 	</span>
@@ -292,6 +297,20 @@
     	<a href="#" class="btn btn-primary" data-dismiss="modal">OK</a>
     </div>
 </script>
+
+
+<div id="helpModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Using the optimizer to create a schedule for your Aimday</h3>
+  </div>
+  <div class="modal-body">
+    <p>Vad gör optimeraren?  Med hjälp av optimeringsverktyget  spar ni tid. Optimeringsverktyget ger er till att börja med  en bra bas till ett schema, d.v.s. den kommer alltså att göra grovjobbet. Därefter förväntas ni själva fortsätta laborera med grundinställningarna (se nedan) tills ni blir helt nöjda. Även här är ni hjälpta av de funktioner som finns i optimeringsverktyget.</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+  </div>
+</div>
 
 
 <script type="text/javascript">
