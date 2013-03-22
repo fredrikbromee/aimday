@@ -10,7 +10,6 @@ import models.Forskare;
 import models.Question;
 import play.Logger;
 
-
 public class IndividualAgenda {
 
 	private final Forskare participant;
@@ -55,17 +54,11 @@ public class IndividualAgenda {
 
 	public double score(int numSessions) {
 		if (participant.isJoker()) {
-			return 1;
+			return 1; // alltid nöjd!
 		}
 
-		int antalMöten = antalMöten();
-		int max = Math.min(numSessions, participant.getÖnskelista().size());
-		if (antalMöten >= max) {
-			return 1;
-		}
-		return antalMöten() / max;
+		return new Scorer(this).score(participant.getÖnskelista(), numSessions);
 	}
-
 	public Forskare getParticipant() {
 		return participant;
 	}
@@ -86,7 +79,7 @@ public class IndividualAgenda {
 		StringBuilder sb = new StringBuilder();
 		for (Question q : participant.getÖnskelista()) {
 			sb.append("Q" + q.id);
-			if (skaSe(q)) {
+			if (isPlacedIn(q)) {
 				sb.append("(S" + vilkenSession(q) + ")");
 			}
 			sb.append(' ');
@@ -104,7 +97,7 @@ public class IndividualAgenda {
 		return 0;
 	}
 
-	private boolean skaSe(Question q) {
+	boolean isPlacedIn(Question q) {
 		return vilkenSession(q) > 0;
 	}
 }
