@@ -9,17 +9,17 @@
 #{/if}
 
 <div id="filler1" style="margin-bottom: 70px;">
+<section id="help">
+    <span class="pull-right">
+    	<a href="#helpModal" data-toggle="modal">Show help</a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+   	</span>
+</section>
 
 #{if schedule}
 <section id="schema">
   <div class="page-header">
-    <h1>
-    
+    <h1>    
     Schema för <span data-bind="text: namn"/></h1>
-    <span class="pull-right">
-    	<a href="#helpModal" data-toggle="modal">Need help?</a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-   	</span>
- 
     <br>
     <span data-bind="if: optimeringsInformation.anvandVikter">
 	    Vid optimering av det här schemat används viktning, dvs hänsyn tas till att forskare <span data-bind="text: optimeringsInformation.viktNamn"></span>
@@ -302,10 +302,20 @@
 <div id="helpModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="myModalLabel">Using the optimizer to create a schedule for your Aimday</h3>
+    <h3 id="myModalLabel">Create a schedule for your Aimday</h3>
   </div>
   <div class="modal-body">
-    <p>Vad gör optimeraren?  Med hjälp av optimeringsverktyget  spar ni tid. Optimeringsverktyget ger er till att börja med  en bra bas till ett schema, d.v.s. den kommer alltså att göra grovjobbet. Därefter förväntas ni själva fortsätta laborera med grundinställningarna (se nedan) tills ni blir helt nöjda. Även här är ni hjälpta av de funktioner som finns i optimeringsverktyget.</p>
+    Creating an aimday schedule is about meeting conflicting needs: <br> 
+    Is it more important to fit many questions in your aimday, to fill the schedule with many workshops? Or would you 
+    rather ensure that the workshops are well attended by experienced researchers? Or maybe it is most important that 
+    the researchers wishes are fulfilled so that they always be placed in their top priority questions...
+    <p>
+    <p>
+    There is no one <b>right</b> schedule so depending on what you think is important this tool helps you generate a schedule
+    that fits <b>your</b> choices. This schedule is your starting point - from it you are free to rearrange 
+    questions (try drag-and-drop!) and participants and even add more questions or researchers if needed. 
+	<p>
+	See the <a href="#">aimday handbook</a> for more details.    
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
