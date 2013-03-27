@@ -1,8 +1,8 @@
 #{extends 'main.html' /}
-#{set title:'Home' /}
+#{set title:'Aimday Schedule' /}
 
 #{if hittadeFel}
-	Varning: det här schemat innehåller fel! Följande fel hittades: 
+	Warning: this schedule contains the following errors: 
      #{list fel, as:'felet'}
          ${felet}<br>
      #{/list}
@@ -19,21 +19,24 @@
 <section id="schema">
   <div class="page-header">
     <h1>    
-    Schema för <span data-bind="text: namn"/></h1>
+    Schedule for <span data-bind="text: namn"/></h1>
     <br>
     <span data-bind="if: optimeringsInformation.anvandVikter">
-	    Vid optimering av det här schemat används viktning, dvs hänsyn tas till att forskare <span data-bind="text: optimeringsInformation.viktNamn"></span>
+	    When evaluating this schedule specific researcher experience is considered. This experience is called 
+	     <span data-bind="text: optimeringsInformation.viktNamn"></span>
 	</span>
     
   </div>
 	#{if !sparatSchema}
-		Det här schemats poäng är ${schedule.score.format('#.##')} (1=idealt schema, 0=sämst tänkbara).<br>
+		This schedule's score is 
+		${schedule.score.format('#.##')} 
+		(1=ideal schedule, 0=worst possible).<br>
 	#{/if}
 	 <table class="table table-striped table-condensed">
 	     <thead>
 	         <tr>
 		         #{list spår, as:'spårnr'}
-		             <th>Rum ${spårnr}</th>
+		             <th>Room ${spårnr}</th>
 			     #{/list}
 	         </tr>
 	     </thead>
@@ -43,9 +46,9 @@
 					<td>
 						<b>
 							<span data-bind="if: model.getFraga(frageId).ärLåstTillRum">
-							<a href="#" title="Frågan är låst till det här rummet"><i class="icon-lock"></i></a>
+							<a href="#" title="Question is locked to this room"><i class="icon-lock"></i></a>
 							</span>
-							Fråga 
+							Question 
 							<span data-bind="text: frageId"/> </span>
 						</b>
 						<ul data-bind="sortable: {data:forskare, beforeMove: model.verifyMoves}" class="unstyled">
@@ -53,7 +56,7 @@
 								<div data-bind="template: { name: 'forskar-template', data: model.getForskare($data) }"></div>
 							</li>
 						</ul>
-						<a data-toggle="modal" data-bind="attr: {href:'#'+frageId}" >Se hela frågan</a>
+						<a data-toggle="modal" data-bind="attr: {href:'#'+frageId}" >See full workshop</a>
 						<div data-bind="attr: {id:frageId}" class="modal hide">
 							<div data-bind="template: { name: 'modal-fraga-template'}"></div>
 						</div>
@@ -66,7 +69,7 @@
 	 
 	  <div id="dragWarningModal" class="modal hide">
 	    <div class="modal-header">
-	      Kan inte flytta <button type="button" class="close" data-dismiss="modal">&times;</button>
+	      Disallowed move <button type="button" class="close" data-dismiss="modal">&times;</button>
 	    </div>
 	    <div class="modal-body" data-bind="text: lastError">
 	    </div>
@@ -77,26 +80,29 @@
 	 
 	 	 
 	#{if schedule.unplacedQuestions}
-		<br>I det här schemat misslyckades vi att placera ut:
+		<br>In this schedule we failed to place:
 		#{list schedule.unplacedQuestions, as:'unplaced'}
-		        Fråga ${unplaced.q}#{if unplaced.hasZeroAttendants}*#{/if}
+		        Question ${unplaced.q}#{if unplaced.hasZeroAttendants}*#{/if}
 		#{/list}<br>
-		En eventuell asterisk (*) efter en fråga betyder att den frågan inte har någon forskare anmäld till sig. <p> 
+		An asterisk (*) after a question indicates that the question does not have any researchers on its list.
+		<p> 
 	#{/if}
 	<p>
 	#{if schedule.unsatisfied}
-		I det här schemat fick följande (${schedule.unsatisfied.size} st) deltagare inte vara med på hela sin önskelista:
+		In this schedule the following
+		(${schedule.unsatisfied.size} st) 
+		participants were not placed in all their questions
 		#{list schedule.unsatisfied, as:'un'}
-		         <div "unsatisfied_participant">${un.participant.first_name} önskade ${un.wishedNumber} st, fick se 
-		         ${un.assignedNumber} st ${un.agenda} </div>
+		         <div "unsatisfied_participant">${un.participant.first_name} enrolled in ${un.wishedNumber} questions, 
+		         was placed in  
+		         ${un.assignedNumber} questions ${un.agenda} </div>
 		#{/list}                        
 	#{/if}
-	<p>
-	
-	Om du vill utgå från det här schemat och lägga till nya frågor eller forskare så kan du låsa hela schemat innan du gör en ny optimering: 
+	<p>	
+	To use this schedule as a starting point for the next schedule generation you may lock the entire schedule in place:
 	<br>
 	<form class="form-horizontal" action="" method="POST" data-bind="submit: model.låsAllt">
-		<button type="submit" class="btn btn-primary" >Lås frågor och forskare till detta schema</button>		
+		<button type="submit" class="btn btn-primary" >Lock all questions and researchers to this schedule</button>		
 	</form>
 	
 	
@@ -104,7 +110,7 @@
 #{/if}
 <section id="fragor">
   <div class="page-header">
-    <h1>Frågor</h1>
+    <h1>Questions</h1>
   </div>
 
 	<table>
@@ -115,13 +121,13 @@
 	            <td data-bind="text: id"></td>
 	            <td data-bind="text: cappadFråga"></td>
 	            <td>
-	            	<a href="#" data-bind="click: edit">Låst till session <span data-bind="text: låst"></a>
-	            	<a href="#" data-bind="visible: ärLåst, click: removeLås"> (ta bort alla sessionslås)</a> 
+	            	<a href="#" data-bind="click: edit">Locked to session <span data-bind="text: låst"></a>
+	            	<a href="#" data-bind="visible: ärLåst, click: removeLås"> (remove all session locks)</a> 
 	            </td>
 	            <td><select data-bind="visible: editing, hasfocus: editing, options: model.sessioner, selectedOptions: låst" multiple="true"></select></td>
 	            <td data-bind="visible: ärLåstTillRum">
-	            	<a href="#"> Låst till rum  <span data-bind="text: låstaRum"> </a>
-	             	<a href="#" data-bind="click: removeLåstRum"> (ta bort rumslås)</a>
+	            	<a href="#"> Locked to room  <span data-bind="text: låstaRum"> </a>
+	             	<a href="#" data-bind="click: removeLåstRum"> (unlock from room)</a>
 	            </td> 
 	        </tr>
 	    </tbody>
@@ -130,7 +136,7 @@
 </section>
 <section id="forskare">
   <div class="page-header">
-    <h1>Forskare</h1>
+    <h1>Researchers</h1>
   </div>
 	
 	<table>
@@ -142,14 +148,14 @@
 					<div data-bind="template: { name: 'forskar-template' }"></div>
 	            </td>
 	            <td>
-	            	<a href="#" data-bind="click: edit">Låst till session <span data-bind="text: låstaSessioner"></a>
-	            	<a href="#" data-bind="visible: ärLåst, click: removeLås"> (ta bort alla sessionslås)</a> 
+	            	<a href="#" data-bind="click: edit">Locked to session <span data-bind="text: låstaSessioner"></a>
+	            	<a href="#" data-bind="visible: ärLåst, click: removeLås"> (remove all session locks)</a> 
 	            </td>
 	            <td><select data-bind="visible: editingSession, hasfocus: editingSession, options: model.sessioner, selectedOptions: låstaSessioner" multiple="true"></select></td>
 
 	            <td>
-	            	<a href="#" data-bind="click: editFraga">Låst till fråga <span data-bind="text: låstaFrågor"></a>
-	            	<a href="#" data-bind="visible: ärLåstTillFråga, click: removeFrågeLås"> (ta bort alla frågelås)</a> 
+	            	<a href="#" data-bind="click: editFraga">Locked to question <span data-bind="text: låstaFrågor"></a>
+	            	<a href="#" data-bind="visible: ärLåstTillFråga, click: removeFrågeLås"> (remove all question locks)</a> 
 	            </td>
 	            <td><select data-bind="visible: editingFraga, hasfocus: editingFraga, options: frageIdn, selectedOptions: låstaFrågor" multiple="true"></select></td>
 	            
@@ -166,15 +172,17 @@
 	<form class="form-horizontal" action="@{Application.scheduleNew()}" method="POST" accept-charset="${_response_encoding}" data-bind="submit: model.generera">
 	<fieldset>
 	     <div class="control-group">
-	     <label class="control-label" for="tracks">Maximalt antal rum</label>
+	     <label class="control-label" for="tracks">Number of rooms</label>
             <div class="controls">
 	     <input type="text" name="tracks" id="tracks"  data-bind="value:scheduleRequest.tracks"/>
-	     <span class="help-inline">I schemat kommer högst så här många rum användas samtidigt</span>
+	     <span class="help-inline">At most this many rooms will be used at the same time in the generated schedule.
+	     	The scheduler will try to use as few rooms as possible.
+	     </span>
 	     </div>
 	     </div>
 
 	     <div class="control-group">
-	     <label class="control-label" for="sessions">Antal sessioner</label>
+	     <label class="control-label" for="sessions">Number of sessions</label>
             <div class="controls">
 	     <input type="text" name="sessions" id="sessions" data-bind="value:scheduleRequest.sessions"/>
 	     </div>
@@ -183,67 +191,75 @@
 
 	     
 	     <div class="control-group">
-	     <label class="control-label" for="generations">Antal generationer</label>
+	     <label class="control-label" for="generations">Number of generations</label>
             <div class="controls">
 	     <input type="text" name="generations" id="generations" data-bind="value:scheduleRequest.generations"/>
-	     <span class="help-inline">Talar om hur länge schemaläggaren skall leta efter det bästa schemat</span>
+	     <span class="help-inline">How long should the scheduler look for a schedule? </span>
 	     </div>
 	     </div>
 
 	     <div class="control-group">
-	     <label class="control-label" for="placeWeight">Utplaceringsvikt</label>
+	     <label class="control-label" for="placeWeight">Place weight</label>
             <div class="controls">
 	     <input type="text" name="placeWeight" id="placeWeight" data-bind="value:scheduleRequest.placeWeight"/>
-	     <span class="help-inline">Hur viktigt är det att varje fråga är utplacerad?</span>
+	     <span class="help-inline">How important is it that every question is in the schedule?</span>
 	     </div>
 	     </div>
 
 	     <div class="control-group">
-	     <label class="control-label">Frågevikt</label>
+	     <label class="control-label">Question weight</label>
             <div class="controls">
 	     <input type="text" name="wsWeight" id="wsWeight" data-bind="value:scheduleRequest.wsWeight"/>
-	     <span class="help-inline">Hur viktigt är det att varje fråga har fyllts med erfarna deltagare?</span>
+	     <span class="help-inline">How important is it that each question has experienced participants?	     </span>
 	     </div>
 	     </div>
 
 	     <div class="control-group">
-	     <label class="control-label" for="agendaWeight">Forskarvikt</label>
+	     <label class="control-label" for="agendaWeight">Researcher weight</label>
             <div class="controls">
 	     <input type="text" name="agendaWeight" id="agendaWeight" data-bind="value:scheduleRequest.agendaWeight"/>
-	     <span class="help-inline">Hur viktigt är det att uppfylla forskarnas önskemål?</span>
-              <p class="help-block">Vikterna är relativt varandra, så om du t ex sätter frågevikt 1 och forskarvikt 2 betyder det att det är dubbelt så viktigt att forskarnas önskemål uppfyllts än att frågor fyllts med erfarna forskare</p>
+	     <span class="help-inline">How important is it that the researchers' wishes have been fulfilled?
+	     </span>
+              <p class="help-block">
+              These weights are relative to each other so that a question weight of 1 and a researcher weight means 
+              that keeping researchers happy is twice as important as filling every single question with experienced
+              researchers.
+              </p>
 	     </div>
 	     </div>
 	     
 	     <div class="control-group">
-	     <label class="control-label">Max antal</label>
+	     <label class="control-label">Maximum number	</label>
             <div class="controls">
 		     <select name="max_antal_deltagare" data-bind="value:scheduleRequest.maxAntalDeltagare">
-			  <option value="100">ingen begränsning</option>
-			  <option value="10">10 deltagare</option>
-			  <option value="11">11 deltagare</option>
-			  <option value="12">12 deltagare</option>
+			  <option value="100">no limit</option>
+			  <option value="10">10 participants</option>
+			  <option value="11">11 participants</option>
+			  <option value="12">12 participants</option>
 			</select>
-	     <span class="help-inline">Hur många deltagare (forskare + företagsrepresentanter) får varje workshop ha som mest?</span>
+	     <span class="help-inline">
+	     	How many participants (researchers + company reps) should each workshop at most have?
+	     </span>
 	     </div>
 	     </div>
 
 	     <div class="control-group">
-	     <label class="control-label">Minimi-antal</label>
+	     <label class="control-label">Minimum number</label>
             <div class="controls">
 		     <select name="min_antal_deltagare" data-bind="value:scheduleRequest.minAntalDeltagare">
-			  <option value="1">1 forskare</option>
-			  <option value="2">2 forskare</option>
-			  <option value="3">3 forskare</option>
-			  <option value="4">4 forskare</option>
+			  <option value="1">1 researcher</option>
+			  <option value="2">2 researchers</option>
+			  <option value="3">3 researchers</option>
+			  <option value="4">4 researchers</option>
 			</select>
-	     <span class="help-inline">Minsta antal forskare som måste delta på frågan för att den skall schemaläggas</span>
+	     <span class="help-inline">For a question to be scheduled it needs at least this many researchers
+	     </span>
 	     </div>
 	     </div>
 
 	     <input type="hidden" data-bind="value: model.genereradJson" name="json"></input>
 	     <br>
-		<button type="submit" class="btn btn-primary" >Generera nytt schema</button>
+		<button type="submit" class="btn btn-primary" >Generate new schedule</button>
 		</fieldset>
 		
 	 </form>
@@ -252,10 +268,10 @@
 <div class="navbar navbar-fixed-bottom" data-bind="visible: !sparat()">
   <div class="navbar-inner">
     <div class="container">
-	    <a class="brand" href="#">Schemat innehåller osparade ändringar. </a>
+	    <a class="brand" href="#">This schedule has unsaved changes. </a>
 		<form class="form-horizontal" action="${postback_url}" method="POST" data-bind="submit: model.generera">
 			<input type="hidden" data-bind="value: model.genereradJson" name="json"></input>
-			<button type="submit" class="btn btn-primary" >Spara schema</button>		
+			<button type="submit" class="btn btn-primary" >Save schedule</button>		
 		</form>
     </div>
   </div>
@@ -264,10 +280,12 @@
 
 <script type="text/html" id="forskar-template">
 	<span data-bind="if: harVikt">
-	<a href="#" title="Den här forskaren är markerad att ha specifik kompetens för den här konferensen (har vikt som används i optimeringen)"><i class="icon-flag"></i></a>
+	<a href="#" title="This researcher is marked as having specific experience for this aimday."><i class="icon-flag"></i></a>
 	</span>
 	<span data-bind="if: joker">
-	<a href="#" title="Den här forskaren är joker och placeras ut sist av alla på de frågor som behöver mer kompetens"><i class="icon-star"></i></a></span>
+	<a href="#" title="This researcher is a joker/wild card and will be placed last of all in questions that need more
+	experience 
+	"><i class="icon-star"></i></a></span>
 	<span data-bind="text: namn"></span>, <span data-bind="text: model.getGrad(grad)"> </span>&nbsp<span data-bind="text: kontakt().avdelning"></span> 
 </script>
 
@@ -277,7 +295,7 @@
 
 <script type="text/html" id="modal-fraga-template">
     <div class="modal-header">
-      Fråga <span data-bind="text: frageId"></span>: 
+      Question <span data-bind="text: frageId"></span>: 
       <span data-bind="text: model.getFraga(frageId).fråga"></span>
       <button type="button" class="close" data-dismiss="modal">&times;</button>
     </div>
@@ -619,11 +637,11 @@
 	        console.log("Trying to move scientist " + arg.item + " from " + arg.sourceParent.id + " to " + arg.targetParent.id);
 	        
 	        if (arg.sourceParent().length<2){
-                self.lastError("Kan inte flytta sista forskaren i frågan!");	        
+                self.lastError("Can't move the last researcher in the workshop!");	        
                 arg.cancelDrop = true;	        	
 	        }
 	        if (arg.targetParent.indexOf(arg.item) >= 0){
-                self.lastError("Forskaren är redan i den frågan!");	        
+                self.lastError("The researcher is already in the workshop!");
                 arg.cancelDrop = true;	        	
 	        }
 
@@ -632,7 +650,7 @@
 	        var sessionViFlyttarFrån = self.schema.getSessionFörFråga(arg.sourceParent.id);
 	        if (sessionViFlyttarTill !== sessionViFlyttarFrån){
 		        if (sessionViFlyttarTill.harNågonWorkshopMedForskare(arg.item)){
-		        	self.lastError("Forskaren är redan placerad i en fråga den sessionen!");
+		        	self.lastError("The researcher is already placed in a workshop that session!");
 		        	arg.cancelDrop = true;
 		        }
 		    }
