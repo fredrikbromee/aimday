@@ -1524,25 +1524,25 @@ legend + .control-group {
 }
 .form-horizontal .control-label {
   float: left;
-  width: 140px;
+  width: 240px;
   padding-top: 5px;
   text-align: right;
 }
 .form-horizontal .controls {
   *display: inline-block;
   *padding-left: 20px;
-  margin-left: 160px;
+  margin-left: 260px;
   *margin-left: 0;
 }
 .form-horizontal .controls:first-child {
-  *padding-left: 160px;
+  *padding-left: 260px;
 }
 .form-horizontal .help-block {
   margin-top: 9px;
   margin-bottom: 0;
 }
 .form-horizontal .form-actions {
-  padding-left: 160px;
+  padding-left: 260px;
 }
 .btn {
   display: inline-block;

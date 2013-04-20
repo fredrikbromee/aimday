@@ -7,7 +7,7 @@
          ${felet}<br>
      #{/list}
 #{/if}
-
+    
 <div id="filler1" style="margin-bottom: 70px;">
 <section id="help">
     <span class="pull-right">
@@ -25,7 +25,6 @@
 	    When evaluating this schedule specific researcher experience is considered. This experience is called 
 	     <span data-bind="text: optimeringsInformation.viktNamn"></span>
 	</span>
-    
   </div>
 	#{if !sparatSchema}
 		This schedule's score is 
@@ -198,34 +197,30 @@
 	     </div>
 	     </div>
 
+          <p class="help-block">
+          Move sliders: more important to the right, less important to the left. This will change how the optimizer
+          chooses which schedule is the best.
+          </p>
+
 	     <div class="control-group">
-	     <label class="control-label" for="placeWeight">Place weight</label>
+			<label class="control-label" for="placeWeight">How important is it that every question is in the schedule?</label>
             <div class="controls">
-	     <input type="text" name="placeWeight" id="placeWeight" data-bind="value:scheduleRequest.placeWeight"/>
-	     <span class="help-inline">How important is it that every question is in the schedule?</span>
-	     </div>
+             	 <div data-bind="jqSlider: placeWeight, jqOptions: { min: 0, max: 100, animate: true}" style="width: 400px; margin-top:10px;"></div>
+	     	</div>
 	     </div>
 
 	     <div class="control-group">
-	     <label class="control-label">Question weight</label>
+		    <label class="control-label">How important is it that each question has experienced participants?</label>
             <div class="controls">
-	     <input type="text" name="wsWeight" id="wsWeight" data-bind="value:scheduleRequest.wsWeight"/>
-	     <span class="help-inline">How important is it that each question has experienced participants?	     </span>
-	     </div>
+             	 <div data-bind="jqSlider: wsWeight, jqOptions: { min: 0, max: 100, animate: true }" style="width: 400px; margin-top:10px;"></div>
+			</div>
 	     </div>
 
 	     <div class="control-group">
-	     <label class="control-label" for="agendaWeight">Researcher weight</label>
+		    <label class="control-label">How important is it that the researchers' wishes have been fulfilled?</label>
             <div class="controls">
-	     <input type="text" name="agendaWeight" id="agendaWeight" data-bind="value:scheduleRequest.agendaWeight"/>
-	     <span class="help-inline">How important is it that the researchers' wishes have been fulfilled?
-	     </span>
-              <p class="help-block">
-              These weights are relative to each other so that a question weight of 1 and a researcher weight means 
-              that keeping researchers happy is twice as important as filling every single question with experienced
-              researchers.
-              </p>
-	     </div>
+             	 <div data-bind="jqSlider: agendaWeight, jqOptions: { min: 0, max: 100, animate: true }" style="width: 400px; margin-top:10px;"></div>
+			</div>
 	     </div>
 	     
 	     <div class="control-group">
@@ -267,6 +262,9 @@
 		</fieldset>
 		
 	 </form>
+	 
+
+
 </section>
 </div>
 <div class="navbar navbar-fixed-bottom" data-bind="visible: !sparat()">
@@ -350,6 +348,8 @@
 
 	var json = ${json.raw()};
 	var model = new KonferensModel();
+	model.setInitialWeights(json.placeWeight, json.wsWeight, json.agendaWeight);
+	
 	model.id = json.id;
 	model.namn = json.namn;
 	model.optimeringsInformation = json.optimeringsInformation;
@@ -390,6 +390,36 @@
 		model.forskare.push(f);
 	}
 	
+	var lastSlide = new Date().getTime();
+	
+	ko.bindingHandlers.jqSlider = {
+    init: function(element, valueAccessor, allBindingsAccessor, data) {
+        //initialize the control
+        var options = allBindingsAccessor().jqOptions || {};
+        $(element).slider(options);
+
+        //handle the value changing in the UI
+        ko.utils.registerEventHandler(element, "slidechange", function() {
+        	newSlideTime = new Date().getTime();
+        	if (newSlideTime-lastSlide < 50 ){
+        		return; // since the sliders are coupled, don't update on the triggered events
+        	}
+        	lastSlide = newSlideTime;
+            //would need to do some more work here, if you want to bind against non-observables
+            var observable = valueAccessor();
+            observable($(element).slider("value"));
+            data.weightChanged(observable, $(element).slider("value"));
+            
+        });
+
+    },
+    //handle the model value changing
+    update: function(element, valueAccessor) {
+        var value = ko.utils.unwrapObservable(valueAccessor());
+        $(element).slider("value", value);   
+
+    }
+	};
 	ko.applyBindings(model);
 	
 
@@ -526,8 +556,55 @@
 	    
     }
     
-    function KonferensModel(){
+    function KonferensModel(){    
     	var self = this;
+    	
+    	self.weightChanged = function(observableChanged, updatedValue){
+    		var updateOthers = function(updatedValue, observable1, observable2){
+	    		// we want the sum of the three to be 150
+	    		var diff = 150 - updatedValue - observable1() - observable2();
+	    		console.log("diff " +diff);
+	    		if (diff == Math.abs(1)){
+	    			// Special case for one-step changes
+	    			if (Math.random() >0.5){
+	    				observable1(observable1()+diff);
+	    			} else{
+	    				observable2(observable2()+diff);	    			
+	    			}
+	    		} else{
+	    			// For larger changes, distribute based on ratio (more important weight receives most of the change)
+	    			var ratio = (observable1()/ (observable1()+observable2())) ;
+	    			console.log("ratio is " + ratio);
+	    			
+	    			var oneDiff = Math.round(ratio*diff);
+	    			console.log("obs 1 should be added with " + oneDiff); 
+	    			var twoDiff = diff-oneDiff;
+	    			console.log("obs 2 should be added with " + twoDiff); 
+		    		observable1(observable1()+oneDiff);
+		    		observable2(observable2()+twoDiff);
+		    	}
+    		};
+    			
+    		if (observableChanged === self.wsWeight){
+    			console.log("ws slide");
+    			updateOthers(updatedValue, self.placeWeight, self.agendaWeight);
+    		}
+    		if (observableChanged === self.placeWeight){
+    			console.log("place slide");
+    			updateOthers(updatedValue, self.wsWeight, self.agendaWeight);
+    		}
+    		if (observableChanged === self.agendaWeight){
+    			console.log("agenda slide");
+    			updateOthers(updatedValue, self.placeWeight, self.wsWeight);
+    		}
+    	};
+    	
+    	self.setInitialWeights = function(place, ws, agenda){
+	    	self.placeWeight = ko.observable(place || 50);
+	    	self.wsWeight = ko.observable(ws || 50);
+	    	self.agendaWeight = ko.observable(agenda || 50);
+    	}
+    	
 		self.sessioner = [1,2,3,4,5,6]; // Antar att vi bara tillåter så här många sessioner
     	self.fragor = ko.observableArray();
     	self.forskare = ko.observableArray();

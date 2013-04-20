@@ -21,6 +21,9 @@ import controllers.ScheduleRequest;
  * 
  */
 public class KonferensJson {
+	public Integer placeWeight;
+	public Integer wsWeight;
+	public Integer agendaWeight;
 	public String id;
 	public String postback_url;
 	public String namn;

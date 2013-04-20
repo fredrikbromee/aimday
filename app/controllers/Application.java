@@ -150,27 +150,10 @@ public class Application extends Controller {
 		return spår;
 	}
 
-	public static void scheduleNew(int tracks, int sessions, int generations, String json, int placeWeight,
-			int wsWeight,
-			int agendaWeight, int max_antal_deltagare, int min_antal_deltagare) throws InterruptedException,
+	public static void scheduleNew(int tracks, int sessions, int generations, String json,
+ int max_antal_deltagare,
+			int min_antal_deltagare) throws InterruptedException,
 			ExecutionException {
-
-		if (placeWeight < 0) {
-			placeWeight = 10;
-		}
-		if (wsWeight < 0) {
-			wsWeight = 10;
-		}
-		if (agendaWeight < 0) {
-			agendaWeight = 10;
-		}
-
-		if ((max_antal_deltagare > 15 || max_antal_deltagare < 0) && max_antal_deltagare != 100) {
-			throw new RuntimeException("Felaktigt antal max deltagare, fick " + max_antal_deltagare);
-		}
-		if (min_antal_deltagare > 15 || min_antal_deltagare < 0) {
-			throw new RuntimeException("Felaktigt minimi-antal  deltagare, fick " + min_antal_deltagare);
-		}
 
 		Konferens k = null;
 		KonferensJson konf = null;
@@ -184,9 +167,19 @@ public class Application extends Controller {
 			renderTemplate("Application/fel.html", felMeddelande);
 		}
 
+		Logger.info("New generation request. Place weight %s, ws weight %s, agenda weight %s", konf.placeWeight,
+				konf.wsWeight, konf.agendaWeight);
+
+		if ((max_antal_deltagare > 15 || max_antal_deltagare < 0) && max_antal_deltagare != 100) {
+			throw new RuntimeException("Felaktigt antal max deltagare, fick " + max_antal_deltagare);
+		}
+		if (min_antal_deltagare > 15 || min_antal_deltagare < 0) {
+			throw new RuntimeException("Felaktigt minimi-antal  deltagare, fick " + min_antal_deltagare);
+		}
+
 		generations = Math.min(100000, generations);
-		ScheduleRequest scheduleRequest = new ScheduleRequest(tracks, sessions, generations, placeWeight, wsWeight,
-				agendaWeight, max_antal_deltagare, min_antal_deltagare);
+		ScheduleRequest scheduleRequest = new ScheduleRequest(tracks, sessions, generations, konf.placeWeight,
+				konf.wsWeight, konf.agendaWeight, max_antal_deltagare, min_antal_deltagare);
 		Scheduler scheduler = new Scheduler(k, scheduleRequest);
 
 		String randomId = UUID.randomUUID().toString();
