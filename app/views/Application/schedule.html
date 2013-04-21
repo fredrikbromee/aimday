@@ -266,6 +266,12 @@
 
 
 </section>
+<div id="bugreport">
+	<span class="pull-right">
+		<a href="#bugReportModal" data-toggle="modal">Report error</a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+	</span>
+	<div>&nbsp</div>
+</div>
 </div>
 <div class="navbar navbar-fixed-bottom" data-bind="visible: !sparat()">
   <div class="navbar-inner">
@@ -342,6 +348,25 @@
   </div>
 </div>
 
+<div id="bugReportModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Weird schedule? Found a bug?</h3>
+  </div>
+  <div class="modal-body">
+  	Please help us make the scheduler better by giving us a report. Send an e-mail to bug@aimday.se stating what your
+  	settings were (number of rooms etc), what you think is wrong with the schedule and please include this json to make
+  	it easier for us to find out what went wrong.
+  	
+  	Copy from here:
+  	<div data-bind="text:bugreport" style="white-space: nowrap;">
+	</div>
+  	..to here!
+  	
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+  </div>
+</div>
 
 <script type="text/javascript">
 
@@ -649,10 +674,8 @@
 			låstaFrågor.push(frågeId);
 		}
 
-		// när generera-knappen trycks så måste vi plocka ut de ändringar som gjorts (låsningar) och
-		// skicka med dem till servern
-		self.generera = function(formElement) {
-		
+
+		self.getLås = function(){
 			var frågelås = [];
 			var frågerumslås = [];
 			for (var i = 0; i < self.fragor().length; i++) {
@@ -681,13 +704,30 @@
 				}
 			}
 			
-			self.låsningar = {frågesessionslås:frågelås, frågerumslås:frågerumslås, forskarfrågelås:forskarFrågeLås, forskarsessionslås:forskarTidLås};		
+			return {frågesessionslås:frågelås, frågerumslås:frågerumslås, forskarfrågelås:forskarFrågeLås, forskarsessionslås:forskarTidLås};		
+		}
+		
+		
+		
+		// när generera-knappen trycks så måste vi plocka ut de ändringar som gjorts (låsningar) och
+		// skicka med dem till servern
+		self.generera = function() {
+		
+			self.låsningar = self.getLås();
 			var newJson = ko.toJSON(self);
 			self.genereradJson(newJson);
 			
 			console.log(newJson);
 			return true;
         }
+        
+        self.bugreport = ko.computed({
+        	read:function(){
+				var låsningar = self.getLås();
+				json.låsningar = låsningar;
+        		return JSON.stringify(json);				
+        	}        	
+	 	});
         
         self.getForskare = function(id){
         	return ko.utils.arrayFirst(self.forskare(), function(f) {
