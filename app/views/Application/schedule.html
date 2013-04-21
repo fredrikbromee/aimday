@@ -486,7 +486,7 @@
     	self.id = ko.observable(f.id);
     	self.fråga = ko.observable(f.fråga);
     	self.låst = ko.observableArray(f.låst);
-    	self.låstaRum = ko.observableArray();
+    	self.låstaRum = ko.observableArray(f.låstaRum);
 
 	    self.editing = ko.observable(false);
 	    self.edit = function() { this.editing(true); }
