@@ -64,7 +64,9 @@ public class AIMDay implements Serializable {
 		unplacedQuestions.addAll(frågor);
 		for (Session session : existingSchedule) {
 			for (Workshop ws : session.getAllWorkshops()) {
-				unplacedQuestions.remove(ws.question);
+				if (unplacedQuestions.contains(ws.question)) {
+					unplacedQuestions.remove(ws.question);
+				}
 			}
 		}
 	}
