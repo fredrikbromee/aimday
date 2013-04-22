@@ -3,7 +3,6 @@ package controllers;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -83,19 +82,15 @@ public class Application extends Controller {
 	}
 
 	public static void scheduleAPI(String json) {
-		Logger.info("params:" + params.toString());
-
-		Map<String, String> allSimple = params.allSimple();
-		for (String key : allSimple.keySet()) {
-			Logger.info("%s : %s", key, allSimple.get(key));
-		}
-
-		Logger.info("----------------------------");
-		for (String key : request.headers.keySet()) {
-			Logger.info("%s : %s", key, request.headers.get(key));
-		}
-		Logger.info("qs:" + request.querystring);
-
+		/*
+		 * Logger.info("params:" + params.toString());
+		 * 
+		 * Map<String, String> allSimple = params.allSimple(); for (String key : allSimple.keySet()) {
+		 * Logger.info("%s : %s", key, allSimple.get(key)); }
+		 * 
+		 * Logger.info("----------------------------"); for (String key : request.headers.keySet()) {
+		 * Logger.info("%s : %s", key, request.headers.get(key)); } Logger.info("qs:" + request.querystring);
+		 */
 		KonferensJson konf = null;
 		AIMDay schedule = null;
 		try {
@@ -107,6 +102,7 @@ public class Application extends Controller {
 
 			if (konf.schema != null && konf.schema.sessioner != null) {
 				konf.schema.sparat = true;
+				konf.schema.removeRemovedStuff(konf);
 				schedule = AIMDay.fromJson(konf.schema, k);
 			}
 

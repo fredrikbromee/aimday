@@ -66,4 +66,31 @@ public class KonferensJson {
 		return grad;
 	}
 
+	public boolean harFrågaMedId(String frageId) {
+		for (FragaJson f : fragor) {
+			if (f.id.equals(frageId)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean harForskareMedId(String forskarId) {
+		for (ForskareJson f : forskare) {
+			if (f.id.equals(forskarId)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean harRepMedId(String repId) {
+		for (ForetagsRepresentantJson f : foretagsrepresentanter) {
+			if (f.id.equals(repId)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

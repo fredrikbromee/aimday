@@ -15,7 +15,6 @@ import models.ForetagsRepresentant;
 import models.Forskare;
 import models.Konferens;
 import models.Question;
-import play.Logger;
 import se.aimday.scheduler.api.SchemaJson;
 import se.aimday.scheduler.api.SessionJson;
 import se.aimday.scheduler.api.WorkshopJson;
@@ -65,10 +64,7 @@ public class AIMDay implements Serializable {
 		unplacedQuestions.addAll(frågor);
 		for (Session session : existingSchedule) {
 			for (Workshop ws : session.getAllWorkshops()) {
-				Logger.info("workshop: ", ws);
-				if (unplacedQuestions.contains(ws.question)) {
-					unplacedQuestions.remove(ws.question);
-				}
+				unplacedQuestions.remove(ws.question);
 			}
 		}
 	}
