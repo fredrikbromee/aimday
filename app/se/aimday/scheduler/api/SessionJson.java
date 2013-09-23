@@ -35,11 +35,13 @@ public class SessionJson {
 					}
 				}
 				// för varje företagsrep ta bort om ej finns kvar
-				for (Iterator<String> repsIterator = ws.foretagsrepresentanter.iterator(); repsIterator.hasNext();) {
-					String repId = repsIterator.next();
-					if (!konf.harRepMedId(repId)) {
-						Logger.warn("removed rep %s from q %s", repId, ws.frageId);
-						repsIterator.remove();
+				if (ws.foretagsrepresentanter != null) {
+					for (Iterator<String> repsIterator = ws.foretagsrepresentanter.iterator(); repsIterator.hasNext();) {
+						String repId = repsIterator.next();
+						if (!konf.harRepMedId(repId)) {
+							Logger.warn("removed rep %s from q %s", repId, ws.frageId);
+							repsIterator.remove();
+						}
 					}
 				}
 			}
