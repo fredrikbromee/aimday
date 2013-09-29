@@ -168,7 +168,7 @@
     <h1></h1>
   </div>
 
-	<form class="form-horizontal" action="@{Application.scheduleNew()}" method="POST" accept-charset="${_response_encoding}" data-bind="submit: model.generera">
+	<form class="form-horizontal" data-bind="submit: model.generera">
 	<fieldset>
 	     <div class="control-group">
 	     <label class="control-label" for="tracks">Number of rooms</label>
@@ -205,21 +205,21 @@
 	     <div class="control-group">
 			<label class="control-label" for="placeWeight">How important is it that every question is in the schedule?</label>
             <div class="controls">
-             	 <div data-bind="jqSlider: placeWeight, jqOptions: { min: 0, max: 100, animate: true}" style="width: 400px; margin-top:10px;"></div>
+             	 <div data-bind="jqSlider: scheduleRequest.placeWeight, jqOptions: { min: 0, max: 100, animate: true}" style="width: 400px; margin-top:10px;"></div>
 	     	</div>
 	     </div>
 
 	     <div class="control-group">
 		    <label class="control-label">How important is it that each question has experienced participants?</label>
             <div class="controls">
-             	 <div data-bind="jqSlider: wsWeight, jqOptions: { min: 0, max: 100, animate: true }" style="width: 400px; margin-top:10px;"></div>
+             	 <div data-bind="jqSlider: scheduleRequest.wsWeight, jqOptions: { min: 0, max: 100, animate: true }" style="width: 400px; margin-top:10px;"></div>
 			</div>
 	     </div>
 
 	     <div class="control-group">
 		    <label class="control-label">How important is it that the researchers' wishes have been fulfilled?</label>
             <div class="controls">
-             	 <div data-bind="jqSlider: agendaWeight, jqOptions: { min: 0, max: 100, animate: true }" style="width: 400px; margin-top:10px;"></div>
+             	 <div data-bind="jqSlider: scheduleRequest.agendaWeight, jqOptions: { min: 0, max: 100, animate: true }" style="width: 400px; margin-top:10px;"></div>
 			</div>
 	     </div>
 	     
@@ -285,6 +285,7 @@
   </div>
 </div>
 
+<!--############ TEMPLATES #################-->
 
 <script type="text/html" id="forskar-template">
 	<span data-bind="if: harVikt">
@@ -324,6 +325,23 @@
     </div>
 </script>
 
+<!--############ /TEMPLATES #################-->
+
+
+<!--############ DIALOGS #################-->
+
+<div id="generationProgressReport" class="modal hide fade" tabindex="-1" role="dialog">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Your schedule is being generated...</h3>
+  </div>
+  <div class="modal-body">
+  	Your schedule is <span data-bind="text:progress"></span>% complete. Your schedule will display once it is complete.
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel generation</button>
+  </div>    
+</div>
 
 <div id="helpModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
@@ -368,24 +386,29 @@
   </div>
 </div>
 
+<!--############ /DIALOGS #################-->
+
+
 <script type="text/javascript">
 
 
 	var json = ${json.raw()};
 	var model = new KonferensModel();
-	model.setInitialWeights(json.placeWeight, json.wsWeight, json.agendaWeight);
 	
 	model.id = json.id;
 	model.namn = json.namn;
 	model.optimeringsInformation = json.optimeringsInformation;
 	model.senioritetsgrader = json.senioritetsgrader;
-	if (json.scheduleRequest === undefined){
-		model.scheduleRequest = {tracks:10, sessions:5, generations:1000, placeWeight:10, wsWeight:10, agendaWeight:10,
-		 maxAntalDeltagare:100, minAntalDeltagare:1};
-	} else {
-		model.scheduleRequest = json.scheduleRequest;
+	model.scheduleRequest = {
+		tracks:ko.observable(json.scheduleRequest? json.scheduleRequest.tracks : 10), 
+		sessions:ko.observable(json.scheduleRequest? json.scheduleRequest.sessions : 5), 
+		generations:ko.observable(json.scheduleRequest? json.scheduleRequest.generations :1000), 
+		placeWeight:ko.observable(json.scheduleRequest? json.scheduleRequest.placeWeight : 50), 
+		wsWeight:ko.observable(json.scheduleRequest? json.scheduleRequest.wsWeight : 50 ), 
+		agendaWeight:ko.observable(json.scheduleRequest? json.scheduleRequest.agendaWeight : 50),
+		maxAntalDeltagare:ko.observable(json.scheduleRequest? json.scheduleRequest.maxAntalDeltagare : 100), 
+		minAntalDeltagare:ko.observable(json.scheduleRequest? json.scheduleRequest.minAntalDeltagare : 1)
 	}
-	
 	var finnsEttSchemaAttSpara = json.schema != null && json.schema.sessioner != null
 	if (finnsEttSchemaAttSpara){
 		model.schema = new Schema(json.schema);
@@ -610,17 +633,17 @@
 		    	}
     		};
     			
-    		if (observableChanged === self.wsWeight){
+    		if (observableChanged === self.scheduleRequest.wsWeight){
     			console.log("ws slide");
-    			updateOthers(updatedValue, self.placeWeight, self.agendaWeight);
+    			updateOthers(updatedValue, self.scheduleRequest.placeWeight, self.scheduleRequest.agendaWeight);
     		}
-    		if (observableChanged === self.placeWeight){
+    		if (observableChanged === self.scheduleRequest.placeWeight){
     			console.log("place slide");
-    			updateOthers(updatedValue, self.wsWeight, self.agendaWeight);
+    			updateOthers(updatedValue, self.scheduleRequest.wsWeight, self.scheduleRequest.agendaWeight);
     		}
-    		if (observableChanged === self.agendaWeight){
+    		if (observableChanged === self.scheduleRequest.agendaWeight){
     			console.log("agenda slide");
-    			updateOthers(updatedValue, self.placeWeight, self.wsWeight);
+    			updateOthers(updatedValue, self.scheduleRequest.placeWeight, self.scheduleRequest.wsWeight);
     		}
     	};
     	
@@ -637,6 +660,9 @@
 		self.genereradJson = ko.observable();
 		this.lastError = ko.observable();
 		self.sparat = ko.observable(true);
+		self.nextId = ko.observable();
+		self.progress = ko.observable();
+		self.isGenerating = false;
 
 		self.låsAllt = function(formElement){
 			
@@ -717,8 +743,39 @@
 			var newJson = ko.toJSON(self);
 			self.genereradJson(newJson);
 			
-			console.log(newJson);
-			return true;
+			var onSuccess = function(postResult){
+				console.log("generation triggered, id of next schedule: " + postResult);
+				self.nextId(postResult);
+				self.progress(3);
+				self.isGenerating = true;	
+				function timer()
+				{
+					if (!self.isGenerating){return;}
+					var url = "progress?id="+self.nextId();
+					var progress = $.get(url, function(data){
+						self.progress(data);
+						if (data === 100){
+							self.isGenerating = false;
+							window.location = "@{Application.schedule()}?id="+self.nextId();
+						}
+					});
+					setTimeout(timer, 500);
+				}
+				timer();
+	        	$('#generationProgressReport').modal('show')
+	        	$('#generationProgressReport').on('hidden', function () {
+    				console.log("Cancelling generation");
+    				self.isGenerating = false;
+				})
+			};
+			
+			jQuery.ajax({
+				type: 'post',
+				url: '@{Application.scheduleNew()}',
+				data: {'json':newJson},
+				success: onSuccess
+			});
+			return false;
         }
         
         self.bugreport = ko.computed({

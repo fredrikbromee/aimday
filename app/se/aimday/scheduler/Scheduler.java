@@ -9,11 +9,12 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import se.aimday.scheduler.api.ScheduleRequest;
+
 import models.ForetagsRepresentant;
 import models.Forskare;
 import models.Konferens;
 import models.Question;
-import controllers.ScheduleRequest;
 
 /**
  * Spottar ut sig ett schema givet input om vilka frågor som skall diskuteras och vilka som vill vara med och diskutera

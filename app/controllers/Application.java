@@ -16,6 +16,7 @@ import se.aimday.scheduler.AIMDay;
 import se.aimday.scheduler.Scheduler;
 import se.aimday.scheduler.api.InconsistentJsonException;
 import se.aimday.scheduler.api.KonferensJson;
+import se.aimday.scheduler.api.ScheduleRequest;
 
 import com.google.gson.Gson;
 
@@ -29,12 +30,10 @@ public class Application extends Controller {
 	public static class RequestAndScheduleTuple implements Serializable {
 
 		public final AIMDay schedule;
-		public final ScheduleRequest scheduleRequest;
 		public final String json;
 
-		public RequestAndScheduleTuple(AIMDay schedule, ScheduleRequest scheduleRequest, String json) {
+		public RequestAndScheduleTuple(AIMDay schedule, String json) {
 			this.schedule = schedule;
-			this.scheduleRequest = scheduleRequest;
 			this.json = json;
 		}
 
@@ -48,7 +47,7 @@ public class Application extends Controller {
 			Cache.set(id, progress, "10min");
 			AIMDay schedule = scheduler.lägg(progress);
 
-			RequestAndScheduleTuple tuple = new RequestAndScheduleTuple(schedule, scheduleRequest, json);
+			RequestAndScheduleTuple tuple = new RequestAndScheduleTuple(schedule, json);
 			Logger.info("Caching new schedule with id %s", id);
 			Cache.set(id, tuple, "1h");
 
@@ -56,13 +55,11 @@ public class Application extends Controller {
 
 		private final Scheduler scheduler;
 		private final String id;
-		private final ScheduleRequest scheduleRequest;
 		private final String json;
 
-		public AimdayJob(Scheduler scheduler, String id, ScheduleRequest scheduleRequest, String json) {
+		public AimdayJob(Scheduler scheduler, String id, String json) {
 			this.scheduler = scheduler;
 			this.id = id;
-			this.scheduleRequest = scheduleRequest;
 			this.json = json;
 
 		}
@@ -82,15 +79,6 @@ public class Application extends Controller {
 	}
 
 	public static void scheduleAPI(String json) {
-		/*
-		 * Logger.info("params:" + params.toString());
-		 * 
-		 * Map<String, String> allSimple = params.allSimple(); for (String key : allSimple.keySet()) {
-		 * Logger.info("%s : %s", key, allSimple.get(key)); }
-		 * 
-		 * Logger.info("----------------------------"); for (String key : request.headers.keySet()) {
-		 * Logger.info("%s : %s", key, request.headers.get(key)); } Logger.info("qs:" + request.querystring);
-		 */
 		KonferensJson konf = null;
 		AIMDay schedule = null;
 		try {
@@ -146,9 +134,7 @@ public class Application extends Controller {
 		return spår;
 	}
 
-	public static void scheduleNew(int tracks, int sessions, int generations, String json,
- int max_antal_deltagare,
-			int min_antal_deltagare) throws InterruptedException,
+	public static void scheduleNew(String json) throws InterruptedException,
 			ExecutionException {
 
 		Konferens k = null;
@@ -163,28 +149,34 @@ public class Application extends Controller {
 			renderTemplate("Application/fel.html", felMeddelande);
 		}
 
-		Logger.info("New generation request. Place weight %s, ws weight %s, agenda weight %s", konf.placeWeight,
-				konf.wsWeight, konf.agendaWeight);
+		ScheduleRequest sr = konf.scheduleRequest;
+		Logger.info("New generation request. Place weight %s, ws weight %s, agenda weight %s", sr.placeWeight,
+				sr.wsWeight, sr.agendaWeight);
 
-		if ((max_antal_deltagare > 15 || max_antal_deltagare < 0) && max_antal_deltagare != 100) {
-			throw new RuntimeException("Felaktigt antal max deltagare, fick " + max_antal_deltagare);
+		if ((sr.maxAntalDeltagare > 15 || sr.maxAntalDeltagare < 0) && sr.maxAntalDeltagare != 100) {
+			throw new RuntimeException("Felaktigt antal max deltagare, fick " + sr.maxAntalDeltagare);
 		}
-		if (min_antal_deltagare > 15 || min_antal_deltagare < 0) {
-			throw new RuntimeException("Felaktigt minimi-antal  deltagare, fick " + min_antal_deltagare);
+		if (sr.minAntalDeltagare > 15 || sr.minAntalDeltagare < 0) {
+			throw new RuntimeException("Felaktigt minimi-antal  deltagare, fick " + sr.minAntalDeltagare);
 		}
 
-		generations = Math.min(100000, generations);
-		ScheduleRequest scheduleRequest = new ScheduleRequest(tracks, sessions, generations, konf.placeWeight,
-				konf.wsWeight, konf.agendaWeight, max_antal_deltagare, min_antal_deltagare);
-		Scheduler scheduler = new Scheduler(k, scheduleRequest);
+		sr.generations = Math.min(100000, sr.generations);
+		Scheduler scheduler = new Scheduler(k, konf.scheduleRequest);
 
 		String randomId = UUID.randomUUID().toString();
 
-		new AimdayJob(scheduler, randomId, scheduleRequest, json).now();
+		new AimdayJob(scheduler, randomId, json).now();
+		renderJSON(gson.toJson(randomId));
+	}
+
+	public static void testProgress(String randomId) {
 		render(randomId);
 	}
 
 	public static void progress(String id) {
+		if (id.equals("test")) {
+			renderJSON(Math.random() * 100);
+		}
 		Object object = Cache.get(id.trim());
 
 		if (object != null && object instanceof AtomicInteger) {
@@ -212,7 +204,6 @@ public class Application extends Controller {
 		Gson gson = new Gson();
 		KonferensJson konf = gson.fromJson(tuple.json, KonferensJson.class);
 		konf.schema = tuple.schedule.toAPI();
-		konf.scheduleRequest = tuple.scheduleRequest;
 		String postback_url = getPostBackURL(konf);
 		AIMDay schedule = tuple.schedule;
 		ArrayList<Integer> spår = getSpårArray(schedule);

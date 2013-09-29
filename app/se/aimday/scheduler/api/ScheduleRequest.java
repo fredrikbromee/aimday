@@ -1,17 +1,17 @@
-package controllers;
+package se.aimday.scheduler.api;
 
 import java.io.Serializable;
 
 public class ScheduleRequest implements Serializable {
 
-	public final int tracks;
-	public final int sessions;
-	public final int generations;
-	public final int placeWeight;
-	public final int wsWeight;
-	public final int agendaWeight;
-	public final int maxAntalDeltagare;
-	public final int minAntalDeltagare;
+	public int tracks;
+	public int sessions;
+	public int generations;
+	public int placeWeight;
+	public int wsWeight;
+	public int agendaWeight;
+	public int maxAntalDeltagare;
+	public int minAntalDeltagare;
 
 	public ScheduleRequest(int tracks, int sessions, int generations, int placeWeight, int wsWeight, int agendaWeight,
 			int maxAntalDeltagare, int minAntalDeltagare) {

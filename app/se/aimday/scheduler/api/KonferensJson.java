@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import controllers.ScheduleRequest;
 
 /**
  * Konferens -id/namn -lista med frågor -lista med forskare -lista med företagsrepresentanter -schema där alla är

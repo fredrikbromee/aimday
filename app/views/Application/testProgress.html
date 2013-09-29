@@ -1,0 +1,50 @@
+#{extends 'main.html' /}
+
+Kvar: 
+flytta in schedulerequest in i json (klart)
+ny server-metod för att starta schedulering, (klart, ändrade den befintliga till att returnera json. Kom ihåg att ta bort den gamla vyn!) 
+posta formulär med jquery (klart, men tar inte emot resultatet. Läs på om jquery post). Tar nu emot resultatet. 
+
+flytta över den här koden till schedule.html. Kanske ska lägga det i en popup? Och inte en egen viewModel utan som en
+del i KonferensModel.
+lösa spara-knappen (den använder samma funk)
+
+Generating schedule...
+<div class="progress">
+  <div class="bar" data-bind="style:{width: prog}"></div>
+</div>
+
+<a href="#" class="btn btn-primary" data-bind="click: cancelTimer">Stäng av timer</a>
+
+<script type="text/javascript">
+function viewModel (){
+	var self = this;
+	self.progPercent = ko.observable(0);
+	self.prog = ko.computed(function(){
+	    	return self.progPercent()+"%";
+	    }, self);
+	
+	self.cancelTimer = function(){
+		self.isTimerShutdown = true;
+	}
+	self.isTimerShutdown = false;
+}
+var model = new viewModel();
+ko.applyBindings(model);
+
+
+function timerToGetProgressOnGeneration( )
+{
+	var progress = $.get("progress?id=${randomId}", function(data){
+	    model.progPercent(data);
+		if (data === 100 || model.isTimerShutdown){
+			console.log("complete");
+			
+			// så här, eller så ersätter vi schemat i befintligt json:
+//			window.location = "@{Application.schedule()}?id=${randomId}";
+		} else{
+			setTimeout(timer,800);
+		}
+	});
+}
+</script>
