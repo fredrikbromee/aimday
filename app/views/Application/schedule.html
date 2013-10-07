@@ -277,7 +277,7 @@
   <div class="navbar-inner">
     <div class="container">
 	    <a class="brand" href="#">This schedule has unsaved changes. </a>
-		<form class="form-horizontal" action="${postback_url}" method="POST" data-bind="submit: model.generera">
+		<form class="form-horizontal" action="${postback_url}" method="POST" data-bind="submit: model.saveSchedule">
 			<input type="hidden" data-bind="value: model.genereradJson" name="json"></input>
 			<button type="submit" class="btn btn-primary" >Save schedule</button>		
 		</form>
@@ -734,6 +734,14 @@
 		}
 		
 		
+
+		self.saveSchedule = function() {
+		
+			self.låsningar = self.getLås();
+			var newJson = ko.toJSON(self);
+			self.genereradJson(newJson);
+			return true;
+		}
 		
 		// när generera-knappen trycks så måste vi plocka ut de ändringar som gjorts (låsningar) och
 		// skicka med dem till servern
