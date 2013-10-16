@@ -125,6 +125,9 @@ public class Question implements Comparable<Question> {
 	}
 
 	public Integer getLåstRum() {
+		if (låstaRum == null || låstaRum.isEmpty()) {
+			return null;
+		}
 		return låstaRum.get(0);
 	}
 
