@@ -2,6 +2,7 @@ package models;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -89,6 +90,9 @@ public class Konferens {
 		for (FragaJson fraga : fragor) {
 			Question question = konferens.getFråga(fraga.id);
 			fraga.låst = question.getLås();
+			if (question.getLåstRum() != null) {
+				fraga.låstaRum = Collections.singletonList(question.getLåstRum());
+			}
 		}
 		for (ForskareJson forskareApi : konf.forskare) {
 			Forskare forskare = konferens.getForskare(forskareApi.id);
