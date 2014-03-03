@@ -34,17 +34,12 @@
 	     <span data-bind="text: optimeringsInformation.viktNamn"></span>
 	</span>
   </div>
-	#{if !sparatSchema}
-		This schedule's score is 
-		${schedule.score.format('#.##')} 
-		(1=ideal schedule, 0=worst possible).<br>
-	#{/if}
 	 <table class="table table-striped table-condensed">
 	     <thead>
 	         <tr>
-		         #{list spår, as:'spårnr'}
-		             <th>Room ${spårnr}</th>
-			     #{/list}
+		     	<!-- ko foreach: model.tracks -->
+		             <th>Room <span data-bind="text: $index()+1"/>		             </th>
+				<!-- /ko -->
 	         </tr>
 	     </thead>
 	     <tbody>
@@ -403,6 +398,7 @@
 	var json = ${json.raw()};
 	var model = new KonferensModel();
 	
+	model.tracks = ko.observableArray();
 	model.id = json.id;
 	model.namn = json.namn;
 	model.optimeringsInformation = json.optimeringsInformation;
@@ -421,6 +417,7 @@
 	if (finnsEttSchemaAttSpara){
 		model.schema = new Schema(json.schema);
 		model.sparat(json.schema.sparat);
+		model.tracks = ko.observableArray(model.schema.getTracks());
 	}
 	model.postback_url = json.postback_url;
 
@@ -492,7 +489,14 @@
 	        });
 	        return hittadSession;
         }
-		
+        self.getTracks = function(){
+        	var numWs = 0;
+	        for (var i = 0; i < self.sessioner().length; i++) {
+			    numWs = Math.max(numWs, self.sessioner()[i].getNumberOfWs());
+			}
+			// not interested in the actual elements in array, just that it has the correct number of elements:
+			return new Array(numWs);
+        }
     }
     
     function Session(s){
@@ -517,6 +521,9 @@
         	return ko.utils.arrayFirst(self.workshops(), function(workshop) {
 	            return (workshop.besöksAv(forskarId));
 	        });
+        }
+        self.getNumberOfWs = function(){
+        	return self.workshops().length;
         }
     }
     
