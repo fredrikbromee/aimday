@@ -1,12 +1,20 @@
-#{extends 'main.html' /}
-#{set title:'Aimday Schedule' /}
+<!DOCTYPE html>
 
-#{if hittadeFel}
-	Warning: this schedule contains the following errors: 
-     #{list fel, as:'felet'}
-         ${felet}<br>
-     #{/list}
-#{/if}
+<html lang="en">
+    <head>
+        <title>Aimday Schedule</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=${_response_encoding}">
+        <link rel="stylesheet" type="text/css" media="screen" href="@{'/public/stylesheets/bootstrap.css'}">
+        <link rel="shortcut icon" type="image/png" href="@{'/public/images/favicon.png'}">
+        <script src="@{'/public/javascripts/jquery-1.7.1.js'}" type="text/javascript" charset="${_response_encoding}"></script>
+        <script src="@{'/public/javascripts/bootstrap.js'}" type="text/javascript" charset="${_response_encoding}"></script>
+        <script type='text/javascript' src="@{'/public/javascripts/knockout-2.1.0.js'}"></script>
+        <script type='text/javascript' src="@{'/public/javascripts/knockout-sortable.js'}"></script>
+        
+        <script type="text/javascript" src="@{'/public/javascripts/jquery-ui-1.8.18.min.js'}"></script>
+        <link rel="stylesheet" type="text/css" href="@{'/public/stylesheets/jquery-ui-1.8.14.css'}">
+    </head>
+    <body>
     
 <div id="filler1" style="margin-bottom: 70px;">
 <section id="help">
@@ -15,7 +23,7 @@
    	</span>
 </section>
 
-#{if schedule}
+<div data-bind="if: schema != null">
 <section id="schema">
   <div class="page-header">
     <h1>    
@@ -106,7 +114,7 @@
 	
 	
 </section>
-#{/if}
+</div>
 <section id="fragor">
   <div class="page-header">
     <h1>Questions</h1>
@@ -751,7 +759,10 @@
 			var newJson = ko.toJSON(self);
 			self.genereradJson(newJson);
 			
+				// TODO DART: byt ut till anrop till isolate:
 			var onSuccess = function(postResult){
+			
+			
 				console.log("generation triggered, id of next schedule: " + postResult);
 				self.nextId(postResult);
 				self.progress(3);
@@ -850,4 +861,6 @@
     };
     }
 	
-</script>	
+</script>
+    </body>
+</html>
