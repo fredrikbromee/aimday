@@ -220,6 +220,25 @@ public class AIMDay implements Serializable {
 			sessioner.add(sess.toAPI());
 		}
 		schemaJson.sessioner = sessioner;
+		HashSet<String> un = new HashSet<String>();
+		for (Question question : unplacedQuestions) {
+			String id = question.id;
+			if (question.hasZeroAttendants){
+				id= id+'*';
+			}
+			un.add(id);
+		}
+		schemaJson.unplacedQuestions = un;
+		HashSet<String> up = new HashSet<String>();
+		for (IndividualAgenda ag : getUnsatisfied()) {
+			Forskare f = ag.getParticipant();
+			up.add(String.format("%s enrolled in %s questions, was placed in %s questions", f.first_name, ag.getWishedNumber(), ag.getAssignedNumber()));
+/*			${un.participant.first_name} enrolled in ${un.wishedNumber} questions, 
+	         was placed in  
+	         ${un.assignedNumber} questions ${un.agenda} 
+	*/
+		}
+		schemaJson.unsatisfied = up;
 		return schemaJson;
 	}
 

@@ -81,25 +81,31 @@
 	  </div>
 	 
 	 	 
-	#{if schedule.unplacedQuestions}
-		<br>In this schedule we failed to place:
-		#{list schedule.unplacedQuestions, as:'unplaced'}
-		        Question ${unplaced.q}#{if unplaced.hasZeroAttendants}*#{/if}
-		#{/list}<br>
-		An asterisk (*) after a question indicates that the question does not have any researchers on its list.
-		<p> 
-	#{/if}
-	<p>
-	#{if schedule.unsatisfied}
-		In this schedule the following
-		(${schedule.unsatisfied.size} st) 
-		participants were not placed in all their questions
-		#{list schedule.unsatisfied, as:'un'}
-		         <div "unsatisfied_participant">${un.participant.first_name} enrolled in ${un.wishedNumber} questions, 
-		         was placed in  
-		         ${un.assignedNumber} questions ${un.agenda} </div>
-		#{/list}                        
-	#{/if}
+	<div data-bind="if: schema != null">
+		<div data-bind="if: schema.unplacedQuestions() != null && schema.unplacedQuestions().length >0">
+		
+			<br>In this schedule we failed to place:
+			<ul data-bind="foreach: schema.unplacedQuestions">
+			    <li>
+			        Question <span data-bind="text: $data"></span> 
+			    </li>
+			</ul>
+			<br>
+			An asterisk (*) after a question indicates that the question does not have any researchers on its list.
+			<p> 
+		</div>
+		<p>
+		<div data-bind="if: schema.unsatisfied() != null && schema.unsatisfied().length >0">
+			In this schedule the following
+			(<span data-bind="text: schema.unsatisfied().length"></span>) 
+			participants were not placed in all their questions
+			<ul data-bind="foreach: schema.unsatisfied">
+			    <li>
+			        <span data-bind="text: $data"></span> 
+			    </li>
+			</ul>
+		</div>
+	</div>
 	<p>	
 	To use this schedule as a starting point for the next schedule generation you may lock the entire schedule in place:
 	<br>
@@ -479,6 +485,8 @@
     function Schema(s){
     	var self = this;
 		self.sessioner = ko.observableArray();
+		self.unplacedQuestions = ko.observableArray(s.unplacedQuestions);
+		self.unsatisfied = ko.observableArray(s.unsatisfied);
 		for (var i = 0; i < s.sessioner.length; i++) {
 		    var session = s.sessioner[i];
 			self.sessioner.push(new Session(session));
