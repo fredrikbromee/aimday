@@ -78,6 +78,10 @@ public class Application extends Controller {
 		render();
 	}
 
+	public static void scheduleDart(String json) {
+		renderTemplate("public/web/dart_scheduler.html", json);
+	}
+	
 	public static void scheduleAPI(String json) {
 		KonferensJson konf = null;
 		AIMDay schedule = null;

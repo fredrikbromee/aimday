@@ -232,7 +232,8 @@ public class AIMDay implements Serializable {
 		HashSet<String> up = new HashSet<String>();
 		for (IndividualAgenda ag : getUnsatisfied()) {
 			Forskare f = ag.getParticipant();
-			up.add(String.format("%s enrolled in %s questions, was placed in %s questions", f.first_name, ag.getWishedNumber(), ag.getAssignedNumber()));
+			up.add(String.format("%s enrolled in %s questions, was placed in %s questions, %s", 
+					f.first_name, ag.getWishedNumber(), ag.getAssignedNumber(), ag.getAgenda()));
 /*			${un.participant.first_name} enrolled in ${un.wishedNumber} questions, 
 	         was placed in  
 	         ${un.assignedNumber} questions ${un.agenda} 

@@ -9,6 +9,14 @@
      &nbsp;
      <input type="submit" value="Visa schema" id="scheduleBtn" />
  </form>
+ <form action="/public/web/dart_scheduler" method="POST" accept-charset="${_response_encoding}">
+     <label for="json">Dart</label>
+     <textarea name="json"  class="input-xlarge, span12" rows="43" id="json" >
+{"postback_url":"http://aimdaylabb.se.preview.binero.se/materials/parse-json/","id":"1","namn":"Aimday life science","optimeringsInformation":{"anvandVikter":true,"viktNamn":"Har klinisk erfarenhet"},"senioritetsgrader":["Överl.","Prof.","Doc.","Dr.","Doktorand"],"fragor":[{"id":"f1","fråga":"What is the cure for the common cold?","vikt":5,"låst":[]},{"id":"f2","fråga":"What is the cure for the common cancer?","vikt":0,"låst":[]},{"id":"f3","fråga":"What is the cure for the common arne?","vikt":0,"låst":[]},{"id":"f4","fråga":"What is the cure for the common bjarne?","vikt":0,"låst":[]}],"foretagsrepresentanter":[{"id":"rep1","kontakt":{"fornamn":"Arne","efternamn":"Företagskontakt","org":"Ett företag"},"frågor":["f1","f2"]}],"forskare":[{"harVikt":true,"id":"id1","grad":2,"frågor":["f1","f2"],"joker":true,"kontakt":{"fornamn":"Arne","efternamn":"Arnesson","avdelning":"Institutionen för materialfysik","org":"Uppsala universitet"},"låstaFrågor":[],"låstaSessioner":[]},{"harVikt":false,"id":"id2","grad":1,"frågor":["f2","f3"],"joker":false,"kontakt":{"fornamn":"Bjarne","efternamn":"Bengtsson","avdelning":"Institutionen för neurologi","org":"Uppsala universitet"},"låstaFrågor":[],"låstaSessioner":[]},{"harVikt":false,"id":"id3","grad":3,"frågor":["f4"],"joker":false,"kontakt":{"fornamn":"Carl","efternamn":"Carlsson","avdelning":"Institutionen för materialfysik","org":"Lunds universitet"},"låstaFrågor":[],"låstaSessioner":[]}],"schema":{"sessioner":[{"workshops":[{"frageId":"f1","forskare":["id1"],"foretagsrepresentanter":["rep1"],"score":0},{"frageId":"f2","forskare":["id2"],"score":0}]},{"workshops":[{"frageId":"f3","forskare":["id2"],"score":0},{"frageId":"f4","forskare":["id3"],"score":0}]}]},"låsningar":{"frågesessionslås":[{"id":"f1","låsttill":[1]}],"forskarfrågelås":[{"id":"id3","låsttill":["f4"]}],"forskarsessionslås":[{"id":"id1","låsttill":[1]}]}}      
+     </textarea>
+     &nbsp;
+     <input type="submit" value="Visa schema" id="scheduleBtn" />
+ </form>
 
     #{authenticityToken /}
 <p>
