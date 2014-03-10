@@ -278,6 +278,11 @@
 	<span class="pull-right">
 		<a href="#bugReportModal" data-toggle="modal">Report error</a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 	</span>
+	<form class="form-horizontal" action="/public/web/dart_scheduler" method="POST">
+      <input type="hidden" data-bind="value: JSON.stringify(json)" name="json"></input>
+      <button type="submit" class="btn btn-primary" >Sneak preview on client-side scheduler</button>
+    </form>
+	
 	<div>&nbsp</div>
 </div>
 </div>
