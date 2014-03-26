@@ -23,7 +23,7 @@
    	</span>
 </section>
 
-<div data-bind="if: schema != null">
+<div data-bind="if: model.hasSchema()">
 <section id="schema">
   <div class="page-header">
     <h1>    
@@ -434,6 +434,13 @@
 	for (var i = 0; i < json.foretagsrepresentanter.length; i++) {
 	    var f = json.foretagsrepresentanter[i];
 		model.foretagsrepresentanter.push(new Foretagsrepresentant(f));
+	}
+	model.hasSchema = function(){
+		if (!model.schema) return false;
+		if (!model.schema.sessioner) return false;
+		if (!model.schema.sessioner().length >0) return false;
+		
+		return true;
 	}
 	var ändrat = function(){
 		if (finnsEttSchemaAttSpara){
