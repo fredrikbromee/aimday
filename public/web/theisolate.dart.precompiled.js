@@ -258,8 +258,7 @@ yQ:function(a,b){var z,y,x,w,v,u
 z=null
 y=null
 try{y=G.YP(C.xr.kV(a))
-y.gBA()
-y.gBA().m8(y)
+if(y.gBA()!=null)y.gBA().m8(y)
 z=M.fh(y)}catch(w){v=H.Ru(w)
 x=v
 P.JS("JSON encoding exception: "+H.d(x))
@@ -1715,7 +1714,7 @@ $.S6=z}$.k8=null},
 BG:[function(){var z
 try{P.Cx()}catch(z){H.Ru(z)
 P.jL(C.ny,P.qZ())
-$.S6=$.S6.gaw()
+$.S6=$.S6.aw
 throw z}},"call$0","qZ",0,0,1],
 IA:function(a){var z,y
 z=$.k8
@@ -2021,7 +2020,7 @@ z.a=w
 w.E6(a,b)}P.HZ(z.a,this.HZ)},
 call$1:function(a){return this.call$2(a,null)}},
 OM:{
-"^":"a;FR,aw@",
+"^":"a;FR,aw",
 Ki:function(){return this.FR.call$0()}},
 qh:{
 "^":"a;",
@@ -2914,7 +2913,6 @@ if(y<0||y>=x.length)return H.e(x,y)
 b.call$1(x[y])
 if(z!==this.qT)H.vh(P.a4(this))}},
 gB:function(a){return(this.HV-this.av&this.v5.length-1)>>>0},
-h:function(a,b){this.NZ(b)},
 v7:function(a,b){var z,y,x,w
 z=this.qT
 y=this.av
@@ -3775,22 +3773,26 @@ if(y.qD(a)!=null)return y}return},
 qD:function(a){var z,y
 for(z=this.Ep,z=new H.a7(z,z.length,0,null);z.G();){y=z.lo.qD(a)
 if(y!=null)return y}return},
-U9:function(){var z,y,x,w,v,u,t,s
-z=new G.VU(null,null,null,null)
-y=H.VM([],[G.cR])
-for(x=this.Ep,x=new H.a7(x,x.length,0,null);x.G();)y.push(x.lo.U9())
-z.MK=y
-w=H.VM([],[J.O])
-x=this.oD
-H.rd(x,null)
-for(x=this.oD,x=new H.a7(x,x.length,0,null);x.G();){v=x.lo
-u=v.gjO()
-w.push(v.gRV()?J.WB(u,"*"):u)}z.oD=w
-t=H.VM([],[J.O])
-for(x=this.IG(),x=new H.a7(x,x.length,0,null);x.G();){s=x.lo
-t.push(H.d(s.zU().gna())+" enrolled in "+s.cJ.K8().length+" questions, was placed in "+s.BA.hr+" questions "+s.cp())}H.rd(t,null)
-z.fS=t
-return z},
+U9:function(){var z,y,x,w,v,u,t,s,r
+z=Array(0)
+z.fixed$length=init
+y=Array(0)
+y.fixed$length=init
+x=new G.VU(Array(0),z,y,!1)
+w=H.VM([],[G.cR])
+for(z=this.Ep,z=new H.a7(z,z.length,0,null);z.G();)w.push(z.lo.U9())
+x.MK=w
+v=H.VM([],[J.O])
+z=this.oD
+H.rd(z,null)
+for(z=this.oD,z=new H.a7(z,z.length,0,null);z.G();){u=z.lo
+t=u.gjO()
+v.push(u.gRV()?J.WB(t,"*"):t)}x.oD=v
+s=H.VM([],[J.O])
+for(z=this.IG(),z=new H.a7(z,z.length,0,null);z.G();){r=z.lo
+s.push(H.d(r.zU().gna())+" enrolled in "+r.cJ.K8().length+" questions, was placed in "+r.BA.hr+" questions "+r.cp())}H.rd(s,null)
+x.fS=s
+return x},
 NH:function(a){var z,y
 this.tz=null
 this.V3=0
@@ -3875,9 +3877,7 @@ t=s.V3
 r=w.V3
 if(typeof t!=="number")return t.D()
 if(typeof r!=="number")return H.s(r)
-if(t>r){q="\nBetter schedule: \n"+s.bu(0)
-H.qw(q)
-q="\nChanged resp to: \n"+s.bu(0)
+if(t>r){q="\nBetter schedule: \n"+y.bu(0)
 H.qw(q)
 w=s}t=this.HU
 if(typeof t!=="number")return H.s(t)
@@ -4082,7 +4082,6 @@ vn:{
 "^":"a;mt,TX,m9,V3",
 Il:function(a){return C.Nm.tg(this.mt,a)},
 J1:function(a){return C.Nm.tg(this.TX,a)},
-h:function(a,b){this.mt.push(b)},
 bu:function(a){return H.d(this.m9)+" : "+H.d(this.mt)},
 ze:function(){return this.m9},
 IB:function(){return this.mt.length},
@@ -4114,13 +4113,11 @@ z.TJ=this.m9.gjO()
 z.V3=this.V3
 z.QG=H.VM([],[J.O])
 for(y=this.mt,y=new H.a7(y,y.length,0,null);y.G();){x=y.lo
-J.f7(z.QG,x.gjO())}z.T2=H.VM([],[J.O])
+z.QG.push(x.gjO())}z.T2=H.VM([],[J.O])
 for(y=this.TX,y=new H.a7(y,y.length,0,null);y.G();){w=y.lo
-J.f7(z.T2,w.gjO())}return z},
+z.T2.push(w.gjO())}return z},
 $isvn:true}}],["se.aimday.scheduler.api","file:///Users/fredrik.bromee/projects/uu/dartscheduler/web/api.dart",,G,{
 "^":"",
-eN:function(a){if(a==null)return[]
-return a},
 iF:function(a){if(typeof a==="number")return a
 if(a==null||J.xC(a,""))return
 return P.C1(a,null)},
@@ -4132,11 +4129,6 @@ z.u(0,"forskare",this.QG)
 z.u(0,"foretagsrepresentanter",this.T2)
 z.u(0,"score",this.V3)
 return z},
-Le:function(a){var z=J.dD(a)
-this.TJ=z.t(a,"frageId")
-this.QG=G.eN(z.t(a,"forskare"))
-this.T2=G.eN(z.t(a,"foretagsrepresentanter"))
-this.V3=z.t(a,"score")},
 $isNM:true},
 kM:{
 "^":"a;jO<,lf<,eR<",
@@ -4164,32 +4156,25 @@ z.ee(a)
 return z}}},
 cR:{
 "^":"a;AK",
-m8:function(a){var z,y
+m8:function(a){var z,y,x
 z=this.AK
 if(z==null)return
 z.toString
 H.Ap(z,new G.fm(a))
 for(z=this.AK,z=new H.a7(z,z.length,0,null);z.G();){y=z.lo
-J.xF(y.gQG(),new G.iL(a))
-J.xF(y.gT2(),new G.EX(a))}},
+x=y.gQG()
+x.toString
+H.Ap(x,new G.iL(a))
+x=y.gT2()
+x.toString
+H.Ap(x,new G.EX(a))}},
 rw:function(){var z,y,x
 z=P.L5(null,null,null,null,null)
 y=H.VM([],[P.L8])
 for(x=this.AK,x=new H.a7(x,x.length,0,null);x.G();)y.push(x.lo.rw())
 z.u(0,"workshops",y)
 return z},
-hm:function(a){var z,y,x,w,v
-z=J.lU(a,"workshops")
-this.AK=H.VM([],[G.NM])
-for(y=J.de(z);y.G();){x=y.gl()
-w=this.AK
-v=new G.NM(null,null,null,null)
-v.Le(x)
-w.push(v)}},
-$iscR:true,
-static:{Ai:function(a){var z=new G.cR(null)
-z.hm(a)
-return z}}},
+$iscR:true},
 fm:{
 "^":"Tp:11;a",
 call$1:function(a){return!this.a.Yo(a.gTJ())}},
@@ -4211,18 +4196,7 @@ z.u(0,"sessioner",y)
 z.u(0,"sparat",this.Ze)
 z.u(0,"unplacedQuestions",this.oD)
 z.u(0,"unsatisfied",this.fS)
-return z},
-Va:function(a){var z,y,x,w
-z=J.dD(a)
-y=z.t(a,"sessioner")
-this.MK=H.VM([],[G.cR])
-for(x=J.de(y);x.G();){w=x.gl()
-this.MK.push(G.Ai(w))}this.oD=z.t(a,"unplacedQuestions")
-this.fS=z.t(a,"unsatisfied")
-this.Ze=z.t(a,"sparat")},
-static:{Gn:function(a){var z=new G.VU(null,null,null,null)
-z.Va(a)
-return z}}},
+return z}},
 PR:{
 "^":"a;Tb<,jO<,ir<,eR<,hN,lf<,FD?,zc?",
 rw:function(){var z=P.L5(null,null,null,null,null)
@@ -4430,8 +4404,7 @@ t=[]
 t.$builtinTypeInfo=[J.P]
 u=new G.PR(null,null,null,null,null,null,u,t)
 u.E2(w)
-v.push(u)}this.BA=G.Gn(z.t(a,"schema"))
-this.HW=G.Ej(z.t(a,"scheduleRequest"))
+v.push(u)}this.HW=G.Ej(z.t(a,"scheduleRequest"))
 y=new G.Kv(null,null,null,null)
 y.L9(z.t(a,"l\u00e5sningar"))
 this.Zo=y},
@@ -4566,7 +4539,6 @@ J.WB=function(a,b){if(typeof a=="number"&&typeof b=="number")return a+b
 return J.Qc(a).g(a,b)}
 J.cO=function(a,b){return J.lG(a).srZ(a,b)}
 J.de=function(a){return J.lG(a).gA(a)}
-J.f7=function(a,b){return J.lG(a).h(a,b)}
 J.lU=function(a,b){if(a.constructor==Array||typeof a=="string")if(b>>>0===b&&b<a.length)return a[b]
 return J.dD(a).t(a,b)}
 J.le=function(a){return J.x(a).gEo(a)}
@@ -5358,8 +5330,6 @@ if(!"name" in OM)OM.name="OM"
 $desc=$collectedClasses.OM
 if($desc instanceof Array)$desc=$desc[1]
 OM.prototype=$desc
-OM.prototype.gaw=function(){return this.aw}
-OM.prototype.saw=function(v){return this.aw=v}
 function qh(){}qh.builtin$cls="qh"
 if(!"name" in qh)qh.name="qh"
 $desc=$collectedClasses.qh
